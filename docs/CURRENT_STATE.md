@@ -17,6 +17,8 @@ Milestone 0 — Project initialization: completado.
 - README con requisitos, instalación, ejecución, pruebas y estructura.
 - `.gitignore` excluye entorno virtual, cachés, artefactos y archivos `.env` locales.
 - Git inicializado en la rama `main`; el cierre se registra en el primer commit local.
+- Remoto `origin`: `https://github.com/luissm01/biomedical-evidenceops.git`.
+  Configurado por el desarrollador; la publicación mediante push no está confirmada.
 - `AGENTS.md` y documentación de contexto, aprendizaje, decisiones y roadmap.
 
 ## Verificación
