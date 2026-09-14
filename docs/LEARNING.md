@@ -273,7 +273,9 @@ Las fixtures, `monkeypatch`, `yield` y la parametrización se han explicado sobr
 los tests existentes. Su comprensión práctica aún no se ha confirmado; no se
 consideran dominados por haber leído la explicación. El agente ha verificado
 la primera ejecución remota de GitHub Actions; queda pendiente que el desarrollador
-revise el workflow y sus resultados. También se ha introducido el flujo milestone,
+revise en profundidad el workflow y sus resultados si lo necesita. Las dos PRs
+se han integrado desde GitHub; esto no demuestra por sí solo dominio de CI.
+También se ha introducido el flujo milestone,
 issue, rama y PR; su creación automática no implica dominio práctico.
 
 Concepts pending

@@ -9,6 +9,8 @@ Milestone 0 — Project initialization: completado.
 Fase 1 — Software Engineering Foundations: registro y consulta de preguntas
 implementados y probados. El desarrollador ha confirmado comprender los modelos,
 la validación y el recorrido de los endpoints tras la explicación guiada.
+Testing y CI completados e integrados en main mediante PR #3 y PR #4.
+Las issues #1 y #2 están cerradas; Fase 1 continúa.
 
 ## Implementado
 
@@ -37,8 +39,7 @@ la validación y el recorrido de los endpoints tras la explicación guiada.
 - `.github/workflows/ci.yml`: workflow CI para pushes y pull requests, con
   un trabajo Tests en Ubuntu, Python desde `.python-version` y uv 0.11.29.
   Ejecuta `uv sync --locked --dev` y `uv run --locked pytest`; acciones fijadas
-  por SHA y permisos de lectura. Publicado en la rama de CI; primera ejecución
-  remota correcta, pendiente de revisión e integración en main.
+  por SHA y permisos de lectura. Integrado en main y verificado en GitHub.
 - `.gitignore` excluye entorno virtual, cachés, artefactos y archivos `.env` locales.
 - Git inicializado en la rama `main`; Milestone 0 registrado en el commit `14bebbb`.
 - Remoto `origin`: `https://github.com/luissm01/biomedical-evidenceops.git`.
@@ -48,33 +49,24 @@ la validación y el recorrido de los endpoints tras la explicación guiada.
 
 ## Verificación
 
-- El desarrollador ha probado el endpoint mediante curl.
-- Experimento de regresión completado: cambiar el cuerpo a `{"status": "error"}`
-  provoca un fallo en la comparación del JSON, manteniendo el estado HTTP 200.
-- El desarrollador ha restaurado `{"status": "ok"}` y confirmado que pytest pasa.
-- Verificación del agente tras restaurar el endpoint: **1 passed, 1 warning**.
-  Se ejecutó `uv run --cache-dir /tmp/evidenceops-uv-cache --offline pytest`
-  fuera del entorno restringido, donde la ejecución inicial quedó esperando.
-- El aviso por utilizar httpx ha desaparecido tras migrar a httpx2.
-- Revisión del 2026-09-13: **1 passed, 1 warning** al ejecutar pytest con uv
-  fuera del entorno restringido. Dentro de este volvió a quedar esperando.
-- Revisión tras incorporar `HealthCheckResponse`: **1 passed, 1 warning**.
-  Comprobaciones adicionales del agente: el modelo rechaza un campo `status`
-  ausente y el valor `"error"`; OpenAPI enlaza la respuesta con el modelo y
-  declara `status` obligatorio con valor constante `"ok"`.
-- Tras declarar Pydantic directamente: `uv run --locked --offline pytest`
-  fuera del entorno restringido termina con **1 passed, 1 warning**.
-  La actualización del lockfile no cambia las versiones de los paquetes.
-- Tras implementar preguntas: **16 passed, 1 warning** con
-  `uv run --locked --offline pytest` fuera del entorno restringido.
-- Preparación de CI: sincronización con `--locked --dev --offline` correcta;
-  suite de nuevo con **16 passed, 1 warning**, Python 3.14.4 y uv 0.11.29,
-  fuera del sandbox. Se utilizó la caché `/tmp/evidenceops-uv-cache`.
-  YAML parseado correctamente y `git diff --check` sin errores.
-- CI remoto por push verificado: [ejecución 34822739721](https://github.com/luissm01/biomedical-evidenceops/actions/runs/34822739721),
-  commit `4e5c831`, **16 passed, 1 warning**, Python 3.14.7 y uv 0.11.29.
-  `.python-version` fija la serie 3.14, no su versión de parche; localmente se
-  verificó con 3.14.4. El aviso de Starlette sigue visible.
+- Suite actual: **16 passed, 1 warning**. Incluye salud y 15 casos de preguntas.
+- Local: Python 3.14.4, uv 0.11.29; sincronización correcta con
+  `uv sync --locked --dev --cache-dir /tmp/evidenceops-uv-cache --offline` y
+  pruebas con `uv run --locked --cache-dir /tmp/evidenceops-uv-cache --offline pytest`.
+  TestClient queda esperando dentro del sandbox; fuera termina correctamente.
+  No interpretar esa espera como fallo de una assertion ni cambiar tests por ello.
+- GitHub Actions: Python 3.14.7, uv 0.11.29; 16 tests correctos y el mismo aviso.
+  Eventos verificados sobre `db1efd3`:
+  [push](https://github.com/luissm01/biomedical-evidenceops/actions/runs/34822825578) y
+  [pull request](https://github.com/luissm01/biomedical-evidenceops/actions/runs/34822828806).
+  Estos enlaces son evidencia de ese commit; los commits posteriores de
+  documentación disparan nuevas ejecuciones que deben consultarse antes del merge.
+- CI de main tras integrar ambas PRs: [ejecución 34822948154](https://github.com/luissm01/biomedical-evidenceops/actions/runs/34822948154),
+  commit `a9cd353`, resultado correcto.
+- `.python-version` fija la serie 3.14, no su versión de parche.
+- YAML parseado correctamente y `git diff --check` sin errores.
+- Regresión de /health trabajada por el desarrollador: observó fallar el test al
+  devolver `error` en lugar de `ok`, restauró el código y confirmó que pasaba.
 
 ## Limitaciones y aviso conocido
 
@@ -87,29 +79,49 @@ Starlette utiliza el alias obsoleto `anyio.abc.BlockingPortal`, que genera un
 `DeprecationWarning`. No impide que la prueba pase. Revisar su resolución cuando
 corresponda actualizar dependencias; no se ha ocultado ni modificado código de terceros.
 
-## Próximo paso
+## Cierre de sesión y siguiente misión
 
-La tarea de modelos y endpoints queda cerrada tras la revisión del desarrollador.
-La misión de testing y CI tiene el workflow publicado y una ejecución remota correcta.
-Se han explicado los tests, su aislamiento y el recorrido de ejecución del
-sistema; el desarrollador ha autorizado avanzar a la preparación de CI.
+**Testing y CI completados.** El desarrollador ha integrado las PRs desde GitHub:
+- [PR #3](https://github.com/luissm01/biomedical-evidenceops/pull/3): preguntas y tests,
+  integrada en main; [issue #1](https://github.com/luissm01/biomedical-evidenceops/issues/1) cerrada.
+- [PR #4](https://github.com/luissm01/biomedical-evidenceops/pull/4): GitHub Actions,
+  integrada en main; [issue #2](https://github.com/luissm01/biomedical-evidenceops/issues/2) cerrada.
+- [Milestone Fase 1](https://github.com/luissm01/biomedical-evidenceops/milestone/1)
+  sigue abierto: estas dos issues no representan todo el alcance de la fase.
 
-El trabajo está organizado en el milestone [Fase 1](https://github.com/luissm01/biomedical-evidenceops/milestone/1):
-- [Issue #1](https://github.com/luissm01/biomedical-evidenceops/issues/1): preguntas,
-  rama `feat/1-question-api`, con commits separados para la política de aprendizaje
-  previa y para los endpoints con sus tests. [PR #3](https://github.com/luissm01/biomedical-evidenceops/pull/3), base main.
-- [Issue #2](https://github.com/luissm01/biomedical-evidenceops/issues/2): testing y CI,
-  rama `ci/2-github-actions`, basada en la anterior para ejecutar los 16 tests.
-  [PR #4](https://github.com/luissm01/biomedical-evidenceops/pull/4), base `feat/1-question-api`.
+Main remoto está en `a9cd353` al verificar el cierre. El agente detectó los merges
+al consultar GitHub; no los realizó. La rama local de cierre es
+`docs/session-handoff`, basada en ese main, con esta actualización documental.
+Antes de comenzar, consultar su PR y sincronizar main según el estado real.
+No recrear las issues ni repetir la implementación de preguntas o CI.
 
-Siguiente paso: revisar las dos PRs con el desarrollador.
-Integrar primero preguntas en main; después actualizar la base de la PR de CI
-hacia main y comprobar sus tests antes de integrarla. No se ha autorizado ni
-realizado el merge. Las issues permanecen abiertas hasta completar la revisión.
+**Siguiente misión propuesta: configuración de aplicación y logging básico.**
 
-Preferencia de colaboración: avisar explícitamente al cambiar de tarea grande
-para que el desarrollador pueda continuar en otro chat, dejando aquí un punto
-de continuación concreto.
+Problema inicial: poder distinguir el entorno de ejecución y obtener información
+útil para investigar peticiones y errores sin depender de inspeccionar el código.
+El alcance exacto se acordará al comenzar; todavía no existe una issue ni código
+para esta misión.
+
+Primeros pasos del próximo chat:
+1. Leer AGENTS.md, CURRENT_STATE.md, LEARNING.md y DECISIONS.md. Comprobar estado
+   local, main remoto y CI; resolver primero la integración del cierre documental
+   si sigue pendiente.
+2. Proponer un alcance pequeño: configuración necesaria mediante variables de
+   entorno y logs útiles de la API, sin registrar el texto biomédico por defecto.
+   Explicar el problema y las alternativas antes de escoger herramientas.
+3. Crear una issue en Fase 1 con criterios de cierre, y una rama desde main.
+4. Implementar únicamente el alcance acordado, verificar comportamiento y CI,
+   documentar y abrir PR. No introducir persistencia ni IA por anticipación.
+
+Contexto pedagógico: el desarrollador pidió una explicación estructural del
+sistema antes de continuar. Priorizar problema, piezas y recorrido de ejecución
+antes de detallar sintaxis. Fixtures, monkeypatch y parametrize están explicados,
+pero no se ha confirmado dominio práctico; no convertir su revisión en un examen.
+El agente preparó issues, ramas, commits y PRs; no registrar como dominados todos
+los mecanismos de GitHub únicamente por haberse automatizado.
+
+Preferencia de colaboración: cambiar de chat al pasar a una misión grande,
+dejando un punto de continuación concreto. El roadmap conserva su alcance actual.
 
 ## Alcance pendiente
 
