@@ -1,24 +1,44 @@
 # EvidenceOps — Current State
 
-Última actualización: 2026-09-06.
+Última actualización: 2026-09-14.
 
 ## Milestone actual
 
 Milestone 0 — Project initialization: completado.
 
+Fase 1 — Software Engineering Foundations: registro y consulta de preguntas
+implementados y probados. El desarrollador ha confirmado comprender los modelos,
+la validación y el recorrido de los endpoints tras la explicación guiada.
+
 ## Implementado
 
 - Proyecto Python 3.14 gestionado con uv y estructura `src/evidenceops/`.
 - Configuración en `pyproject.toml`, `.python-version` y `uv.lock`.
-- Dependencias de ejecución: FastAPI y Uvicorn.
+- Dependencias de ejecución: FastAPI, Pydantic y Uvicorn.
+- Pydantic declarado directamente como `pydantic>=2.13.5`; `uv.lock` mantiene
+  la versión `2.13.5` que ya utilizaba FastAPI.
 - Dependencias de desarrollo: pytest y httpx2.
 - `GET /health`: devuelve `200 OK` y `{"status": "ok"}`.
+- `HealthCheckResponse` en `main.py`: modelo Pydantic con `status: Literal["ok"]`,
+  utilizado como tipo de retorno y como `response_model` del endpoint.
 - `tests/test_health.py`: comprueba estado HTTP y cuerpo JSON con TestClient.
+- `POST /questions`: valida `QuestionCreate`, genera un UUID y devuelve `201`,
+  `QuestionResponse` (`id`, `text`) y la cabecera `Location` de consulta.
+- `GET /questions/{question_id}`: devuelve la pregunta con `200`, `404` si el
+  UUID no existe y `422` si el identificador no es un UUID válido.
+- `text`: cadena de 1 a 2.000 caracteres tras quitar espacios de los extremos;
+  los campos adicionales se rechazan. Entradas inválidas devuelven `422`.
+- Almacenamiento temporal en un diccionario por proceso, acordado con el
+  desarrollador. Cada POST válido crea un registro, incluso con texto repetido.
+- `tests/test_questions.py`: 15 casos de creación, recuperación, IDs distintos,
+  límites de longitud, datos inválidos y errores de consulta; almacenamiento
+  aislado por test mediante una fixture.
 - README con requisitos, instalación, ejecución, pruebas y estructura.
 - `.gitignore` excluye entorno virtual, cachés, artefactos y archivos `.env` locales.
-- Git inicializado en la rama `main`; el cierre se registra en el primer commit local.
+- Git inicializado en la rama `main`; Milestone 0 registrado en el commit `14bebbb`.
 - Remoto `origin`: `https://github.com/luissm01/biomedical-evidenceops.git`.
-  Configurado por el desarrollador; la publicación mediante push no está confirmada.
+  El desarrollador ha confirmado la publicación en GitHub; `main` tiene configurado
+  el seguimiento de `origin/main`.
 - `AGENTS.md` y documentación de contexto, aprendizaje, decisiones y roadmap.
 
 ## Verificación
@@ -31,8 +51,23 @@ Milestone 0 — Project initialization: completado.
   Se ejecutó `uv run --cache-dir /tmp/evidenceops-uv-cache --offline pytest`
   fuera del entorno restringido, donde la ejecución inicial quedó esperando.
 - El aviso por utilizar httpx ha desaparecido tras migrar a httpx2.
+- Revisión del 2026-09-13: **1 passed, 1 warning** al ejecutar pytest con uv
+  fuera del entorno restringido. Dentro de este volvió a quedar esperando.
+- Revisión tras incorporar `HealthCheckResponse`: **1 passed, 1 warning**.
+  Comprobaciones adicionales del agente: el modelo rechaza un campo `status`
+  ausente y el valor `"error"`; OpenAPI enlaza la respuesta con el modelo y
+  declara `status` obligatorio con valor constante `"ok"`.
+- Tras declarar Pydantic directamente: `uv run --locked --offline pytest`
+  fuera del entorno restringido termina con **1 passed, 1 warning**.
+  La actualización del lockfile no cambia las versiones de los paquetes.
+- Tras implementar preguntas: **16 passed, 1 warning** con
+  `uv run --locked --offline pytest` fuera del entorno restringido.
+## Limitaciones y aviso conocido
 
-## Aviso conocido
+Las preguntas se pierden al reiniciar o recargar el servidor y no se comparten
+entre procesos. El almacenamiento no tiene límite de registros; esta versión
+está destinada a desarrollo local temporal con un único proceso. No hay todavía
+persistencia, búsqueda de evidencia ni generación de respuestas.
 
 Starlette utiliza el alias obsoleto `anyio.abc.BlockingPortal`, que genera un
 `DeprecationWarning`. No impide que la prueba pase. Revisar su resolución cuando
@@ -40,16 +75,27 @@ corresponda actualizar dependencias; no se ha ocultado ni modificado código de 
 
 ## Próximo paso
 
-Al retomar, revisar el cierre de Milestone 0 y acordar el primer objetivo pequeño
-de la fase de fundamentos de software. Todavía no se ha decidido el siguiente
-endpoint ni se ha autorizado implementar fases posteriores.
+Trabajo organizado en el milestone [Fase 1](https://github.com/luissm01/biomedical-evidenceops/milestone/1).
+La [issue #1](https://github.com/luissm01/biomedical-evidenceops/issues/1) recoge
+el registro y consulta de preguntas; implementación y tests preparados en
+`feat/1-question-api`, pendientes de revisión e integración en main.
+La [issue #2](https://github.com/luissm01/biomedical-evidenceops/issues/2) recoge
+testing y CI: el workflow se incorporará en una PR posterior basada en esta rama.
+Se han explicado los tests y el recorrido del sistema; queda pendiente revisar
+la ejecución remota de CI. No se consideran aprendidos automáticamente los
+mecanismos de fixtures ni GitHub Actions.
+
+Preferencia de colaboración: avisar explícitamente al cambiar de tarea grande
+para que el desarrollador pueda continuar en otro chat, dejando aquí un punto
+de continuación concreto.
 
 ## Alcance pendiente
 
-No existen todavía modelos Pydantic propios, configuración de aplicación,
-logging, Dockerización, CI, base de datos ni componentes de IA.
+No existen todavía configuración de aplicación, logging, Dockerización,
+base de datos ni componentes de IA.
 RAG, tools, agentes, MCP, observabilidad avanzada y cloud se introducirán cuando
 corresponda según `ROADMAP.md` y las decisiones del desarrollador.
 
 Los conceptos trabajados se mantienen en `LEARNING.md`; las decisiones técnicas,
-en `DECISIONS.md`. En este cierre no cambian el roadmap ni el contexto del proyecto.
+en `DECISIONS.md`. La filosofía de aprendizaje se detalla en `AGENTS.md` y se
+resume en `PROJECT_CONTEXT.md`; el roadmap no cambia.

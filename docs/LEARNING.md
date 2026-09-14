@@ -220,11 +220,65 @@ El desarrollador ha restaurado el endpoint y confirmado que la prueba vuelve a
 pasar. Se completa así el ciclo: comportamiento correcto, fallo deliberado y
 restauración del comportamiento correcto.
 
+Fase 1 — Primer modelo de respuesta
+
+El desarrollador ha razonado que `dict[str, str]` permite distintas claves y
+valores siempre que sean cadenas, y ha implementado `HealthCheckResponse`
+heredando de `BaseModel`, con el campo `status: Literal["ok"]`.
+
+Ha conectado el modelo a `/health` mediante `response_model` y la anotación
+de retorno, y devuelve una instancia creada con `HealthCheckResponse(status="ok")`.
+Primera práctica de campos declarados, restricción a un valor concreto y
+construcción de una instancia como respuesta del endpoint.
+
+Fase 1 — Modelos de entrada, validación y endpoints
+
+Tras solicitar una explicación más detallada, el desarrollador ha confirmado
+comprender el recorrido del código. Se han trabajado:
+
+- Clases Pydantic como tipos propios de datos, herencia de `BaseModel` e instancias.
+- Campos obligatorios, `Field`, límites de longitud y `ConfigDict` para recortar
+  espacios exteriores y rechazar campos extra.
+- Separación entre `QuestionCreate` (texto del cliente) y `QuestionResponse`
+  (identificador generado por el servidor y texto).
+- Validación de entrada de FastAPI anterior al handler: `422` automático y
+  localización del error en `detail`. Se ha localizado el handler de la librería.
+- Diferencia entre entrada inválida (`422`) y recurso no encontrado (`404`).
+- Registro de rutas, parámetros del cuerpo y de la URL, creación de UUID,
+  almacenamiento y consulta en un diccionario, `raise HTTPException`, cabecera
+  `Location` y serialización de la respuesta.
+
+Se ha aclarado que un error al construir una salida en nuestro código es un
+error del servidor, distinto de una petición inválida del cliente. No se ha
+profundizado todavía en validadores personalizados ni en gestión de excepciones.
+
+Fase 1 — Almacenamiento temporal y persistencia
+
+El desarrollador ha considerado suficiente perder las preguntas al reiniciar
+esta primera versión, y ha identificado la necesidad de conservarlas en un
+producto más completo. Se acuerda comenzar con memoria y abordar persistencia
+cuando el proyecto la necesite. No se han trabajado todavía bases de datos ni
+transacciones en EvidenceOps.
+
+Fase 1 — Recorrido de ejecución y pruebas
+
+Se ha revisado con el desarrollador la relación entre uv y el entorno, Uvicorn
+y FastAPI, los modelos Pydantic, el diccionario en memoria y pytest. Tras pedir
+una explicación estructural adicional, ha aceptado continuar hacia CI.
+Se ha explicado el arranque por importación, el registro de rutas y el recorrido
+de una petición: validación, handler, almacenamiento y respuesta. También el
+recorrido de pruebas con TestClient, sin Uvicorn, y el papel de CI al automatizarlas.
+
+Las fixtures, `monkeypatch`, `yield` y la parametrización se han explicado sobre
+los tests existentes. Su comprensión práctica aún no se ha confirmado; no se
+consideran dominados por haber leído la explicación. GitHub Actions queda
+pendiente de revisión del workflow y de su primera ejecución remota.
+
 Concepts pending
 
 Todavía no deben considerarse aprendidos:
 
-Pydantic models;
+Pydantic: validadores personalizados y validación en mayor profundidad;
 dependency injection;
 async Python;
 unit vs integration testing en profundidad;
