@@ -271,8 +271,10 @@ recorrido de pruebas con TestClient, sin Uvicorn, y el papel de CI al automatiza
 
 Las fixtures, `monkeypatch`, `yield` y la parametrización se han explicado sobre
 los tests existentes. Su comprensión práctica aún no se ha confirmado; no se
-consideran dominados por haber leído la explicación. GitHub Actions queda
-pendiente de revisión del workflow y de su primera ejecución remota.
+consideran dominados por haber leído la explicación. El agente ha verificado
+la primera ejecución remota de GitHub Actions; queda pendiente que el desarrollador
+revise el workflow y sus resultados. También se ha introducido el flujo milestone,
+issue, rama y PR; su creación automática no implica dominio práctico.
 
 Concepts pending
 

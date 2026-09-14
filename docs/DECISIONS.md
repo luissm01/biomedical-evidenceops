@@ -186,6 +186,27 @@ local temporal con un único proceso. Cuando se incorpore persistencia se podrá
 conservar el contrato HTTP y reemplazar el acceso al diccionario; no se introduce
 una abstracción Repository por anticipación.
 
+D006 — Seguimiento de trabajo y revisión en GitHub
+
+Status
+
+Accepted.
+
+Problem and decision
+
+Los cambios locales de preguntas y CI se habían acumulado sin seguimiento en
+GitHub. Se acuerda usar un milestone para Fase 1 e issues con criterios de cierre
+para las tareas actuales, ramas de trabajo y PRs antes de integrar en main.
+La documentación del repositorio conserva el contexto técnico y de aprendizaje;
+las issues conservan el estado de entrega. No se crean tareas de fases futuras.
+
+Trade-offs
+
+El seguimiento requiere mantener ambos contextos coherentes, pero permite revisar
+el alcance y la validación de cada cambio. Para separar el trabajo ya acumulado,
+la PR inicial de CI parte de la rama de preguntas; tras integrar preguntas debe
+cambiarse su base a main y comprobar de nuevo CI. Esta dependencia es puntual.
+
 Future decisions
 
 Todavía NO se han tomado decisiones sobre:

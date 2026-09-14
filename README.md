@@ -82,12 +82,37 @@ sin arrancar Uvicorn. Cada test de preguntas utiliza un diccionario vacío propi
 Aviso conocido: Starlette utiliza el alias obsoleto `anyio.abc.BlockingPortal`.
 Puede aparecer un `DeprecationWarning` aunque la prueba pase.
 
+## Integración continua
+
+El workflow [CI](.github/workflows/ci.yml) ejecuta las pruebas en GitHub Actions
+en cada push y pull request. Utiliza Ubuntu, la versión de Python indicada en
+`.python-version` (3.14) y uv 0.11.29.
+
+Para reproducir sus comandos en local:
+
+```bash
+uv sync --locked --dev
+uv run --locked pytest
+```
+
+`--locked` exige que `uv.lock` esté actualizado respecto a `pyproject.toml`;
+si no lo está, el comando falla en lugar de modificarlo automáticamente.
+La sincronización incluye las dependencias de desarrollo necesarias para pytest.
+
+Tras publicar los cambios, abre la pestaña **Actions** del repositorio y revisa
+el workflow **CI**, trabajo **Tests**. Si falla, abre el paso que aparece en rojo:
+un error de instalación ocurre antes de ejecutar los tests y debe investigarse
+por separado de un fallo de sus assertions. Este workflow ejecuta pruebas;
+no despliega la aplicación. La [primera ejecución remota](https://github.com/luissm01/biomedical-evidenceops/actions/runs/34822739721)
+ha pasado los 16 tests, con el aviso conocido de Starlette.
+
 ## Estructura
 
 ```text
 src/evidenceops/       Paquete Python de la aplicación
   main.py             API, modelos y almacenamiento temporal de preguntas
 tests/                Pruebas automatizadas
+.github/workflows/    Automatización de pruebas en GitHub Actions
 docs/                 Contexto, estado, aprendizaje, decisiones y roadmap
 pyproject.toml        Configuración y dependencias declaradas
 uv.lock               Versiones resueltas de las dependencias

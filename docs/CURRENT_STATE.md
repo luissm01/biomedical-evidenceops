@@ -34,6 +34,11 @@ la validación y el recorrido de los endpoints tras la explicación guiada.
   límites de longitud, datos inválidos y errores de consulta; almacenamiento
   aislado por test mediante una fixture.
 - README con requisitos, instalación, ejecución, pruebas y estructura.
+- `.github/workflows/ci.yml`: workflow CI para pushes y pull requests, con
+  un trabajo Tests en Ubuntu, Python desde `.python-version` y uv 0.11.29.
+  Ejecuta `uv sync --locked --dev` y `uv run --locked pytest`; acciones fijadas
+  por SHA y permisos de lectura. Publicado en la rama de CI; primera ejecución
+  remota correcta, pendiente de revisión e integración en main.
 - `.gitignore` excluye entorno virtual, cachés, artefactos y archivos `.env` locales.
 - Git inicializado en la rama `main`; Milestone 0 registrado en el commit `14bebbb`.
 - Remoto `origin`: `https://github.com/luissm01/biomedical-evidenceops.git`.
@@ -62,6 +67,15 @@ la validación y el recorrido de los endpoints tras la explicación guiada.
   La actualización del lockfile no cambia las versiones de los paquetes.
 - Tras implementar preguntas: **16 passed, 1 warning** con
   `uv run --locked --offline pytest` fuera del entorno restringido.
+- Preparación de CI: sincronización con `--locked --dev --offline` correcta;
+  suite de nuevo con **16 passed, 1 warning**, Python 3.14.4 y uv 0.11.29,
+  fuera del sandbox. Se utilizó la caché `/tmp/evidenceops-uv-cache`.
+  YAML parseado correctamente y `git diff --check` sin errores.
+- CI remoto por push verificado: [ejecución 34822739721](https://github.com/luissm01/biomedical-evidenceops/actions/runs/34822739721),
+  commit `4e5c831`, **16 passed, 1 warning**, Python 3.14.7 y uv 0.11.29.
+  `.python-version` fija la serie 3.14, no su versión de parche; localmente se
+  verificó con 3.14.4. El aviso de Starlette sigue visible.
+
 ## Limitaciones y aviso conocido
 
 Las preguntas se pierden al reiniciar o recargar el servidor y no se comparten
@@ -75,15 +89,23 @@ corresponda actualizar dependencias; no se ha ocultado ni modificado código de 
 
 ## Próximo paso
 
-Trabajo organizado en el milestone [Fase 1](https://github.com/luissm01/biomedical-evidenceops/milestone/1).
-La [issue #1](https://github.com/luissm01/biomedical-evidenceops/issues/1) recoge
-el registro y consulta de preguntas; implementación y tests preparados en
-`feat/1-question-api`, pendientes de revisión e integración en main.
-La [issue #2](https://github.com/luissm01/biomedical-evidenceops/issues/2) recoge
-testing y CI: el workflow se incorporará en una PR posterior basada en esta rama.
-Se han explicado los tests y el recorrido del sistema; queda pendiente revisar
-la ejecución remota de CI. No se consideran aprendidos automáticamente los
-mecanismos de fixtures ni GitHub Actions.
+La tarea de modelos y endpoints queda cerrada tras la revisión del desarrollador.
+La misión de testing y CI tiene el workflow publicado y una ejecución remota correcta.
+Se han explicado los tests, su aislamiento y el recorrido de ejecución del
+sistema; el desarrollador ha autorizado avanzar a la preparación de CI.
+
+El trabajo está organizado en el milestone [Fase 1](https://github.com/luissm01/biomedical-evidenceops/milestone/1):
+- [Issue #1](https://github.com/luissm01/biomedical-evidenceops/issues/1): preguntas,
+  rama `feat/1-question-api`, con commits separados para la política de aprendizaje
+  previa y para los endpoints con sus tests. [PR #3](https://github.com/luissm01/biomedical-evidenceops/pull/3), base main.
+- [Issue #2](https://github.com/luissm01/biomedical-evidenceops/issues/2): testing y CI,
+  rama `ci/2-github-actions`, basada en la anterior para ejecutar los 16 tests.
+  [PR #4](https://github.com/luissm01/biomedical-evidenceops/pull/4), base `feat/1-question-api`.
+
+Siguiente paso: revisar las dos PRs con el desarrollador.
+Integrar primero preguntas en main; después actualizar la base de la PR de CI
+hacia main y comprobar sus tests antes de integrarla. No se ha autorizado ni
+realizado el merge. Las issues permanecen abiertas hasta completar la revisión.
 
 Preferencia de colaboración: avisar explícitamente al cambiar de tarea grande
 para que el desarrollador pueda continuar en otro chat, dejando aquí un punto
