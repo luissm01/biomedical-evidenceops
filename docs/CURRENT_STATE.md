@@ -9,7 +9,8 @@ Milestone 0 — Project initialization: completado.
 Fase 1 — Software Engineering Foundations: registro y consulta de preguntas
 implementados y probados. El desarrollador ha confirmado comprender los modelos,
 la validación y el recorrido de los endpoints tras la explicación guiada.
-Testing y CI implementados y verificados en GitHub; falta revisar e integrar las PRs.
+Testing y CI completados e integrados en main mediante PR #3 y PR #4.
+Las issues #1 y #2 están cerradas; Fase 1 continúa.
 
 ## Implementado
 
@@ -38,8 +39,7 @@ Testing y CI implementados y verificados en GitHub; falta revisar e integrar las
 - `.github/workflows/ci.yml`: workflow CI para pushes y pull requests, con
   un trabajo Tests en Ubuntu, Python desde `.python-version` y uv 0.11.29.
   Ejecuta `uv sync --locked --dev` y `uv run --locked pytest`; acciones fijadas
-  por SHA y permisos de lectura. Publicado en la rama de CI; primera ejecución
-  remota correcta, pendiente de revisión e integración en main.
+  por SHA y permisos de lectura. Integrado en main y verificado en GitHub.
 - `.gitignore` excluye entorno virtual, cachés, artefactos y archivos `.env` locales.
 - Git inicializado en la rama `main`; Milestone 0 registrado en el commit `14bebbb`.
 - Remoto `origin`: `https://github.com/luissm01/biomedical-evidenceops.git`.
@@ -61,6 +61,8 @@ Testing y CI implementados y verificados en GitHub; falta revisar e integrar las
   [pull request](https://github.com/luissm01/biomedical-evidenceops/actions/runs/34822828806).
   Estos enlaces son evidencia de ese commit; los commits posteriores de
   documentación disparan nuevas ejecuciones que deben consultarse antes del merge.
+- CI de main tras integrar ambas PRs: [ejecución 34822948154](https://github.com/luissm01/biomedical-evidenceops/actions/runs/34822948154),
+  commit `a9cd353`, resultado correcto.
 - `.python-version` fija la serie 3.14, no su versión de parche.
 - YAML parseado correctamente y `git diff --check` sin errores.
 - Regresión de /health trabajada por el desarrollador: observó fallar el test al
@@ -79,56 +81,47 @@ corresponda actualizar dependencias; no se ha ocultado ni modificado código de 
 
 ## Cierre de sesión y siguiente misión
 
-La implementación de modelos y endpoints está revisada a nivel de aprendizaje;
-su entrega mediante PR sigue pendiente.
-La misión de testing y CI tiene el workflow publicado y una ejecución remota correcta.
-Se han explicado los tests, su aislamiento y el recorrido de ejecución del
-sistema; el desarrollador ha autorizado avanzar a la preparación de CI.
+**Testing y CI completados.** El desarrollador ha integrado las PRs desde GitHub:
+- [PR #3](https://github.com/luissm01/biomedical-evidenceops/pull/3): preguntas y tests,
+  integrada en main; [issue #1](https://github.com/luissm01/biomedical-evidenceops/issues/1) cerrada.
+- [PR #4](https://github.com/luissm01/biomedical-evidenceops/pull/4): GitHub Actions,
+  integrada en main; [issue #2](https://github.com/luissm01/biomedical-evidenceops/issues/2) cerrada.
+- [Milestone Fase 1](https://github.com/luissm01/biomedical-evidenceops/milestone/1)
+  sigue abierto: estas dos issues no representan todo el alcance de la fase.
 
-Rama local al cerrar: `ci/2-github-actions`, publicada en origin. `main` conserva
-`9a35c4d`; todavía no contiene los endpoints de preguntas ni CI. No volver a
-implementar estas tareas ni crear issues duplicadas.
+Main remoto está en `a9cd353` al verificar el cierre. El agente detectó los merges
+al consultar GitHub; no los realizó. La rama local de cierre es
+`docs/session-handoff`, basada en ese main, con esta actualización documental.
+Antes de comenzar, consultar su PR y sincronizar main según el estado real.
+No recrear las issues ni repetir la implementación de preguntas o CI.
 
-El trabajo está organizado en el milestone [Fase 1](https://github.com/luissm01/biomedical-evidenceops/milestone/1):
+**Siguiente misión propuesta: configuración de aplicación y logging básico.**
 
-- [Issue #1](https://github.com/luissm01/biomedical-evidenceops/issues/1): preguntas,
-  rama `feat/1-question-api`, con commits separados para la política de aprendizaje
-  previa y para los endpoints con sus tests. [PR #3](https://github.com/luissm01/biomedical-evidenceops/pull/3), base main.
-- [Issue #2](https://github.com/luissm01/biomedical-evidenceops/issues/2): testing y CI,
-  rama `ci/2-github-actions`, basada en la anterior para ejecutar los 16 tests.
-  [PR #4](https://github.com/luissm01/biomedical-evidenceops/pull/4), base `feat/1-question-api`.
+Problema inicial: poder distinguir el entorno de ejecución y obtener información
+útil para investigar peticiones y errores sin depender de inspeccionar el código.
+El alcance exacto se acordará al comenzar; todavía no existe una issue ni código
+para esta misión.
 
-**Primera misión del próximo chat: revisión e integración de las PRs.**
-
-1. Leer AGENTS.md y este documento; comprobar rama, árbol de trabajo y estado
-   remoto de PR #3 y PR #4, por si el desarrollador ha actuado desde GitHub.
-2. Guiar una revisión breve de PR #3: contrato HTTP, límites del almacenamiento
-   y qué comportamientos protegen los tests. Evitar repetir la explicación básica
-   salvo que el desarrollador la necesite.
-3. Revisar PR #4: recorrido del workflow, resultado de Tests y diferencia entre
-   fallo de instalación, test fallido y warning.
-4. Tras la aprobación del desarrollador, integrar primero PR #3. Mantener su rama
-   hasta actualizar la base de PR #4 a main; revisar el diff y CI tras el cambio.
-   Si el método de merge cambia la historia, ajustar la rama de CI preservando
-   sus cambios, sin duplicar los de preguntas.
-5. Integrar PR #4 cuando corresponda, comprobar el estado de las issues #1 y #2,
-   sincronizar main y actualizar este documento. No se ha realizado ni autorizado
-   todavía el merge; la autorización previa cubrió commits, publicación y PRs.
-
-Después de integrar: proponer la siguiente misión de Fase 1, configuración de
-aplicación y logging básico, partiendo de una necesidad concreta de ejecución o
-diagnóstico. Es una propuesta para acordar alcance, no una misión ya iniciada.
-Crear su issue con criterios de cierre antes de implementar. No añadir aún
-persistencia ni componentes de IA ni ampliar el roadmap.
+Primeros pasos del próximo chat:
+1. Leer AGENTS.md, CURRENT_STATE.md, LEARNING.md y DECISIONS.md. Comprobar estado
+   local, main remoto y CI; resolver primero la integración del cierre documental
+   si sigue pendiente.
+2. Proponer un alcance pequeño: configuración necesaria mediante variables de
+   entorno y logs útiles de la API, sin registrar el texto biomédico por defecto.
+   Explicar el problema y las alternativas antes de escoger herramientas.
+3. Crear una issue en Fase 1 con criterios de cierre, y una rama desde main.
+4. Implementar únicamente el alcance acordado, verificar comportamiento y CI,
+   documentar y abrir PR. No introducir persistencia ni IA por anticipación.
 
 Contexto pedagógico: el desarrollador pidió una explicación estructural del
 sistema antes de continuar. Priorizar problema, piezas y recorrido de ejecución
 antes de detallar sintaxis. Fixtures, monkeypatch y parametrize están explicados,
 pero no se ha confirmado dominio práctico; no convertir su revisión en un examen.
+El agente preparó issues, ramas, commits y PRs; no registrar como dominados todos
+los mecanismos de GitHub únicamente por haberse automatizado.
 
-Preferencia de colaboración: avisar explícitamente al cambiar de tarea grande
-para que el desarrollador pueda continuar en otro chat, dejando aquí un punto
-de continuación concreto.
+Preferencia de colaboración: cambiar de chat al pasar a una misión grande,
+dejando un punto de continuación concreto. El roadmap conserva su alcance actual.
 
 ## Alcance pendiente
 
