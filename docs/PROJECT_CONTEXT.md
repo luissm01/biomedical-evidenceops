@@ -154,6 +154,14 @@ No se pretende estudiar meses de teoría antes de construir.
 
 La teoría aparecerá cuando sea necesaria para resolver problemas reales del proyecto.
 
+El trabajo será asistido por IA: el desarrollador debe comprender, revisar,
+modificar y depurar el código, sin necesidad de escribir cada línea ni memorizar
+sintaxis. Las decisiones de arquitectura y AI Engineering requieren participación
+y profundidad; los conceptos ordinarios, una explicación breve aplicada al
+proyecto; el trabajo mecánico puede automatizarse. Evitar preguntas constantes y
+ejercicios repetitivos cuando el patrón ya se entiende. `AGENTS.md` concreta esta
+política para la colaboración diaria.
+
 Project philosophy
 
 Prioridades:

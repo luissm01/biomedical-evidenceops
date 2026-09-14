@@ -100,6 +100,7 @@ Separar:
 
 Runtime
 FastAPI;
+Pydantic (dependencia directa desde su uso en modelos propios);
 Uvicorn.
 Development
 pytest;
@@ -151,6 +152,39 @@ Parte de la arquitectura futura deberá añadirse o refactorizarse posteriorment
 Esto se considera intencional.
 
 No diseñaremos hoy para problemas que todavía no tenemos.
+
+D005 — Registro temporal de preguntas en memoria
+
+Status
+
+Accepted para la primera versión de Fase 1.
+
+Problem
+
+Necesitamos registrar y consultar preguntas para trabajar el contrato de la API.
+El desarrollador considera que conservarlas tras un reinicio no es necesario
+en esta primera versión, aunque sí será útil en un producto más completo.
+
+Options and decision
+
+Un diccionario en memoria permite trabajar este flujo sin gestionar todavía
+una base de datos. El almacenamiento persistente conservaría los registros,
+pero introduciría configuración, esquema y gestión de datos en este incremento.
+Se elige un diccionario por proceso; la tecnología de persistencia queda pendiente.
+
+Contract and trade-offs
+
+`POST /questions` crea un registro con UUID generado por el servidor; devuelve
+`201`, su `id` y `text`, y una cabecera `Location`. `GET /questions/{question_id}`
+permite recuperarlo, con `404` para un UUID ausente y `422` para uno inválido.
+El texto se recorta en sus extremos, admite de 1 a 2.000 caracteres y no se
+aceptan campos extra. Repetir un POST crea otro registro.
+
+Los datos se pierden al reiniciar o recargar el servidor, no se comparten entre
+workers y no se limita aún el número de registros. El alcance es desarrollo
+local temporal con un único proceso. Cuando se incorpore persistencia se podrá
+conservar el contrato HTTP y reemplazar el acceso al diccionario; no se introduce
+una abstracción Repository por anticipación.
 
 Future decisions
 
