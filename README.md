@@ -103,7 +103,8 @@ Tras publicar los cambios, abre la pestaña **Actions** del repositorio y revisa
 el workflow **CI**, trabajo **Tests**. Si falla, abre el paso que aparece en rojo:
 un error de instalación ocurre antes de ejecutar los tests y debe investigarse
 por separado de un fallo de sus assertions. Este workflow ejecuta pruebas;
-no despliega la aplicación. Su primera ejecución remota está pendiente.
+no despliega la aplicación. La [primera ejecución remota](https://github.com/luissm01/biomedical-evidenceops/actions/runs/34822739721)
+ha pasado los 16 tests, con el aviso conocido de Starlette.
 
 ## Estructura
 
