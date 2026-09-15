@@ -1,0 +1,20 @@
+services:
+  postgres:
+    image: postgres:18.6
+    environment:
+      POSTGRES_DB: evidenceops
+      POSTGRES_USER: evidenceops
+      POSTGRES_PASSWORD: evidenceops-local
+    ports:
+      - "5432:5432"
+    volumes:
+      - evidenceops_postgres_data:/var/lib/postgresql
+      - ./docker/postgres/init-test-db.sql:/docker-entrypoint-initdb.d/init-test-db.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U evidenceops -d evidenceops"]
+      interval: 2s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  evidenceops_postgres_data:

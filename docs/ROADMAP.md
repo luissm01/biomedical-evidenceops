@@ -345,3 +345,29 @@ cómo diseñaría herramientas;
 cómo diseñaría un agente;
 cómo escalaría el servicio;
 qué trade-offs existen.
+
+
+Estas son las milestones que vamos a seguir en GitHub:
+Los servicios elegidos deberán poder utilizarse gratis; los milestones de
+cloud y despliegue estudiarán la arquitectura sin depender de servicios
+gestionados de pago ni free tiers temporales.
+M0  Project Foundation
+M1  Production Python & API Foundations
+M2  Application Architecture & Persistence
+M3  First LLM Integration
+M4  Evaluation Foundations
+M5  Observability
+M6  Biomedical Data Ingestion
+M7  Retrieval & Embeddings
+M8  RAG v1
+M9  Advanced Retrieval & RAG Evaluation
+M10 Tool Calling
+M11 Agent Fundamentals
+M12 MCP Integration
+M13 Async Processing & Distributed Systems
+M14 Production Hardening
+M15 Cloud Deployment
+M16 Kubernetes Foundations
+M17 Advanced LLM Engineering
+M18 Fine-tuning & Model Adaptation
+M19 Final Production System & Portfolio
