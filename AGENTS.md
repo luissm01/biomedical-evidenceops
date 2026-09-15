@@ -563,6 +563,26 @@ No corrijas warnings automáticamente si hacerlo requiere cambios significativos
 
 ---
 
+# Tool use and verification
+
+Da por válidas las confirmaciones del desarrollador sobre acciones realizadas
+(por ejemplo, mergear una PR o cerrar una issue). No consultes GitHub ni ejecutes
+comandos únicamente para volver a comprobarlas.
+
+Usa herramientas cuando su resultado sea necesario para la tarea actual.
+Reutiliza el contexto y los resultados disponibles; limita las lecturas al
+alcance relevante y agrupa consultas independientes cuando sea útil. No repitas
+comprobaciones tras una operación cuya respuesta ya confirma el resultado.
+
+Si una consulta necesaria para avanzar revela después una discrepancia,
+resuélvela entonces dentro del alcance autorizado. Comprueba previamente solo
+cuando la siguiente acción dependa materialmente de ese estado o exista un
+riesgo concreto de pérdida de datos. Esto no sustituye los tests pertinentes
+de cambios de comportamiento ni las comprobaciones necesarias para evitar
+duplicados al crear recursos.
+
+---
+
 # Documentation
 
 Los documentos del repositorio forman parte del contexto persistente del proyecto.

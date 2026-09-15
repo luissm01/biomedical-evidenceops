@@ -278,6 +278,31 @@ se han integrado desde GitHub; esto no demuestra por sí solo dominio de CI.
 También se ha introducido el flujo milestone,
 issue, rama y PR; su creación automática no implica dominio práctico.
 
+M3 — Primera inferencia y salida estructurada
+
+El desarrollador realizó manualmente una primera inferencia con Gemini desde
+Python. Separó `system_instruction` de la pregunta, envió el JSON Schema
+derivado de Pydantic y validó el resultado con `model_validate_json`.
+Trabajó `answer` y `limitations`, la expresión de incertidumbre y la distinción
+entre estructura válida y veracidad biomédica. EvidenceOps determina el
+indicador de fuentes externas, que no pertenece a GeneratedContent.
+
+Configuró una API key local en `.env`, fuera de Git, y trabajó los límites
+iniciales de tokens de salida y timeout. Esto no implica todavía dominio de
+presupuestos temporales totales, retries o gestión de secretos en producción.
+
+M3 — Frontera del proveedor y errores comunes
+
+El desarrollador eligió un `Protocol` de una sola operación para sustituir el
+proveedor por un fake y aislar el SDK de la aplicación. Decidió validar dentro
+del cliente y devolver tipos propios. Implementó la base de `GenerationError`,
+sus causas y `raise ... from ...` para conservar la excepción original.
+La clasificación exhaustiva de fallos se trabajará en #11.
+
+El cierre de recursos y los tests con transporte simulado se consolidaron en
+la revisión asistida de #9. Su implementación automática no acredita todavía
+aprendizaje práctico de lifecycle ni mocking.
+
 Concepts pending
 
 Todavía no deben considerarse aprendidos:

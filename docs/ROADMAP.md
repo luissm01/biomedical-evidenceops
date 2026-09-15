@@ -371,3 +371,33 @@ M16 Kubernetes Foundations
 M17 Advanced LLM Engineering
 M18 Fine-tuning & Model Adaptation
 M19 Final Production System & Portfolio
+
+## M3 — First LLM Integration: alcance detallado
+
+Objetivo: generar una primera respuesta estructurada a una pregunta registrada,
+con un LLM detrás de un límite de aplicación sencillo y comprobable.
+
+Secuencia de trabajo:
+
+1. #8: acordar el contrato de generación efímera para una pregunta persistida y
+   elegir con el desarrollador un modelo Gemini utilizable gratis (completada).
+2. #9: integrar Gemini con configuración validada, salida estructurada, frontera
+   mínima, lifecycle y pruebas sin red; primera llamada real realizada.
+3. #10: conectar el generador con la API y las preguntas persistidas, manteniendo
+   breve el acceso a PostgreSQL.
+4. #11: completar errores, timeouts, presupuesto total y política de retries;
+   validar y documentar el flujo completo.
+
+Criterio de cierre: flujo documentado y ejecutable con Gemini, contrato
+estructurado validado, fallos controlados y tests deterministas en CI sin
+credenciales ni inferencias reales. La demostración manual comprueba la
+integración, sin demostrar todavía calidad factual.
+
+Por decisión explícita del desarrollador, Gemini es el único proveedor de M3.
+Ollama queda aplazado hasta que exista una necesidad de comparación, posiblemente
+en Evaluation. No se altera la secuencia canónica de milestones.
+
+La respuesta inicial no incorpora evidencia recuperada ni citas verificadas.
+Evaluation sistemática corresponde a M4; observabilidad a M5; ingestion,
+retrieval, RAG, tools, agentes y workers quedan en sus milestones respectivos.
+No se introduce un framework de orquestación ni persistencia de respuestas.
