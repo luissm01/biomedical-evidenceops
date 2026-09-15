@@ -207,12 +207,100 @@ el alcance y la validación de cada cambio. Para separar el trabajo ya acumulado
 la PR inicial de CI parte de la rama de preguntas; tras integrar preguntas debe
 cambiarse su base a main y comprobar de nuevo CI. Esta dependencia es puntual.
 
+D007 — PostgreSQL local para la primera persistencia duradera
+
+Status
+
+Accepted.
+
+Problem
+
+El diccionario por proceso pierde las preguntas al reiniciar y no representa
+una dependencia de datos compartida por varias instancias de la aplicación.
+Necesitamos persistencia duradera sin depender de servicios de pago.
+
+Options and decision
+
+SQLite ofrece persistencia transaccional con una puesta en marcha mínima, pero
+su ejecución embebida no permite trabajar varios aspectos relevantes de una
+base de datos de producción. PostgreSQL introduce un servicio independiente,
+conexiones, configuración y una estrategia de testing más exigente.
+
+Se elige PostgreSQL ejecutado localmente. No se utilizará una base de datos
+gestionada, una tarjeta de crédito ni un free tier temporal. El desarrollador
+prefiere asumir la complejidad local para aprender una arquitectura más
+representativa de producción.
+
+Trade-offs
+
+La aplicación necesitará una instancia local de PostgreSQL y más configuración
+que con SQLite. A cambio, trabajaremos límites reales entre procesos,
+concurrencia, conexiones y transacciones. Esta decisión también evita una
+migración inmediata desde una base embebida, sin autorizar todavía `pgvector`
+ni componentes de retrieval de milestones futuros.
+
+D008 — SQLAlchemy ORM síncrono, Psycopg y Alembic
+
+Status
+
+Accepted.
+
+Problem
+
+Necesitamos integrar PostgreSQL con Python, definir los límites transaccionales
+y evolucionar el esquema sin mezclar estas responsabilidades con los modelos
+del contrato HTTP.
+
+Options and decision
+
+Se consideraron SQL directo mediante Psycopg, SQLAlchemy Core y SQLAlchemy ORM.
+El acceso directo ofrece máxima visibilidad sobre SQL y transacciones, mientras
+que el ORM introduce el patrón habitual de mapeo y sesiones en aplicaciones
+Python. El desarrollador elige SQLAlchemy ORM para aprender este patrón; Psycopg
+será el driver y Alembic gestionará las migraciones.
+
+La integración inicial será síncrona. Cada petición que acceda a datos recibirá
+su propia `Session`; las escrituras harán `commit` explícito y los errores
+provocarán `rollback`. No se compartirá una sesión entre peticiones.
+
+Trade-offs
+
+El ORM añade conceptos y puede ocultar el SQL emitido si no se inspecciona.
+La ejecución síncrona bloquea el thread que atiende esa operación mientras
+espera a PostgreSQL, pero mantiene separado el aprendizaje de persistencia del
+modelo async. Este se trabajará cuando exista una necesidad concreta en M13.
+No se introduce todavía un Repository Pattern: los handlers usan la sesión
+directamente mientras no exista lógica de aplicación que justifique otra capa.
+
+D009 — Fallar al arrancar si PostgreSQL no está disponible
+
+Status
+
+Accepted para M2.
+
+Problem and decision
+
+`GET /health` comprueba que el proceso responde, pero no tenemos todavía
+readiness para expresar una dependencia de datos inaccesible. Si la API
+arrancase con PostgreSQL caído, parecería sana mientras sus endpoints
+principales fallan. El desarrollador considera razonable arrancar en modo
+degradado cuando exista readiness; para M2 acuerda fallar temprano.
+
+Durante startup se ejecuta `SELECT 1` sobre una conexión real. Si falla,
+Uvicorn no acepta tráfico y el Engine se cierra. Las migraciones siguen siendo
+una operación explícita separada del arranque.
+
+Trade-offs
+
+Una caída temporal de PostgreSQL durante startup impide levantar la API.
+Más adelante, M14 puede introducir readiness, recuperación y una política
+de disponibilidad parcial. Esta decisión no obliga a tratar igual una caída
+que ocurra después del arranque.
+
 Future decisions
 
 Todavía NO se han tomado decisiones sobre:
 
-database;
-PostgreSQL;
 vector store;
 embeddings;
 LLM provider;

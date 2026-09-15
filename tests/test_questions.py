@@ -1,17 +1,10 @@
-from collections.abc import Iterator
 from uuid import UUID, uuid4
 
 import pytest
 from fastapi.testclient import TestClient
 
-from evidenceops import main
-
-
-@pytest.fixture
-def client(monkeypatch: pytest.MonkeyPatch) -> Iterator[TestClient]:
-    monkeypatch.setattr(main, "_questions", {})
-    with TestClient(main.app) as test_client:
-        yield test_client
+from evidenceops.config import Settings
+from evidenceops.main import create_app
 
 
 def test_create_and_retrieve_question(client: TestClient) -> None:
@@ -42,6 +35,19 @@ def test_repeated_text_creates_distinct_questions(client: TestClient) -> None:
         retrieved = client.get(created.headers["Location"])
         assert retrieved.status_code == 200
         assert retrieved.json() == created.json()
+
+
+def test_question_survives_application_restart(
+    test_settings: Settings, clean_questions: None
+) -> None:
+    with TestClient(create_app(test_settings)) as first_client:
+        created = first_client.post("/questions", json={"text": "Persistente"})
+
+    with TestClient(create_app(test_settings)) as restarted_client:
+        retrieved = restarted_client.get(created.headers["Location"])
+
+    assert retrieved.status_code == 200
+    assert retrieved.json() == created.json()
 
 
 @pytest.mark.parametrize("text", ["x", "x" * 2000])

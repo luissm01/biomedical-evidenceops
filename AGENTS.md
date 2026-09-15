@@ -649,6 +649,13 @@ El mantenimiento de la documentación forma parte de cada tarea de desarrollo.
 
 Antes de considerar una tarea o sesión terminada, revisa siempre si la documentación necesita actualizarse.
 
+Actualizar la documentación no implica publicarla inmediatamente. Mantén los
+archivos al día en local y agrupa su publicación con los siguientes cambios de
+trabajo cuando convenga. No crees commits, pushes ni PRs exclusivamente para
+actualizar el contexto o cerrar una sesión, salvo petición explícita del usuario.
+Los cambios documentales locales pendientes son intencionales: consérvalos al
+cambiar de rama y no los descartes ni los publiques automáticamente.
+
 ---
 
 ## `docs/CURRENT_STATE.md`
@@ -805,3 +812,140 @@ Si la respuesta es no y es principalmente trabajo mecánico:
 El desarrollador debe entender el 100% de los conceptos importantes.
 
 No necesita escribir manualmente el 100% del código que los utiliza.
+
+
+# Canonical milestone sequence
+
+EvidenceOps follows a predefined learning and development sequence.
+
+The milestone sequence is part of the project architecture and must not drift
+without an explicit decision from the developer.
+
+Current canonical sequence:
+
+1. **M0 — Project Foundation**
+   Repository, uv, project structure, FastAPI basics, health endpoint,
+   testing fundamentals, Git and basic documentation.
+
+2. **M1 — Production Python & API Foundations**
+   Pydantic, request/response contracts, validation, error handling,
+   typing, API design and relevant Python production practices.
+
+3. **M2 — Application Architecture & Persistence**
+   Separation of responsibilities, service boundaries, persistence,
+   PostgreSQL, configuration, database access and migrations when the
+   project creates a real need for them.
+
+4. **M3 — First LLM Integration**
+   Introduce an LLM behind a clean application boundary.
+   Learn model APIs, structured outputs, configuration, failures,
+   timeouts and provider abstraction where justified.
+
+5. **M4 — Evaluation Foundations**
+   Golden datasets, baselines, deterministic evaluation,
+   regression testing, human evaluation and evaluation-driven
+   development.
+
+6. **M5 — Observability**
+   Structured logging, metrics, traces, spans, latency, errors,
+   token/cost tracking and OpenTelemetry / LLM observability concepts.
+
+7. **M6 — Biomedical Data Ingestion**
+   Public biomedical sources, document acquisition, parsing,
+   normalization, metadata and ingestion pipelines.
+
+8. **M7 — Retrieval & Embeddings**
+   Embeddings, similarity search, chunking, vector storage,
+   metadata filtering and retrieval metrics.
+
+9. **M8 — RAG v1**
+   Build the first complete retrieval-augmented generation pipeline
+   using previously learned retrieval and evaluation concepts.
+
+10. **M9 — Advanced Retrieval & RAG Evaluation**
+    BM25, hybrid search, reranking, query rewriting and systematic
+    comparison of retrieval/RAG strategies.
+
+11. **M10 — Tool Calling**
+    Structured tools, JSON schemas, validation, tool selection,
+    retries, permissions, timeouts and error handling.
+
+12. **M11 — Agent Fundamentals**
+    Agent loops, ReAct, state, routing, planner/executor patterns,
+    iteration limits and failure handling before introducing
+    high-level agent frameworks.
+
+13. **M12 — MCP Integration**
+    MCP architecture, clients, servers, tools, resources and prompts.
+    Expose useful EvidenceOps capabilities through MCP.
+
+14. **M13 — Async Processing & Distributed Systems**
+    Workers, queues, asynchronous jobs, retries, idempotency,
+    caching, eventual consistency and practical distributed-system
+    failure modes.
+
+15. **M14 — Production Hardening**
+    Security, authentication/authorization where justified,
+    secrets, rate limiting, resilience, health/readiness checks,
+    operational testing and production failure scenarios.
+
+16. **M15 — Cloud Deployment**
+    Containers, compute, storage, managed databases, IAM,
+    networking, secrets, monitoring and deployment in AWS.
+
+17. **M16 — Kubernetes Foundations**
+    Pods, Deployments, Services, ConfigMaps, Secrets, probes,
+    resources and autoscaling at the level relevant to an AI Engineer.
+
+18. **M17 — Advanced LLM Engineering**
+    Tokenization, transformers, inference, KV cache, quantization
+    and deeper understanding of foundation-model behavior.
+
+19. **M18 — Fine-tuning & Model Adaptation**
+    PEFT, LoRA, QLoRA, dataset preparation, evaluation and explicit
+    comparison between prompting, RAG, tool use and fine-tuning.
+    RLHF/DPO/PPO/GRPO are introduced according to their professional
+    relevance, primarily conceptually unless practical experimentation
+    is justified.
+
+20. **M19 — Final Production System & Portfolio**
+    Integrate and harden EvidenceOps as a coherent product.
+    Final evaluation, architecture documentation, deployment,
+    portfolio-quality README, diagrams and interview preparation.
+
+## Milestone discipline
+
+The current milestone is the primary scope boundary.
+
+Before proposing or implementing work:
+
+1. read `docs/CURRENT_STATE.md` to identify the current milestone;
+2. consult `docs/ROADMAP.md` for the detailed objectives of that milestone;
+3. work only on requirements that belong to the current milestone or are
+   necessary prerequisites for it.
+
+Do not skip milestones simply because a later technology would make the
+current implementation easier.
+
+Do not introduce technologies from future milestones for demonstration,
+experimentation or convenience unless the developer explicitly approves it.
+
+A future milestone may be discussed conceptually when relevant, but discussion
+does not authorize implementation.
+
+If the current task appears to require functionality from a future milestone,
+explain the dependency before implementing it.
+
+GitHub milestones should mirror this canonical sequence.
+
+`docs/ROADMAP.md` is the detailed source of truth for milestone content.
+This section defines the canonical order and scope boundaries.
+
+Any change to the canonical milestone sequence is an architectural/project
+decision and must:
+
+- be explicitly agreed with the developer;
+- update `docs/ROADMAP.md`;
+- update this section of `AGENTS.md`;
+- update the corresponding GitHub milestones when applicable;
+- be recorded in `docs/DECISIONS.md` if the change is significant.
