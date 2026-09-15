@@ -10,8 +10,8 @@ M1 — Production Python & API Foundations: completado. El registro y consulta d
 preguntas, sus contratos y pruebas, y CI están integrados en main mediante las
 PR #3 y #4.
 
-M2 — Application Architecture & Persistence: issue #6 implementada localmente
-en `feat/6-question-persistence`; pendiente de revisión y CI remoto.
+M2 — Application Architecture & Persistence: issue #6 implementada en
+`feat/6-question-persistence`; PR #7 abierta para revisión.
 Se eligió PostgreSQL local frente a SQLite, y SQLAlchemy ORM síncrono con
 Psycopg y Alembic. No se usan servicios de pago.
 
@@ -45,8 +45,9 @@ Psycopg y Alembic. No se usan servicios de pago.
 - `tests/test_config.py`: 6 casos de URL válida, inválida y fallo de arranque.
 - README con requisitos, instalación, ejecución, pruebas y estructura.
 - `.github/workflows/ci.yml`: workflow CI para pushes y pull requests; la
-  rama añade un servicio PostgreSQL, migración explícita y pruebas. Pendiente
-  de ejecución remota para esta rama.
+  rama añade un servicio PostgreSQL efímero, migración explícita y pruebas.
+  El servicio de CI usa autenticación `trust` y URLs sin contraseña fija;
+  GitGuardian pasó tras retirar la contraseña de ejemplo del workflow.
 - `.gitignore` excluye entorno virtual, cachés, artefactos y archivos `.env` locales.
 - Git inicializado en la rama `main`; Milestone 0 registrado en el commit `14bebbb`.
 - Remoto `origin`: `https://github.com/luissm01/biomedical-evidenceops.git`.
@@ -68,7 +69,10 @@ Psycopg y Alembic. No se usan servicios de pago.
   `OperationalError` y código 3; no anunció startup completo.
 - La primera ejecución de Alembic dentro del sandbox falló antes de conectar
   por restricción de red local; fuera del sandbox aplicó la migración.
-- GitHub Actions de esta rama aún no se ha ejecutado.
+- GitHub Actions de la PR #7 sobre `1981efb`: runs
+  [push](https://github.com/luissm01/biomedical-evidenceops/actions/runs/34976823435)
+  y [PR](https://github.com/luissm01/biomedical-evidenceops/actions/runs/34976828608),
+  ambos correctos. GitGuardian Security Checks también pasó.
 
 ## Limitaciones y aviso conocido
 
@@ -95,9 +99,9 @@ frente a ORM, Engine, pool, Session, transacciones, migración, configuración y
 testing. La explicación no demuestra por sí sola comprensión profunda;
 revisar la implementación y la evidencia con el desarrollador.
 
-Siguiente paso inmediato: revisar el diff, confirmar pruebas locales finales,
-crear commit y PR de la issue #6, verificar CI remoto antes de integrar.
-La documentación local pendiente se conserva y se publica con este trabajo.
+Siguiente paso inmediato: revisar la PR #7 con el desarrollador y, tras su
+revisión, integrar y cerrar la issue #6. La documentación local pendiente se
+publicó con este trabajo, no en una PR de cierre independiente.
 El logging se reserva para M5 — Observability.
 
 ## Alcance pendiente
