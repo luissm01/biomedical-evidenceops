@@ -297,13 +297,153 @@ Más adelante, M14 puede introducir readiness, recuperación y una política
 de disponibilidad parcial. Esta decisión no obliga a tratar igual una caída
 que ocurra después del arranque.
 
+D010 — Generación efímera vinculada a preguntas en M3
+
+Status
+
+Accepted para M3; contrato y cliente Gemini implementados en #9.
+La integración HTTP queda para #10.
+
+Problem and decision
+
+Queremos aprender a integrar un LLM con las preguntas existentes sin introducir
+almacenamiento de respuestas. El desarrollador elige generar y devolver:
+recuperar una pregunta persistida, llamar a Gemini, validar el resultado y
+devolverlo por HTTP. La respuesta no se guarda; repetir la operación puede
+producir otra respuesta.
+
+El contrato HTTP acordado es `POST /questions/{question_id}/generate`, sin
+cuerpo de petición. Una operación correcta termina con `200 OK`; un UUID
+inválido devuelve `422` y una pregunta inexistente, `404`, sin llamar al LLM.
+No se crea una tabla `answers` ni una cabecera `Location` para la generación.
+
+El cuerpo correcto incluye `answer: str`, `limitations: list[str]` (que puede
+ser vacía) y `external_sources_consulted: false`. Gemini genera `answer` y
+`limitations`; EvidenceOps establece el indicador de fuentes externas, ya que
+esta operación no consulta ninguna. Pydantic validará el contrato estructural,
+sin determinar la veracidad biomédica. El desarrollador acordó exigir que
+`answer` contenga texto tras quitar espacios exteriores y que cada elemento
+de `limitations` contenga texto; la lista puede estar vacía. Ambos campos son
+obligatorios. No se añaden límites arbitrarios de longitud o número de
+limitaciones en este primer contrato.
+
+Ejemplo de la operación acordada, con una pregunta ya registrada:
+
+```http
+POST /questions/9f4d9b6b-2c4d-4f72-9d24-263412df46aa/generate
+```
+
+```json
+{
+  "answer": "Respuesta generada y validada para la pregunta almacenada.",
+  "limitations": ["No se han consultado fuentes biomédicas externas."],
+  "external_sources_consulted": false
+}
+```
+
+El ejemplo muestra el formato, no una respuesta biomédica evaluada. No se
+envía cuerpo HTTP: EvidenceOps recupera el texto de la pregunta por ID.
+
+El desarrollador redactó la primera instrucción para el modelo: responder con
+claridad y prudencia usando su conocimiento, producir `answer` y limitaciones
+relevantes (incluida información clínica faltante cuando proceda), evitar
+referencias inventadas y no afirmar que consultó fuentes externas. La pregunta
+persistida se enviará separadamente como entrada del usuario. Se pedirá una
+salida estructurada con un esquema real de los dos campos generados y se
+validará de nuevo en EvidenceOps. El texto exacto del prompt aún puede
+ajustarse al revisar el primer resultado real.
+
+Se acordó concretar la precaución sobre referencias: no proporcionar estudios,
+citas, cifras o resultados específicos si no se tiene suficiente certeza y
+expresar incertidumbre cuando corresponda. Esta instrucción no permite al
+modelo verificar hechos por sí mismo.
+
+Trade-offs
+
+La operación es pequeña y permite concentrarse en inferencia y validación.
+No permite recuperar una respuesta anterior ni comparar automáticamente
+generaciones repetidas; esto se decidirá cuando exista una necesidad real.
+Queda pendiente estudiar con el desarrollador cómo evitar retener recursos de
+PostgreSQL mientras espera la llamada a Gemini.
+
+D011 — Gemini como único proveedor de M3
+
+Status
+
+Accepted; actualizada por decisión explícita del desarrollador el 2026-09-15.
+Sustituye el plan anterior de Gemini seguido de Ollama dentro de M3.
+
+Problem and decision
+
+Usar únicamente Gemini mediante `google-genai`, con `gemini-3.6-flash`,
+2.048 tokens máximos de salida y 60 segundos de timeout por petición. El modelo
+es el acordado por el desarrollador para esta integración; se elimina la
+referencia anterior a `gemini-3.8-flash`. El desarrollador configuró la clave
+local y confirmó una primera inferencia estructurada correcta. No se publica
+la clave ni se repite automáticamente la inferencia. El objetivo sigue siendo
+usar la opción gratuita; no se presupone una cuota fija para cada proyecto.
+
+Ollama queda aplazado: podrá reconsiderarse cuando tenga sentido comparar
+modelos en Evaluation, sin comprometer ahora su implementación en M4.
+
+La clave es opcional en Settings mientras los endpoints existentes no usan
+el generador. Una clave ausente o vacía impide la llamada manual con un error
+claro antes de construir el cliente. Modelo, tokens y timeout se validan.
+El propietario del generador reutiliza el cliente y lo cierra al terminar;
+el script lo garantiza con `contextlib.closing`. El lifecycle de FastAPI para
+generación se incorporará con #10, sin hacer inferencia al arrancar.
+
+No se añaden retries propios. Se revisó el SDK 2.23.0: `attempts=0` se normaliza
+a 1 y la ruta Interactions lo interpreta como un reintento. Un 503 simulado
+produce dos intentos; el test registra ese comportamiento sin esperas reales.
+Se conserva la opción pública, sin parches privados ni cambio de API. La
+corrección de esta discrepancia y el presupuesto total se abordarán en #11.
+El timeout actual no es una garantía de duración total de la operación.
+
+Trade-offs
+
+Un proveedor permite cerrar la primera integración con una frontera sencilla.
+La API remota depende de disponibilidad y cuotas externas; la primera llamada
+real demuestra conectividad y formato, no calidad factual. La generación es
+efímera: no se persisten respuestas en PostgreSQL y se solicita `store=False`
+a Interactions. Esto no sustituye las condiciones de tratamiento de datos del
+proveedor. No se incorporan LangChain ni LangGraph.
+
+D012 — Frontera LLM con un Protocol de una operación
+
+Status
+
+Accepted e implementada en #9.
+
+Problem and decision
+
+La generación debe poder sustituirse por un fake en tests y el resto de la
+aplicación no debe depender del SDK Gemini. El desarrollador eligió un
+`Protocol` con `generate(question_text: str) -> GeneratedContent`.
+
+`GeneratedContent` contiene solo `answer` y `limitations`. Gemini recibe un
+JSON Schema derivado de ese modelo y el adaptador vuelve a validar su salida
+con Pydantic. La estructura válida no prueba veracidad. EvidenceOps añadirá
+`external_sources_consulted: false` al construir la respuesta HTTP en #10.
+
+Se adopta `GenerationError` con una causa identificable, sin jerarquía adicional.
+En #9, la validación fallida se traduce a `INVALID_OUTPUT` y el resto de fallos
+a `UNKNOWN`, con exception chaining. Las categorías de timeout, rate limit,
+autenticación e indisponibilidad están declaradas; su clasificación completa
+y el mapping HTTP quedan para #11. No se exponen tipos del SDK en el contrato.
+
+Trade-offs
+
+La frontera añade poco código y permite tests sin proveedor real. La clase
+concreta gestiona el cierre del SDK; el Protocol conserva una sola operación.
+No se añaden factories, registries, managers, repositorios ni frameworks de DI.
+
 Future decisions
 
 Todavía NO se han tomado decisiones sobre:
 
 vector store;
 embeddings;
-LLM provider;
 RAG architecture;
 observability platform;
 queue system;

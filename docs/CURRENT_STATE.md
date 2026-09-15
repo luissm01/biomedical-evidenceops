@@ -4,114 +4,101 @@
 
 ## Milestone actual
 
-M0 — Project Foundation: completado.
+M0, M1 y M2 completados. La persistencia PostgreSQL se integró mediante PR #7.
 
-M1 — Production Python & API Foundations: completado. El registro y consulta de
-preguntas, sus contratos y pruebas, y CI están integrados en main mediante las
-PR #3 y #4.
+Milestone actual: [M3 — First LLM Integration](https://github.com/luissm01/biomedical-evidenceops/milestone/3).
 
-M2 — Application Architecture & Persistence: issue #6 implementada en
-`feat/6-question-persistence`; PR #7 abierta para revisión.
-Se eligió PostgreSQL local frente a SQLite, y SQLAlchemy ORM síncrono con
-Psycopg y Alembic. No se usan servicios de pago.
+- #8, contrato y elección del LLM: completada y ya cerrada en GitHub.
+- #9, cliente y configuración: completada y validada localmente.
+  [PR #12](https://github.com/luissm01/biomedical-evidenceops/pull/12)
+  integra el trabajo y contiene `Closes #9`; la issue se cierra al hacer merge.
+- #10, respuestas estructuradas desde la API: siguiente paso.
+- #11, tratamiento completo de fallos, timeouts y política de retries: pendiente.
 
 ## Implementado
 
-- Proyecto Python 3.14 gestionado con uv y estructura `src/evidenceops/`.
-- Configuración en `pyproject.toml`, `.python-version` y `uv.lock`.
-- Dependencias de ejecución: FastAPI, Pydantic, Uvicorn, SQLAlchemy, Psycopg,
-  Alembic y Pydantic Settings; resueltas en `uv.lock`.
-- Dependencias de desarrollo: pytest y httpx2.
-- `GET /health`: devuelve `200 OK` y `{"status": "ok"}`.
-- `HealthCheckResponse` en `schemas.py`: modelo Pydantic con `status: Literal["ok"]`,
-  utilizado como tipo de retorno y como `response_model` del endpoint.
-- `tests/test_health.py`: comprueba estado HTTP y cuerpo JSON con TestClient.
-- `POST /questions`: valida `QuestionCreate`, genera un UUID y devuelve `201`,
-  `QuestionResponse` (`id`, `text`) y la cabecera `Location` de consulta.
-- `GET /questions/{question_id}`: devuelve la pregunta con `200`, `404` si el
-  UUID no existe y `422` si el identificador no es un UUID válido.
-- `text`: cadena de 1 a 2.000 caracteres tras quitar espacios de los extremos;
-  los campos adicionales se rechazan. Entradas inválidas devuelven `422`.
-- Las preguntas se guardan en PostgreSQL mediante el modelo ORM `Question`.
-  Una `Session` por petición, commit explícito en POST y rollback ante errores.
-  Cada POST válido crea un registro, incluso con texto repetido.
-- `Settings` valida `EVIDENCEOPS_DATABASE_URL` al arrancar. Un `SELECT 1`
-  comprueba la conexión antes de aceptar peticiones.
-- `compose.yaml` ejecuta PostgreSQL 18.6 local con volumen persistente y bases
-  separadas de desarrollo y pruebas. `.env.example` documenta la configuración.
-- Alembic aplica la migración inicial `20260914_01`, que crea `questions`.
-- `tests/test_questions.py`: 16 casos, incluido reinicio de la aplicación.
-  Las fixtures migran y limpian la base `evidenceops_test` entre pruebas.
-- `tests/test_config.py`: 6 casos de URL válida, inválida y fallo de arranque.
-- README con requisitos, instalación, ejecución, pruebas y estructura.
-- `.github/workflows/ci.yml`: workflow CI para pushes y pull requests; la
-  rama añade un servicio PostgreSQL efímero, migración explícita y pruebas.
-  El servicio de CI usa autenticación `trust` y URLs sin contraseña fija;
-  GitGuardian pasó tras retirar la contraseña de ejemplo del workflow.
-- `.gitignore` excluye entorno virtual, cachés, artefactos y archivos `.env` locales.
-- Git inicializado en la rama `main`; Milestone 0 registrado en el commit `14bebbb`.
-- Remoto `origin`: `https://github.com/luissm01/biomedical-evidenceops.git`.
-  El desarrollador ha confirmado la publicación en GitHub; `main` tiene configurado
-  el seguimiento de `origin/main`.
-- `AGENTS.md` y documentación de contexto, aprendizaje, decisiones y roadmap.
+- Python 3.14, uv y estructura `src/evidenceops/`.
+- FastAPI: `GET /health`, `POST /questions` y `GET /questions/{question_id}`.
+  Los contratos HTTP existentes no cambian en #9.
+- Preguntas en PostgreSQL mediante SQLAlchemy síncrono y Psycopg. Una Session
+  por petición, commit explícito y rollback ante errores. Alembic mantiene la
+  migración `20260914_01`. No se guardan respuestas generadas.
+- Configuración Pydantic Settings con prefijo `EVIDENCEOPS_` y `.env` local.
+  La API comprueba PostgreSQL al arrancar; falla si no está disponible.
+- `compose.yaml`: PostgreSQL 18.6 con volumen persistente y bases separadas de
+  desarrollo y pruebas. CI utiliza PostgreSQL efímero.
+- `generation.py`: `Generator` es un Protocol con una operación; devuelve
+  `GeneratedContent(answer, limitations)` o lanza `GenerationError` con causa.
+  Se exige texto no vacío tras recortar espacios; limitations puede ser vacía.
+- `gemini.py`: único proveedor actual, SDK oficial `google-genai` 2.23.0.
+  Instrucción separada de pregunta, JSON Schema derivado del modelo y validación
+  Pydantic posterior. Sin dependencias de FastAPI, PostgreSQL ni tipos HTTP.
+- Modelo inicial `gemini-3.6-flash`, máximo de salida 2.048 tokens y timeout
+  de 60 segundos por petición. Settings valida modelo, tokens y timeout finito.
+  La clave se representa como `SecretStr`, no se versiona y no se imprime.
+- La clave ausente/vacía permite usar la API actual; impide la inferencia manual
+  antes de crear el cliente. No hay inferencia al arrancar ni al importar módulos.
+- Cliente reutilizable con `close()`. `test_gemini.py` utiliza `closing` y solo
+  hace una llamada real al ejecutarlo explícitamente. El desarrollador confirmó
+  que ya realizó una primera inferencia estructurada correcta.
+- Salida inválida se convierte en `INVALID_OUTPUT`; fallos restantes en `UNKNOWN`.
+  Se conserva la causa original. La clasificación exhaustiva pertenece a #11.
+- `store=False` en Interactions; sin persistencia propia de respuestas.
+- Tests del adaptador con SDK real y transporte HTTP simulado: petición,
+  respuesta, validación, cierre, reutilización, mensajes seguros y retries.
+  Tests de configuración y contrato sin credenciales reales ni red.
+- README, `.env.example`, dependencias y lock actualizados. Se conserva la mejora
+  manual de AGENTS.md sobre confianza en confirmaciones y uso acotado de herramientas.
 
-## Verificación
+## Verificación de #9
 
-- Local: **23 passed, 1 warning** contra PostgreSQL 18.6 en Docker Desktop.
-  Los tests de configuración, HTTP y persistencia pasan; la base de pruebas
-  termina con cero preguntas.
-- `alembic upgrade head` creó `questions` y registró `20260914_01`.
-  Consultas SQL directas confirmaron `uuid` y `varchar(2000) NOT NULL`.
-- Demostración HTTP: POST creó una pregunta; tras reiniciar FastAPI, GET la
-  recuperó. La fila sobrevivió también a detener y reiniciar PostgreSQL,
-  porque los datos están en el volumen nombrado.
-- Con PostgreSQL detenido, Uvicorn terminó durante startup con
-  `OperationalError` y código 3; no anunció startup completo.
-- La primera ejecución de Alembic dentro del sandbox falló antes de conectar
-  por restricción de red local; fuera del sandbox aplicó la migración.
-- GitHub Actions de la PR #7 sobre `1981efb`: runs
-  [push](https://github.com/luissm01/biomedical-evidenceops/actions/runs/34976823435)
-  y [PR](https://github.com/luissm01/biomedical-evidenceops/actions/runs/34976828608),
-  ambos correctos. GitGuardian Security Checks también pasó.
+- `uv sync --locked --dev`: correcto (caché en `/tmp/evidenceops-uv-cache` por
+  restricciones de escritura del entorno).
+- Pruebas sin PostgreSQL: **37 passed, 2 warnings**.
+- `uv run --locked alembic upgrade head`: correcto.
+- `uv run --locked pytest`: **54 passed, 2 warnings** contra PostgreSQL.
+- El primer intento falló porque PostgreSQL estaba apagado. Se arrancaron Docker
+  Desktop y el contenedor existente desde el ejecutable de Windows; la repetición
+  de migraciones y suite completa terminó correctamente. La integración del CLI
+  Docker con esta WSL sigue sin estar disponible.
+- `git diff --check`: correcto. `.env` está ignorado y fuera del índice.
+- PR #12 creada hacia `main`; GitGuardian Security Checks y
+  [CI de la PR](https://github.com/luissm01/biomedical-evidenceops/actions/runs/35021207302)
+  pasaron.
+- No se han repetido inferencias reales ni expuesto la clave local.
 
-## Limitaciones y aviso conocido
+## Limitaciones y avisos conocidos
 
-La API depende de PostgreSQL para arrancar. Una caída posterior de PostgreSQL
-todavía produce un error no controlado en los endpoints de datos. No hay aún
-política de readiness ni recuperación; esos conceptos corresponden a M14.
-No hay límite de registros, búsqueda de evidencia ni generación de respuestas.
+No existe todavía endpoint de generación ligado a preguntas persistidas.
+El contrato futuro será `POST /questions/{question_id}/generate`, sin cuerpo:
+`200` con `answer`, `limitations` y `external_sources_consulted: false`, `404`
+para pregunta ausente y `422` para UUID inválido. El indicador de fuentes lo
+establecerá EvidenceOps; no forma parte de GeneratedContent.
 
-Starlette utiliza el alias obsoleto `anyio.abc.BlockingPortal`, que genera un
-`DeprecationWarning`. No impide que la prueba pase. Revisar su resolución cuando
-corresponda actualizar dependencias; no se ha ocultado ni modificado código de terceros.
+**Discrepancia de retries del SDK:** `HttpRetryOptions(attempts=0)` se normaliza
+a 1 y la ruta Interactions lo interpreta como un reintento. El test con 503
+simulado verifica dos intentos sin esperas reales. No hay retries propios ni
+parches de internals. Resolver la política y acotar el tiempo total queda para
+#11; los 60 segundos actuales no son una garantía de duración total.
 
-## Misión actual y siguiente paso
+Dos `DeprecationWarning` de dependencias: Starlette usa
+`anyio.abc.BlockingPortal`; google-genai usa `typing._UnionGenericAlias`,
+previsto para eliminación en Python 3.17. No se ocultan ni se modifica código
+de terceros para resolverlos.
 
-[Issue #6](https://github.com/luissm01/biomedical-evidenceops/issues/6),
-`Persistir las preguntas más allá del proceso de la aplicación`, vinculada
-a M2. El desarrollador creó la milestone y la issue para aprender el flujo de
-GitHub. El agente preparó la rama `feat/6-question-persistence`.
+Una caída de PostgreSQL posterior al arranque aún produce un error no controlado
+en los endpoints de datos. Readiness y recuperación corresponden a M14.
+No hay búsqueda de evidencia, citas verificadas, RAG ni evaluación factual.
 
-El desarrollador eligió PostgreSQL local y SQLAlchemy ORM síncrono con Psycopg
-y Alembic. También decidió que la API fallase al arrancar si PostgreSQL no
-está disponible. Se explicaron el recorrido de la petición, modelos Pydantic
-frente a ORM, Engine, pool, Session, transacciones, migración, configuración y
-testing. La explicación no demuestra por sí sola comprensión profunda;
-revisar la implementación y la evidencia con el desarrollador.
+## Siguiente paso exacto
 
-Siguiente paso inmediato: revisar la PR #7 con el desarrollador y, tras su
-revisión, integrar y cerrar la issue #6. La documentación local pendiente se
-publicó con este trabajo, no en una PR de cierre independiente.
-El logging se reserva para M5 — Observability.
+**#10 — Generar respuestas estructuradas desde la API.** Recuperar la pregunta
+por UUID, liberar recursos de PostgreSQL antes de esperar al proveedor y
+componer la respuesta HTTP usando un fake en tests. No está implementado en #9.
 
-## Alcance pendiente
+Gemini es el único proveedor de M3. Ollama queda aplazado por decisión explícita
+del desarrollador; podría reconsiderarse cuando Evaluation lo justifique.
+La secuencia canónica no cambia. Logging y observabilidad se reservan para M5.
 
-No existen todavía logging propio, Dockerización de la aplicación ni
-componentes de IA. PostgreSQL se ejecuta en Docker local, pero FastAPI sigue
-ejecutándose directamente con uv.
-RAG, tools, agentes, MCP, observabilidad avanzada y cloud se introducirán cuando
-corresponda según `ROADMAP.md` y las decisiones del desarrollador.
-
-Los conceptos trabajados se mantienen en `LEARNING.md`; las decisiones técnicas,
-en `DECISIONS.md`. La filosofía de aprendizaje se detalla en `AGENTS.md` y se
-resume en `PROJECT_CONTEXT.md`; el roadmap no cambia.
+LEARNING.md refleja solo el trabajo real del desarrollador; DECISIONS.md recoge
+el contrato, proveedor y frontera. PROJECT_CONTEXT.md no necesita cambios.
