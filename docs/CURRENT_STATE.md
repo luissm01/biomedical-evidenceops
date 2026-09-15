@@ -9,8 +9,9 @@ M0, M1 y M2 completados. La persistencia PostgreSQL se integró mediante PR #7.
 Milestone actual: [M3 — First LLM Integration](https://github.com/luissm01/biomedical-evidenceops/milestone/3).
 
 - #8, contrato y elección del LLM: completada y ya cerrada en GitHub.
-- #9, cliente y configuración: completada y validada localmente; preparada
-  para cierre mediante PR a main tras verificar CI.
+- #9, cliente y configuración: completada y validada localmente.
+  [PR #12](https://github.com/luissm01/biomedical-evidenceops/pull/12)
+  integra el trabajo y contiene `Closes #9`; la issue se cierra al hacer merge.
 - #10, respuestas estructuradas desde la API: siguiente paso.
 - #11, tratamiento completo de fallos, timeouts y política de retries: pendiente.
 
@@ -61,6 +62,9 @@ Milestone actual: [M3 — First LLM Integration](https://github.com/luissm01/bio
   de migraciones y suite completa terminó correctamente. La integración del CLI
   Docker con esta WSL sigue sin estar disponible.
 - `git diff --check`: correcto. `.env` está ignorado y fuera del índice.
+- PR #12 creada hacia `main`; GitGuardian Security Checks y
+  [CI de la PR](https://github.com/luissm01/biomedical-evidenceops/actions/runs/35021207302)
+  pasaron.
 - No se han repetido inferencias reales ni expuesto la clave local.
 
 ## Limitaciones y avisos conocidos
