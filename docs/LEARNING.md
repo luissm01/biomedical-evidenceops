@@ -303,12 +303,29 @@ El cierre de recursos y los tests con transporte simulado se consolidaron en
 la revisión asistida de #9. Su implementación automática no acredita todavía
 aprendizaje práctico de lifecycle ni mocking.
 
+M3 — Generación desde HTTP (#10)
+
+Se ha trabajado Dependency Injection en FastAPI: recibir un Generator desde
+fuera evita construir el proveedor dentro del handler. `Depends` resuelve
+la dependencia y `app.state` conserva el recurso ligado a la aplicación.
+El Protocol permite que GeminiGenerator y FakeGenerator cumplan el mismo
+contrato; el fake sustituye al servicio externo y registra llamadas en tests.
+
+El lifespan delimita startup y shutdown. Quien crea o adquiere un recurso
+debe normalmente liberarlo; la aplicación cierra su generador propio, pero
+no uno prestado. La Session que recupera el texto se cierra antes de esperar
+al LLM para no retener una conexión/transacción durante una operación lenta.
+
+Se ha aplicado la distinción entre UUID inválido (`422`) y pregunta inexistente
+(`404`), comprobando que ninguno provoca una llamada costosa al generador.
+GeneratedContent representa el resultado interno; GenerationResponse añade
+el dato de fuentes externas que conoce EvidenceOps.
+
 Concepts pending
 
 Todavía no deben considerarse aprendidos:
 
 Pydantic: validadores personalizados y validación en mayor profundidad;
-dependency injection;
 async Python;
 unit vs integration testing en profundidad;
 mocking;

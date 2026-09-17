@@ -19,3 +19,9 @@ class QuestionResponse(BaseModel):
 
     id: UUID
     text: str
+
+
+class GenerationResponse(BaseModel):
+    answer: str
+    limitations: list[str]
+    external_sources_consulted: Literal[False] = False
