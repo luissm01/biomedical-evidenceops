@@ -371,13 +371,15 @@ D011 — Gemini como único proveedor de M3
 
 Status
 
-Accepted; actualizada por decisión explícita del desarrollador el 2026-09-15.
+Accepted; proveedor acordado el 2026-09-15 y política de fiabilidad
+actualizada en #11 el 2026-09-17.
 Sustituye el plan anterior de Gemini seguido de Ollama dentro de M3.
 
 Problem and decision
 
 Usar únicamente Gemini mediante `google-genai`, con `gemini-3.6-flash`,
-2.048 tokens máximos de salida y 60 segundos de timeout por petición. El modelo
+2.048 tokens máximos de salida y 60 segundos de timeout de transporte en cada
+intento, sin presupuesto total exacto. El modelo
 es el acordado por el desarrollador para esta integración; se elimina la
 referencia anterior a `gemini-3.8-flash`. El desarrollador configuró la clave
 local y confirmó una primera inferencia estructurada correcta. No se publica
@@ -394,14 +396,27 @@ el proveedor ni se hace inferencia al arrancar. Modelo, tokens y timeout se
 validan. El script manual detecta la ausencia de clave antes de crear el cliente
 y lo cierra mediante `contextlib.closing`.
 
-No se añaden retries propios. Se revisó el SDK 2.23.0: `attempts=0` se normaliza
-a 1 y la ruta Interactions lo interpreta como un reintento. Un 503 simulado
-produce dos intentos; el test registra ese comportamiento sin esperas reales.
-Se conserva la opción pública, sin parches privados ni cambio de API. La
-corrección de esta discrepancia y el presupuesto total se abordarán en #11.
-El timeout actual no es una garantía de duración total de la operación.
+Política aprobada en #11: cero retries propios; `attempts=1` permite como máximo
+un retry del SDK Interactions 2.23.0 para HTTP 408/500/502/503/504. No se reintentan
+400/401/403/429 ni contenido inválido. Los tests con transporte simulado muestran
+que el SDK traduce timeouts/conexión antes del mecanismo de retries: esos fallos
+no se reintentan. Se conserva este comportamiento más conservador, sin parches
+privados ni otro bucle de retry, respetando el máximo aprobado.
+
+El backoff configurado es 0,5 s sin jitter. El SDK respeta `Retry-After` y
+`retry-after-ms` por encima de `max_delay`. HTTPX aplica el timeout a operaciones
+de transporte, incluida la espera entre fragmentos; no es un deadline global.
+Por tanto, 120,5 segundos no constituye una cota total. Se acepta no introducir
+cancelación externa en M3. Un retry puede repetir una inferencia ya ejecutada
+y consumir cuota adicional: un fallo de confirmación no prueba que no se ejecutó.
 
 Trade-offs
+
+El límite de un retry permite recuperarse de ciertos fallos transitorios sin
+encadenar intentos propios y del SDK. A cambio, puede aumentar latencia y cuota;
+no reintentar 429 devuelve el control al consumidor en lugar de esperar dentro
+de la petición. No añadir cancelación externa mantiene sencilla la integración,
+pero deja explícitamente sin garantizar un límite temporal total.
 
 Un proveedor permite cerrar la primera integración con una frontera sencilla.
 La API remota depende de disponibilidad y cuotas externas; la primera llamada
@@ -429,10 +444,18 @@ con Pydantic. La estructura válida no prueba veracidad. EvidenceOps añade
 interno: es conocimiento de la aplicación sobre su ejecución, no del LLM.
 
 Se adopta `GenerationError` con una causa identificable, sin jerarquía adicional.
-En #9, la validación fallida se traduce a `INVALID_OUTPUT` y el resto de fallos
-a `UNKNOWN`, con exception chaining. Las categorías de timeout, rate limit,
-autenticación e indisponibilidad están declaradas; su clasificación completa
-y el mapping HTTP quedan para #11. No se exponen tipos del SDK en el contrato.
+En #11 se clasifican `TIMEOUT` (transporte/408), `RATE_LIMIT` (429),
+`AUTHENTICATION` (401/403), `PROVIDER_UNAVAILABLE` (conexión/5xx),
+`INVALID_OUTPUT` (contenido inválido) y `UNKNOWN` (errores restantes). Se recorren las causas explícitas
+para encontrar el error de transporte, y los atributos `status_code`/`code`
+para el HTTP, sin importar clases privadas del SDK.
+
+La API traduce esas causas a 504, 429, 503, 503, 502 y 502 respectivamente.
+Credenciales inválidas del proveedor no son un 401 del consumidor: se exponen
+como `generation_unavailable`, igual que indisponibilidad. `detail` contiene
+`code` y `message` fijos; ni la excepción ni su cadena se serializan al cliente.
+La causa original se conserva para diagnóstico interno. No se exponen tipos
+del SDK en el contrato ni se cambia GeneratedContent/Generator.
 
 Trade-offs
 

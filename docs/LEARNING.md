@@ -297,7 +297,8 @@ El desarrollador eligió un `Protocol` de una sola operación para sustituir el
 proveedor por un fake y aislar el SDK de la aplicación. Decidió validar dentro
 del cliente y devolver tipos propios. Implementó la base de `GenerationError`,
 sus causas y `raise ... from ...` para conservar la excepción original.
-La clasificación exhaustiva de fallos se trabajará en #11.
+La clasificación exhaustiva se implementó con asistencia en #11; esto no
+acredita por sí solo dominio de los detalles del SDK.
 
 El cierre de recursos y los tests con transporte simulado se consolidaron en
 la revisión asistida de #9. Su implementación automática no acredita todavía
@@ -320,6 +321,31 @@ Se ha aplicado la distinción entre UUID inválido (`422`) y pregunta inexistent
 (`404`), comprobando que ninguno provoca una llamada costosa al generador.
 GeneratedContent representa el resultado interno; GenerationResponse añade
 el dato de fuentes externas que conoce EvidenceOps.
+
+M3 — Política de fallos (#11)
+
+Se han trabajado y aprobado estos conceptos sobre el flujo de EvidenceOps:
+
+- Frontera proveedor/aplicación: el adaptador traduce errores de Gemini a
+  GenerationError; FastAPI utiliza causas propias sin depender del SDK.
+- Error interno frente a contrato público: conservar la causa permite investigar
+  el fallo, mientras el consumidor recibe un código y mensaje estables. Un fallo
+  de credenciales del proveedor no es un error de autenticación del consumidor.
+- Timeout por intento frente a tiempo total: el timeout de transporte no limita
+  toda la operación. El segundo intento y las esperas pueden alargarla; tampoco
+  equivale a un deadline exacto dentro de cada intento.
+- Retries y coste: no recibir una respuesta no demuestra que la inferencia no
+  se haya ejecutado. Repetirla puede duplicar consumo/cuota y producir otro
+  resultado; se aprueba un máximo de un retry automático, sin retries propios.
+
+El desarrollador confirmó la demostración manual HTTP con Gemini del flujo
+completo. Se distingue de las pruebas automatizadas con transporte simulado
+y no acredita por sí sola calidad factual.
+
+La implementación y los tests se delegaron. Se ha explicado el comportamiento
+observado del SDK (sin retry de transporte y con posibles esperas Retry-After
+superiores al backoff configurado). Esto no acredita dominio de sus internals,
+de cancelación ni de implementación de presupuestos temporales estrictos.
 
 Concepts pending
 

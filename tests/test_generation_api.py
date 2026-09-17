@@ -1,5 +1,10 @@
 from uuid import uuid4
+import pytest
+from unittest.mock import Mock
+
 from fastapi.testclient import TestClient
+
+from evidenceops.generation import GenerationError, GenerationErrorCause
 
 
 def test_generate_answer_for_existing_question(
@@ -68,3 +73,32 @@ def test_database_connection_is_released_before_generation(
     response = client.post(f"/questions/{created.json()['id']}/generate")
     assert response.status_code == 200
     assert fake_generator.calls == ["Pregunta persistida"]
+
+
+@pytest.mark.parametrize("cause,status,code,message", [
+    (GenerationErrorCause.TIMEOUT, 504, "generation_timeout",
+     "Generation did not complete in time"),
+    (GenerationErrorCause.RATE_LIMIT, 429, "generation_rate_limited",
+     "Generation is temporarily rate limited"),
+    (GenerationErrorCause.AUTHENTICATION, 503, "generation_unavailable",
+     "Generation service is unavailable"),
+    (GenerationErrorCause.PROVIDER_UNAVAILABLE, 503, "generation_unavailable",
+     "Generation service is unavailable"),
+    (GenerationErrorCause.INVALID_OUTPUT, 502, "invalid_generation",
+     "Generation service returned an invalid response"),
+    (GenerationErrorCause.UNKNOWN, 502, "generation_failed",
+     "Generation could not be completed"),
+])
+def test_generation_errors_are_safe_http_responses(
+    client, fake_generator, monkeypatch, cause, status, code, message
+):
+    created = client.post("/questions", json={"text": "Pregunta persistida"})
+    error = GenerationError(cause, "private provider detail test-only-key")
+    error.__cause__ = RuntimeError("private chained details")
+    generate = Mock(side_effect=error)
+    monkeypatch.setattr(fake_generator, "generate", generate)
+    response = client.post(f"/questions/{created.json()['id']}/generate")
+    assert response.status_code == status
+    assert response.json() == {"detail": {"code": code, "message": message}}
+    generate.assert_called_once_with("Pregunta persistida")
+    assert client.get(created.headers["Location"]).json() == created.json()

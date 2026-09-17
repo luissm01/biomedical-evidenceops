@@ -10,7 +10,11 @@ from sqlalchemy.orm import Session, sessionmaker
 from evidenceops.config import Settings
 from evidenceops.database import create_database, get_session
 from evidenceops.gemini import GeminiGenerator
-from evidenceops.generation import Generator
+from evidenceops.generation import (
+    GenerationError,
+    GenerationErrorCause,
+    Generator,
+)
 from evidenceops.models import Question
 from evidenceops.schemas import (
     GenerationResponse,
@@ -18,6 +22,53 @@ from evidenceops.schemas import (
     QuestionCreate,
     QuestionResponse,
 )
+
+
+_GENERATION_HTTP_ERRORS = {
+    GenerationErrorCause.TIMEOUT: (
+        504,
+        "generation_timeout",
+        "Generation did not complete in time",
+    ),
+    GenerationErrorCause.RATE_LIMIT: (
+        429,
+        "generation_rate_limited",
+        "Generation is temporarily rate limited",
+    ),
+    GenerationErrorCause.AUTHENTICATION: (
+        503,
+        "generation_unavailable",
+        "Generation service is unavailable",
+    ),
+    GenerationErrorCause.PROVIDER_UNAVAILABLE: (
+        503,
+        "generation_unavailable",
+        "Generation service is unavailable",
+    ),
+    GenerationErrorCause.INVALID_OUTPUT: (
+        502,
+        "invalid_generation",
+        "Generation service returned an invalid response",
+    ),
+    GenerationErrorCause.UNKNOWN: (
+        502,
+        "generation_failed",
+        "Generation could not be completed",
+    ),
+}
+
+
+def _generation_http_exception(error: GenerationError) -> HTTPException:
+    status_code, code, message = _GENERATION_HTTP_ERRORS[error.cause]
+
+    return HTTPException(
+        status_code=status_code,
+        detail={
+            "code": code,
+            "message": message,
+        },
+    )
+
 
 router = APIRouter()
 
@@ -82,7 +133,10 @@ def generate_answer(
     question_text: str = Depends(get_question_text),
     generator: Generator = Depends(get_generator),
 ) -> GenerationResponse:
-    generated = generator.generate(question_text)
+    try:
+        generated = generator.generate(question_text)
+    except GenerationError as exc:
+        raise _generation_http_exception(exc) from exc
 
     return GenerationResponse(
         answer=generated.answer,

@@ -13,9 +13,11 @@ Milestone actual: [M3 — First LLM Integration](https://github.com/luissm01/bio
   completada y cerrada al integrar la
   [PR #12](https://github.com/luissm01/biomedical-evidenceops/pull/12)
   en `main` (`afe430d`).
-- #10, respuestas estructuradas desde la API: implementación y revisión completadas;
-  pendiente de integrar la PR.
-- #11, tratamiento completo de fallos, timeouts y política de retries: pendiente.
+- #10, respuestas estructuradas desde la API: completada; PR #13 integrada.
+- [#11 — Controlar fallos y timeouts y validar la integración completa](https://github.com/luissm01/biomedical-evidenceops/issues/11):
+  implementación, revisión, tests y demostración manual HTTP con Gemini completos.
+  Demostración confirmada por el desarrollador; pendiente de merge de la PR
+  para cerrar la issue y, después, M3.
 
 ## Implementado
 
@@ -36,7 +38,8 @@ Milestone actual: [M3 — First LLM Integration](https://github.com/luissm01/bio
   Instrucción separada de pregunta, JSON Schema derivado del modelo y validación
   Pydantic posterior. Sin dependencias de FastAPI, PostgreSQL ni tipos HTTP.
 - Modelo inicial `gemini-3.6-flash`, máximo de salida 2.048 tokens y timeout
-  de 60 segundos por petición. Settings valida modelo, tokens y timeout finito.
+  de 60 segundos por operación de transporte, sin deadline total.
+  Settings valida modelo, tokens y timeout finito.
   La clave se representa como `SecretStr`, no se versiona y no se imprime.
 - Sin Generator inyectado, la clave ausente/vacía impide arrancar la API.
   No hay inferencia al arrancar ni al importar módulos; startup no comprueba
@@ -44,8 +47,11 @@ Milestone actual: [M3 — First LLM Integration](https://github.com/luissm01/bio
 - Cliente reutilizable con `close()`. `test_gemini.py` utiliza `closing` y solo
   hace una llamada real al ejecutarlo explícitamente. El desarrollador confirmó
   que ya realizó una primera inferencia estructurada correcta.
-- Salida inválida se convierte en `INVALID_OUTPUT`; fallos restantes en `UNKNOWN`.
-  Se conserva la causa original. La clasificación exhaustiva pertenece a #11.
+- Errores propios: TIMEOUT → 504, RATE_LIMIT → 429, AUTHENTICATION y
+  PROVIDER_UNAVAILABLE → 503, INVALID_OUTPUT y UNKNOWN → 502. Mensajes HTTP
+  fijos y seguros; se conserva la excepción original solo internamente.
+- `httpx` se declara como dependencia directa para clasificar errores de
+  transporte. No cambian las versiones resueltas.
 - `store=False` en Interactions; sin persistencia propia de respuestas.
 - Tests del adaptador con SDK real y transporte HTTP simulado: petición,
   respuesta, validación, cierre, reutilización, mensajes seguros y retries.
@@ -60,6 +66,22 @@ Milestone actual: [M3 — First LLM Integration](https://github.com/luissm01/bio
   de la inferencia. UUID inválido (`422`) y pregunta ausente (`404`) no invocan
   al generador. Devuelve `answer`, `limitations` y `external_sources_consulted:
   false`, establecido por EvidenceOps. No persiste respuestas ni hace retrieval.
+
+## Verificación de #11
+
+- `uv sync --locked --dev`: correcto; `httpx` pasa a dependencia directa,
+  sin actualizar versiones de paquetes.
+- Suite completa, `uv run --locked pytest`: **86 passed, 2 warnings** contra
+  PostgreSQL local; incluye API, configuración, contratos, lifecycle y adaptador.
+  Sin inferencias reales, credenciales reales ni esperas de retry en tests.
+- Cobertura de todas las causas y mensajes HTTP, número máximo de intentos,
+  ausencia de retry en 429/autenticación/transporte, Retry-After, recuperación
+  tras 503 y flujo completo HTTP/PostgreSQL/SDK con transporte simulado.
+- Revisión final: corregidos fixtures de salida inválida para usar `steps/content`
+  reales; documentadas discrepancias del SDK y ausencia de deadline total.
+- Demostración manual HTTP con Gemini realizada y confirmada por el desarrollador
+  el 2026-09-17. No se repite la inferencia para verificar su confirmación.
+- `git diff --check`: correcto. `.env` no se modifica.
 
 ## Verificación de #10
 
@@ -92,14 +114,14 @@ Milestone actual: [M3 — First LLM Integration](https://github.com/luissm01/bio
 
 ## Limitaciones y avisos conocidos
 
-El endpoint de generación está implementado. El mapping HTTP de fallos del
-proveedor, timeouts y política de retries siguen pendientes de #11.
-
-**Discrepancia de retries del SDK:** `HttpRetryOptions(attempts=0)` se normaliza
-a 1 y la ruta Interactions lo interpreta como un reintento. El test con 503
-simulado verifica dos intentos sin esperas reales. No hay retries propios ni
-parches de internals. Resolver la política y acotar el tiempo total queda para
-#11; los 60 segundos actuales no son una garantía de duración total.
+SDK 2.23.0: máximo un retry para HTTP 408/500/502/503/504, ninguno para
+400/401/403/429, salida inválida o errores de transporte. El SDK traduce estos
+últimos antes de su mecanismo de retry; se verifica ese comportamiento real.
+No hay retries propios. Un retry puede duplicar consumo/cuota si la primera
+inferencia se ejecutó pero no se recibió su respuesta.
+Backoff de 0,5 s, pero Retry-After/retry-after-ms pueden
+alargarlo. Los timeouts HTTPX no son deadlines: no se garantiza una duración
+total de 120,5 s ni se implementa cancelación externa.
 
 Dos `DeprecationWarning` de dependencias: Starlette usa
 `anyio.abc.BlockingPortal`; google-genai usa `typing._UnionGenericAlias`,
@@ -112,8 +134,9 @@ No hay búsqueda de evidencia, citas verificadas, RAG ni evaluación factual.
 
 ## Siguiente paso exacto
 
-**#11 — Controlar fallos y timeouts y validar la integración completa**.
-No se ha adelantado su implementación.
+Revisión y merge de la PR de #11 por el desarrollador. `Closes #11` cerrará
+la issue al integrar los cambios; después se cerrará M3. La demostración manual
+y la suite completa ya están realizadas. No se inicia M4 automáticamente.
 
 Gemini es el único proveedor de M3. Ollama queda aplazado por decisión explícita
 del desarrollador; podría reconsiderarse cuando Evaluation lo justifique.
