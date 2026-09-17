@@ -1,6 +1,6 @@
 # EvidenceOps — Current State
 
-Última actualización: 2026-09-15.
+Última actualización: 2026-09-17.
 
 ## Milestone actual
 
@@ -13,14 +13,15 @@ Milestone actual: [M3 — First LLM Integration](https://github.com/luissm01/bio
   completada y cerrada al integrar la
   [PR #12](https://github.com/luissm01/biomedical-evidenceops/pull/12)
   en `main` (`afe430d`).
-- #10, respuestas estructuradas desde la API: siguiente paso.
+- #10, respuestas estructuradas desde la API: implementación y revisión completadas;
+  pendiente de integrar la PR.
 - #11, tratamiento completo de fallos, timeouts y política de retries: pendiente.
 
 ## Implementado
 
 - Python 3.14, uv y estructura `src/evidenceops/`.
 - FastAPI: `GET /health`, `POST /questions` y `GET /questions/{question_id}`.
-  Los contratos HTTP existentes no cambian en #9.
+  También `POST /questions/{question_id}/generate`, sin body.
 - Preguntas en PostgreSQL mediante SQLAlchemy síncrono y Psycopg. Una Session
   por petición, commit explícito y rollback ante errores. Alembic mantiene la
   migración `20260914_01`. No se guardan respuestas generadas.
@@ -37,8 +38,9 @@ Milestone actual: [M3 — First LLM Integration](https://github.com/luissm01/bio
 - Modelo inicial `gemini-3.6-flash`, máximo de salida 2.048 tokens y timeout
   de 60 segundos por petición. Settings valida modelo, tokens y timeout finito.
   La clave se representa como `SecretStr`, no se versiona y no se imprime.
-- La clave ausente/vacía permite usar la API actual; impide la inferencia manual
-  antes de crear el cliente. No hay inferencia al arrancar ni al importar módulos.
+- Sin Generator inyectado, la clave ausente/vacía impide arrancar la API.
+  No hay inferencia al arrancar ni al importar módulos; startup no comprueba
+  la validez de la clave contra el proveedor.
 - Cliente reutilizable con `close()`. `test_gemini.py` utiliza `closing` y solo
   hace una llamada real al ejecutarlo explícitamente. El desarrollador confirmó
   que ya realizó una primera inferencia estructurada correcta.
@@ -51,7 +53,27 @@ Milestone actual: [M3 — First LLM Integration](https://github.com/luissm01/bio
 - README, `.env.example`, dependencias y lock actualizados. Se conserva la mejora
   manual de AGENTS.md sobre confianza en confirmaciones y uso acotado de herramientas.
 
-## Verificación de #9
+- Generación HTTP mediante `Depends` y `app.state.generator`: GeminiGenerator
+  en producción y FakeGenerator en tests. El lifespan cierra solo el generador
+  creado por la aplicación; libera el Engine incluso si falla ese cierre.
+- Recupera `question.text` de una pregunta persistida y libera la Session antes
+  de la inferencia. UUID inválido (`422`) y pregunta ausente (`404`) no invocan
+  al generador. Devuelve `answer`, `limitations` y `external_sources_consulted:
+  false`, establecido por EvidenceOps. No persiste respuestas ni hace retrieval.
+
+## Verificación de #10
+
+- `uv sync --locked --dev` y `uv run --locked alembic upgrade head`: correctos.
+
+- `uv run pytest`: **62 passed, 2 warnings**, con acceso a PostgreSQL local.
+  El intento restringido encontró errores de acceso; la ejecución autorizada pasó.
+- Tests HTTP con FakeGenerator, sin clave ni inferencias reales. Se añaden
+  pruebas de ownership, startup sin clave, cierre y devolución de la conexión
+  antes de generar. El test de reinicio también inyecta el fake.
+- `git diff --check`: correcto. `.env` no se modifica ni se incluye en Git.
+- Se mantienen los dos DeprecationWarning conocidos, sin cambios de dependencias.
+
+## Verificación previa de #9
 
 - `uv sync --locked --dev`: correcto (caché en `/tmp/evidenceops-uv-cache` por
   restricciones de escritura del entorno).
@@ -70,11 +92,8 @@ Milestone actual: [M3 — First LLM Integration](https://github.com/luissm01/bio
 
 ## Limitaciones y avisos conocidos
 
-No existe todavía endpoint de generación ligado a preguntas persistidas.
-El contrato futuro será `POST /questions/{question_id}/generate`, sin cuerpo:
-`200` con `answer`, `limitations` y `external_sources_consulted: false`, `404`
-para pregunta ausente y `422` para UUID inválido. El indicador de fuentes lo
-establecerá EvidenceOps; no forma parte de GeneratedContent.
+El endpoint de generación está implementado. El mapping HTTP de fallos del
+proveedor, timeouts y política de retries siguen pendientes de #11.
 
 **Discrepancia de retries del SDK:** `HttpRetryOptions(attempts=0)` se normaliza
 a 1 y la ruta Interactions lo interpreta como un reintento. El test con 503
@@ -93,9 +112,8 @@ No hay búsqueda de evidencia, citas verificadas, RAG ni evaluación factual.
 
 ## Siguiente paso exacto
 
-**#10 — Generar respuestas estructuradas desde la API.** Recuperar la pregunta
-por UUID, liberar recursos de PostgreSQL antes de esperar al proveedor y
-componer la respuesta HTTP usando un fake en tests. No está implementado en #9.
+**#11 — Controlar fallos y timeouts y validar la integración completa**.
+No se ha adelantado su implementación.
 
 Gemini es el único proveedor de M3. Ollama queda aplazado por decisión explícita
 del desarrollador; podría reconsiderarse cuando Evaluation lo justifique.

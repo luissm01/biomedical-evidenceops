@@ -38,12 +38,12 @@ def test_repeated_text_creates_distinct_questions(client: TestClient) -> None:
 
 
 def test_question_survives_application_restart(
-    test_settings: Settings, clean_questions: None
+    test_settings: Settings, clean_questions: None, fake_generator
 ) -> None:
-    with TestClient(create_app(test_settings)) as first_client:
+    with TestClient(create_app(test_settings, generator=fake_generator)) as first_client:
         created = first_client.post("/questions", json={"text": "Persistente"})
 
-    with TestClient(create_app(test_settings)) as restarted_client:
+    with TestClient(create_app(test_settings, generator=fake_generator)) as restarted_client:
         retrieved = restarted_client.get(created.headers["Location"])
 
     assert retrieved.status_code == 200

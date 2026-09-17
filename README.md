@@ -5,8 +5,8 @@ Proyecto de aprendizaje de AI Engineering aplicado a evidencia biomédica públi
 ## Estado
 
 M3: API FastAPI con registro y consulta de preguntas en PostgreSQL, y cliente
-Gemini con salida estructurada validada. Todavía no hay endpoint HTTP de
-generación: esa integración corresponde a #10.
+Gemini con salida estructurada validada mediante
+`POST /questions/{question_id}/generate`.
 
 ## Requisitos e instalación
 
@@ -82,6 +82,28 @@ Las preguntas se almacenan en PostgreSQL y sobreviven al reinicio de la
 aplicación. Alembic mantiene el esquema de la base de datos; una aplicación nueva
 debe ejecutar `uv run alembic upgrade head` antes de atender peticiones.
 
+## Generar una respuesta
+
+Con el UUID de una pregunta registrada, sin body:
+
+```http
+POST /questions/{question_id}/generate
+```
+
+Devuelve `200 OK`:
+
+```json
+{
+  "answer": "Generated biomedical answer.",
+  "limitations": ["Relevant limitation."],
+  "external_sources_consulted": false
+}
+```
+
+Una pregunta inexistente devuelve `404`; un UUID inválido, `422`. Ninguno
+invoca al generador. La respuesta no se persiste y repetir la operación puede
+producir otra respuesta. No se han consultado fuentes biomédicas externas.
+
 ## Primera integración Gemini
 
 El SDK oficial `google-genai` se instala con `uv sync --locked`. Configura en
@@ -90,15 +112,15 @@ El SDK oficial `google-genai` se instala con `uv sync --locked`. Configura en
 
 | Variable | Valor inicial |
 | --- | --- |
-| `EVIDENCEOPS_GEMINI_API_KEY` | Sin valor; necesaria para la llamada manual |
+| `EVIDENCEOPS_GEMINI_API_KEY` | Sin valor; necesaria para arrancar la API y la llamada manual |
 | `EVIDENCEOPS_GEMINI_MODEL` | `gemini-3.6-flash` |
 | `EVIDENCEOPS_GEMINI_MAX_OUTPUT_TOKENS` | `2048` |
 | `EVIDENCEOPS_GEMINI_TIMEOUT_SECONDS` | `60` |
 
 `Settings` exige modelo no vacío, tokens positivos y timeout positivo y finito.
-La clave usa `SecretStr`; una clave vacía se trata como ausente. La API actual
-puede arrancar sin ella: todavía no crea un generador. El script manual detecta
-su ausencia antes de crear el cliente. Las variables de entorno prevalecen
+La clave usa `SecretStr`; una clave vacía se trata como ausente. Sin un generador inyectado, la API
+falla al arrancar si falta la clave; no realiza inferencias durante startup.
+El script manual también detecta su ausencia antes de crear el cliente. Las variables de entorno prevalecen
 sobre `.env`. La configuración común exige también la URL de PostgreSQL,
 aunque esta llamada manual no conecta a la base de datos.
 
@@ -122,7 +144,7 @@ la cadena original es diagnóstica y no debe exponerse como respuesta HTTP.
 
 Se utiliza `interactions.create` con `store=False`. No se guardan respuestas en
 PostgreSQL. Un esquema válido no demuestra veracidad biomédica; no hay búsqueda
-de fuentes externas. En #10 EvidenceOps añadirá `external_sources_consulted: false`
+de fuentes externas. EvidenceOps añade `external_sources_consulted: false`
 al contrato HTTP, fuera de los campos generados por Gemini.
 
 **Limitación del SDK 2.23.0:** aunque se solicita `HttpRetryOptions(attempts=0)`,
@@ -145,7 +167,10 @@ uv run pytest
 
 Las pruebas utilizan `TestClient` y la base dedicada `evidenceops_test` para
 verificar salud, creación, persistencia tras reinicio, IDs distintos, límites de
-longitud y errores. Cada test comienza y termina sin preguntas almacenadas.
+longitud y errores. La generación HTTP utiliza FakeGenerator, sin API key ni
+inferencias reales; se comprueban contrato, llamadas y liberación de PostgreSQL
+antes de generar. También se prueba el ownership del generador durante lifespan.
+Cada test de datos comienza y termina sin preguntas almacenadas.
 
 Aviso conocido: Starlette utiliza el alias obsoleto `anyio.abc.BlockingPortal`.
 El SDK Gemini también avisa del uso de `typing._UnionGenericAlias`, obsoleto

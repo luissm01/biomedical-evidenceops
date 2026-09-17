@@ -301,8 +301,8 @@ D010 — Generación efímera vinculada a preguntas en M3
 
 Status
 
-Accepted para M3; contrato y cliente Gemini implementados en #9.
-La integración HTTP queda para #10.
+Accepted para M3; contrato y cliente Gemini implementados en #9 e integración
+HTTP implementada en #10.
 
 Problem and decision
 
@@ -363,8 +363,9 @@ Trade-offs
 La operación es pequeña y permite concentrarse en inferencia y validación.
 No permite recuperar una respuesta anterior ni comparar automáticamente
 generaciones repetidas; esto se decidirá cuando exista una necesidad real.
-Queda pendiente estudiar con el desarrollador cómo evitar retener recursos de
-PostgreSQL mientras espera la llamada a Gemini.
+La dependencia que recupera `question.text` abre una Session corta y la cierra
+antes de llamar al generador. Así no retiene conexión ni transacción durante
+la espera externa; la generación utiliza el texto recuperado en ese momento.
 
 D011 — Gemini como único proveedor de M3
 
@@ -386,12 +387,12 @@ usar la opción gratuita; no se presupone una cuota fija para cada proyecto.
 Ollama queda aplazado: podrá reconsiderarse cuando tenga sentido comparar
 modelos en Evaluation, sin comprometer ahora su implementación en M4.
 
-La clave es opcional en Settings mientras los endpoints existentes no usan
-el generador. Una clave ausente o vacía impide la llamada manual con un error
-claro antes de construir el cliente. Modelo, tokens y timeout se validan.
-El propietario del generador reutiliza el cliente y lo cierra al terminar;
-el script lo garantiza con `contextlib.closing`. El lifecycle de FastAPI para
-generación se incorporará con #10, sin hacer inferencia al arrancar.
+La clave sigue siendo opcional en Settings para permitir un Generator inyectado.
+Desde #10, si no se inyecta uno, la API falla al arrancar sin clave configurada:
+la generación es una dependencia esencial. No se valida la credencial contra
+el proveedor ni se hace inferencia al arrancar. Modelo, tokens y timeout se
+validan. El script manual detecta la ausencia de clave antes de crear el cliente
+y lo cierra mediante `contextlib.closing`.
 
 No se añaden retries propios. Se revisó el SDK 2.23.0: `attempts=0` se normaliza
 a 1 y la ruta Interactions lo interpreta como un reintento. Un 503 simulado
@@ -423,8 +424,9 @@ aplicación no debe depender del SDK Gemini. El desarrollador eligió un
 
 `GeneratedContent` contiene solo `answer` y `limitations`. Gemini recibe un
 JSON Schema derivado de ese modelo y el adaptador vuelve a validar su salida
-con Pydantic. La estructura válida no prueba veracidad. EvidenceOps añadirá
-`external_sources_consulted: false` al construir la respuesta HTTP en #10.
+con Pydantic. La estructura válida no prueba veracidad. EvidenceOps añade
+`external_sources_consulted: false` en `GenerationResponse`, separado del modelo
+interno: es conocimiento de la aplicación sobre su ejecución, no del LLM.
 
 Se adopta `GenerationError` con una causa identificable, sin jerarquía adicional.
 En #9, la validación fallida se traduce a `INVALID_OUTPUT` y el resto de fallos
@@ -437,6 +439,18 @@ Trade-offs
 La frontera añade poco código y permite tests sin proveedor real. La clase
 concreta gestiona el cierre del SDK; el Protocol conserva una sola operación.
 No se añaden factories, registries, managers, repositorios ni frameworks de DI.
+
+Integración HTTP y ownership (#10)
+
+`create_app` recibe opcionalmente un Generator. El handler lo obtiene mediante
+`Depends(get_generator)` desde `app.state`, sin construir GeminiGenerator. Esto
+mantiene la frontera de #9 y permite utilizar FakeGenerator sin llamadas reales.
+
+El lifespan crea y reutiliza GeminiGenerator cuando no hay uno inyectado y lo
+cierra al apagar la aplicación. Un generador externo pertenece a quien lo
+entrega: la aplicación no llama a su `close()`. El Engine se libera incluso
+si falla el cierre del generador. Esta regla hace explícita la responsabilidad
+sobre los recursos sin ampliar el Protocol ni introducir otra capa.
 
 Future decisions
 

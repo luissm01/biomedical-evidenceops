@@ -11,6 +11,7 @@ from sqlalchemy.engine import make_url
 
 from evidenceops.config import Settings
 from evidenceops.database import create_database
+from evidenceops.generation import GeneratedContent
 from evidenceops.main import create_app
 from evidenceops.models import Question
 
@@ -26,6 +27,19 @@ class _TestDatabaseSettings(BaseSettings):
     test_database_url: PostgresDsn
 
 
+class FakeGenerator:
+    def __init__(self) -> None:
+        self.calls: list[str] = []
+
+    def generate(self, question_text: str) -> GeneratedContent:
+        self.calls.append(question_text)
+
+        return GeneratedContent(
+            answer="Respuesta generada para el test",
+            limitations=["Limitación de prueba"],
+        )
+
+
 @pytest.fixture(scope="session")
 def test_settings() -> Settings:
     test_database_url = _TestDatabaseSettings().test_database_url
@@ -33,7 +47,7 @@ def test_settings() -> Settings:
         pytest.fail(
             "EVIDENCEOPS_TEST_DATABASE_URL must point to the evidenceops_test database"
         )
-    return Settings(database_url=test_database_url)
+    return Settings(database_url=test_database_url, gemini_api_key=None)
 
 
 @pytest.fixture(scope="session")
@@ -62,6 +76,20 @@ def clean_questions(
 
 
 @pytest.fixture
-def client(test_settings: Settings, clean_questions: None) -> Iterator[TestClient]:
-    with TestClient(create_app(test_settings)) as test_client:
+def client(
+    test_settings: Settings,
+    clean_questions: None,
+    fake_generator: FakeGenerator,
+) -> Iterator[TestClient]:
+    with TestClient(
+        create_app(
+            test_settings,
+            generator=fake_generator,
+        )
+    ) as test_client:
         yield test_client
+
+
+@pytest.fixture
+def fake_generator() -> FakeGenerator:
+    return FakeGenerator()
