@@ -104,9 +104,10 @@ Una pregunta inexistente devuelve `404`; un UUID inválido, `422`. Ninguno
 invoca al generador. La respuesta no se persiste y repetir la operación puede
 producir otra respuesta. No se han consultado fuentes biomédicas externas.
 
-## Primera integración Gemini
+## Integración Gemini
 
-El SDK oficial `google-genai` se instala con `uv sync --locked`. Configura en
+Gemini es el único proveedor de M3. El SDK oficial `google-genai` se instala
+con `uv sync --locked`. Configura en
 `.env` los valores del ejemplo; introduce personalmente la clave en
 `EVIDENCEOPS_GEMINI_API_KEY` y mantenla fuera de Git.
 
@@ -134,11 +135,14 @@ El desarrollador ya confirmó una primera llamada real correcta, con instrucció
 separada de la pregunta, JSON Schema y validación Pydantic. El script utiliza
 los límites configurados y cierra el cliente con `contextlib.closing`, también
 si la generación falla. Importarlo o ejecutar pytest no hace inferencias.
+El desarrollador confirmó también la demostración manual real del flujo HTTP
+completo de #11 con Gemini. Esta comprobación no demuestra calidad factual.
 
 `GeminiGenerator` reutiliza un cliente síncrono entre llamadas. Devuelve
 `GeneratedContent(answer, limitations)` o `GenerationError`, conservando la
 excepción original con `raise ... from ...`. Una salida inválida se clasifica
-como `INVALID_OUTPUT`; los demás fallos quedan como `UNKNOWN` hasta #11.
+como `INVALID_OUTPUT`; timeouts, rate limit, autenticación e indisponibilidad
+se clasifican por separado. Los errores restantes son `UNKNOWN`.
 Los mensajes propios no incluyen credenciales ni el cuerpo del proveedor;
 la cadena original es diagnóstica y no debe exponerse como respuesta HTTP.
 
@@ -147,13 +151,30 @@ PostgreSQL. Un esquema válido no demuestra veracidad biomédica; no hay búsque
 de fuentes externas. EvidenceOps añade `external_sources_consulted: false`
 al contrato HTTP, fuera de los campos generados por Gemini.
 
-**Limitación del SDK 2.23.0:** aunque se solicita `HttpRetryOptions(attempts=0)`,
-el SDK normaliza ese valor a 1 y su implementación de Interactions lo interpreta
-como un reintento. El test con un 503 simulado verifica dos intentos, sin esperar
-realmente. No hay retries propios. El timeout se aplica a cada petición HTTP;
-no garantiza un presupuesto total de 60 segundos. Resolver la política y el
-presupuesto total corresponde a #11, sin modificar internals del SDK en #9.
-La opción pública está descrita en la [documentación del SDK](https://googleapis.github.io/python-genai/genai.html#genai.types.HttpRetryOptions).
+Errores de generación: el cuerpo es `{"detail": {"code": "...", "message": "..."}}`,
+con mensajes públicos fijos, sin detalles del proveedor ni credenciales.
+
+| Situación | HTTP | `detail.code` |
+| --- | --- | --- |
+| Timeout de transporte o HTTP 408 | 504 | `generation_timeout` |
+| Cuota/rate limit (429) | 429 | `generation_rate_limited` |
+| Credenciales del proveedor (401/403), conexión o 5xx | 503 | `generation_unavailable` |
+| Contenido que no cumple el esquema | 502 | `invalid_generation` |
+| Otro fallo de generación | 502 | `generation_failed` |
+
+Política comprobada con `google-genai` 2.23.0: cero retries propios y como máximo
+un retry del SDK (dos intentos totales), solo para HTTP 408/500/502/503/504.
+400/401/403/429 y salida inválida no se reintentan. En esta versión, los errores
+de transporte se convierten antes del mecanismo de retry y tampoco se reintentan.
+Un retry puede duplicar inferencia y consumo de cuota aunque no llegue la respuesta.
+
+El backoff configurado es 0,5 s sin jitter; `Retry-After` o `retry-after-ms`
+del proveedor pueden imponer una espera mayor. `EVIDENCEOPS_GEMINI_TIMEOUT_SECONDS`
+configura el timeout de transporte de cada intento, no un presupuesto total.
+Con retry, la duración puede superar ese valor; **120,5 s no es un máximo
+garantizado** para la configuración inicial.
+No se añade un timeout externo ni cancelación en M3. Véase la
+[semántica de timeouts de HTTPX](https://www.python-httpx.org/advanced/timeouts/).
 
 ## Ejecutar las pruebas
 
