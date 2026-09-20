@@ -1,23 +1,30 @@
 # EvidenceOps — Current State
 
-Última actualización: 2026-09-17.
+Última actualización: 2026-09-20.
 
 ## Milestone actual
 
-M0, M1 y M2 completados. La persistencia PostgreSQL se integró mediante PR #7.
+M0, M1, M2 y M3 completados. La persistencia PostgreSQL se integró mediante PR #7.
 
-Milestone actual: [M3 — First LLM Integration](https://github.com/luissm01/biomedical-evidenceops/milestone/3).
+Milestone actual: [M4 — Evaluation Foundations](https://github.com/luissm01/biomedical-evidenceops/milestone/4),
+abierta y sin fecha límite. #15 completada técnicamente y validada, pendiente de
+revisión del desarrollador; la issue permanece abierta.
 
-- #8, contrato y elección del LLM: completada y ya cerrada en GitHub.
-- [#9, cliente y configuración](https://github.com/luissm01/biomedical-evidenceops/issues/9):
-  completada y cerrada al integrar la
-  [PR #12](https://github.com/luissm01/biomedical-evidenceops/pull/12)
-  en `main` (`afe430d`).
-- #10, respuestas estructuradas desde la API: completada; PR #13 integrada.
-- [#11 — Controlar fallos y timeouts y validar la integración completa](https://github.com/luissm01/biomedical-evidenceops/issues/11):
-  implementación, revisión, tests y demostración manual HTTP con Gemini completos.
-  Demostración confirmada por el desarrollador; pendiente de merge de la PR
-  para cerrar la issue y, después, M3.
+- [M3 — First LLM Integration](https://github.com/luissm01/biomedical-evidenceops/milestone/3)
+  está cerrada; #8–#11 completadas y cerradas.
+- PRs #12 y #13 integradas; la
+  [PR #14](https://github.com/luissm01/biomedical-evidenceops/pull/14) de #11 está
+  integrada en `main` (`68d18c2`). Tests y demostración manual HTTP con Gemini completos.
+- Secuencia de M4:
+  1. [#15 — Definir criterios de calidad y crear el primer evaluation dataset](https://github.com/luissm01/biomedical-evidenceops/issues/15).
+  2. [#16 — Construir un runner de evaluación offline y establecer un baseline](https://github.com/luissm01/biomedical-evidenceops/issues/16).
+  3. [#17 — Añadir evaluadores y detectar regresiones de calidad](https://github.com/luissm01/biomedical-evidenceops/issues/17).
+- Dimensiones acordadas: `relevance`, `factual_correctness` y
+  `prudence_and_limitations`. Dataset manual en `evaluation/cases.json`, versión
+  `0.1`, con exactamente los 10 casos acordados: hechos de referencia,
+  comportamiento esperado y afirmaciones prohibidas semánticas.
+- Sin respuesta ideal, resultados, scores ni métricas elegidas. No hay runner,
+  baseline, evaluadores ni LLM-as-a-judge. #16 no se ha iniciado.
 
 ## Implementado
 
@@ -66,6 +73,21 @@ Milestone actual: [M3 — First LLM Integration](https://github.com/luissm01/bio
   de la inferencia. UUID inválido (`422`) y pregunta ausente (`404`) no invocan
   al generador. Devuelve `answer`, `limitations` y `external_sources_consulted:
   false`, establecido por EvidenceOps. No persiste respuestas ni hace retrieval.
+
+## Verificación de #15
+
+- `evaluation/cases.json`: versión `0.1`, diez casos transcritos del texto acordado
+  sin correcciones factuales. Revisión prudente de coherencia; no es una revisión
+  sistemática de literatura ni se añaden fuentes al formato del dataset.
+- Un test estructural comprueba JSON, versión, número de casos, IDs únicos,
+  campos y listas no vacíos, dimensiones permitidas y ausencia de campos extra.
+  No evalúa calidad de respuestas ni llama al proveedor.
+- `uv run --locked pytest`: **87 passed, 2 DeprecationWarning conocidos**.
+  El intento con acceso local encontró 29 errores de conexión/setup por PostgreSQL
+  apagado (58 tests pasaron); tras arrancar Docker Desktop y el contenedor existente,
+  la suite completa pasó. Se usó caché uv en `/tmp/evidenceops-uv-cache`.
+- `git diff --check`: correcto. Sin nuevas dependencias, cambios en `.env` ni
+  llamadas reales a Gemini. Los cambios documentales locales previos se conservan.
 
 ## Verificación de #11
 
@@ -134,13 +156,16 @@ No hay búsqueda de evidencia, citas verificadas, RAG ni evaluación factual.
 
 ## Siguiente paso exacto
 
-Revisión y merge de la PR de #11 por el desarrollador. `Closes #11` cerrará
-la issue al integrar los cambios; después se cerrará M3. La demostración manual
-y la suite completa ya están realizadas. No se inicia M4 automáticamente.
+Revisión conjunta del dataset y de los criterios de
+[#15](https://github.com/luissm01/biomedical-evidenceops/issues/15) con el desarrollador
+antes de cerrar la issue y comenzar #16. Revisar especialmente el caso de dolor
+torácico y la transparencia sobre ausencia de evidencia recuperada. Las cláusulas
+«Puede...» son opcionales y `forbidden_claims` describe significados, no coincidencias
+literales. No se han elegido métricas ni herramientas de evaluación.
 
 Gemini es el único proveedor de M3. Ollama queda aplazado por decisión explícita
 del desarrollador; podría reconsiderarse cuando Evaluation lo justifique.
 La secuencia canónica no cambia. Logging y observabilidad se reservan para M5.
 
 LEARNING.md refleja solo el trabajo real del desarrollador; DECISIONS.md recoge
-el contrato, proveedor y frontera. PROJECT_CONTEXT.md no necesita cambios.
+también el alcance del dataset inicial. ROADMAP.md y PROJECT_CONTEXT.md no cambian.
