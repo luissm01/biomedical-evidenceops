@@ -4,9 +4,21 @@ Proyecto de aprendizaje de AI Engineering aplicado a evidencia biomédica públi
 
 ## Estado
 
-M3: API FastAPI con registro y consulta de preguntas en PostgreSQL, y cliente
+M3 completado: API FastAPI con registro y consulta de preguntas en PostgreSQL, y cliente
 Gemini con salida estructurada validada mediante
 `POST /questions/{question_id}/generate`.
+
+M4 — Evaluation Foundations activo. [Dataset inicial](evaluation/cases.json)
+versión `0.1`: diez casos manuales con `relevance`, `factual_correctness` y
+`prudence_and_limitations`, pendientes de revisión del desarrollador en
+[#15](https://github.com/luissm01/biomedical-evidenceops/issues/15).
+
+Los hechos de referencia, comportamientos esperados y afirmaciones prohibidas
+describen la calidad del contenido; no son una respuesta ideal ni resultados.
+Las afirmaciones prohibidas se interpretan semánticamente y los comportamientos
+«Puede...» son opcionales. Los tests protegen la estructura del JSON; contrato
+HTTP, schema, tipos, errores y lifecycle siguen siendo software testing, no
+métricas principales de calidad de IA. No hay runner ni evaluadores todavía.
 
 ## Requisitos e instalación
 

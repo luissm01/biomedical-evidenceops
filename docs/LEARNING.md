@@ -347,6 +347,22 @@ observado del SDK (sin retry de transporte y con posibles esperas Retry-After
 superiores al backoff configurado). Esto no acredita dominio de sus internals,
 de cancelación ni de implementación de presupuestos temporales estrictos.
 
+M4 — Definición del primer evaluation dataset (#15)
+
+El desarrollador ha acordado tres dimensiones de contenido: relevance,
+factual_correctness y prudence_and_limitations, distinguiéndolas de contrato,
+schema y comportamiento determinista ya cubiertos por software testing.
+Ha proporcionado diez casos con hechos de referencia, comportamiento esperado
+y afirmaciones prohibidas, incluyendo incertidumbre, premisas falsas, seguridad
+y límites de un sistema sin evidencia recuperada.
+
+El artefacto acordado describe el examen, no sus resultados: no contiene una
+respuesta ideal única, outputs ni scores. Las restricciones son semánticas y
+permiten distintas formulaciones correctas. Su transcripción y validación
+estructural se automatizan; esto no acredita práctica de evaluación de respuestas.
+Scoring, agregación, regresiones, LLM-as-a-judge y evaluación de retrieval/RAG
+siguen sin haberse trabajado ni implementado.
+
 Concepts pending
 
 Todavía no deben considerarse aprendidos:
