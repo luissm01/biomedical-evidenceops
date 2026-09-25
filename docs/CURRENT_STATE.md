@@ -1,14 +1,14 @@
 # EvidenceOps — Current State
 
-Última actualización: 2026-09-20.
+Última actualización: 2026-09-25.
 
 ## Milestone actual
 
 M0, M1, M2 y M3 completados. La persistencia PostgreSQL se integró mediante PR #7.
 
 Milestone actual: [M4 — Evaluation Foundations](https://github.com/luissm01/biomedical-evidenceops/milestone/4),
-abierta y sin fecha límite. #15 completada técnicamente y validada, pendiente de
-revisión del desarrollador; la issue permanece abierta.
+abierta y sin fecha límite. El dataset de #15 está integrado en `main` mediante
+PR #18. La implementación de #16 está validada y se publica para revisión.
 
 - [M3 — First LLM Integration](https://github.com/luissm01/biomedical-evidenceops/milestone/3)
   está cerrada; #8–#11 completadas y cerradas.
@@ -23,8 +23,13 @@ revisión del desarrollador; la issue permanece abierta.
   `prudence_and_limitations`. Dataset manual en `evaluation/cases.json`, versión
   `0.1`, con exactamente los 10 casos acordados: hechos de referencia,
   comportamiento esperado y afirmaciones prohibidas semánticas.
-- Sin respuesta ideal, resultados, scores ni métricas elegidas. No hay runner,
-  baseline, evaluadores ni LLM-as-a-judge. #16 no se ha iniciado.
+- #16 completada, validada y cerrada en GitHub: runner secuencial sobre Generator en `evaluation.py`, con
+  Gemini explícito mediante `--live`, JSON por run y promoción validada de baseline.
+  Baseline real pendiente únicamente de ejecución/promoción cuando Gemini disponga
+  de cuota suficiente; no queda desarrollo pendiente de #16.
+  Sin scores, evaluadores ni LLM-as-a-judge. Instrucciones en `evaluation/README.md`.
+- `GenerationSettings` reutiliza la configuración de Gemini sin exigir PostgreSQL;
+  `Settings` conserva la configuración y requisitos de la API.
 
 ## Implementado
 
@@ -73,6 +78,31 @@ revisión del desarrollador; la issue permanece abierta.
   de la inferencia. UUID inválido (`422`) y pregunta ausente (`404`) no invocan
   al generador. Devuelve `answer`, `limitations` y `external_sources_consulted:
   false`, establecido por EvidenceOps. No persiste respuestas ni hace retrieval.
+
+## Verificación de #16
+
+- Runner, metadata, checkpoint y promoción cubiertos con fake de Generator.
+  Tests de envío exclusivo de question, causas seguras, continuación tras error,
+  interrupción, dataset inválido y rechazo de baseline incompleto/incompatible.
+  CLI exige --live, valida clave y cierra el cliente. Importación sin API/DB/SDK.
+- Suite enfocada (runner/dataset/configuración): **30 passed**; tras añadir la
+  comprobación de importación aislada, tests del runner: **24 passed**.
+- Suite completa final: **111 passed, 2 DeprecationWarning conocidos**. El primer
+  intento con acceso local encontró **81 passed y 29 errores de conexión/setup**
+  por PostgreSQL no disponible; al estar healthy el contenedor existente, pasó.
+- Ejecución real confirmada por el desarrollador: **1 caso exitoso y 9 con
+  `rate_limit`**. No se obtuvieron outputs correctos para todos los casos y la
+  promoción a baseline fue rechazada correctamente.
+- **#16 completada y cerrada en GitHub** por decisión del desarrollador el 2026-09-25. El baseline
+  real queda pendiente de ejecución/promoción cuando Gemini tenga cuota suficiente,
+  como operación futura. La limitación es externa, de cuota del proveedor,
+  no un fallo de implementación. No se modifica el runner, cambia de proveedor,
+  paga cuota ni introduce retries artificiales para obtenerlo.
+- `git diff --check`: correcto.
+- LEARNING.md no cambia: el código y tests generados no acreditan aprendizaje
+  práctico adicional. D014 registra el diseño aprobado. ROADMAP.md y
+  PROJECT_CONTEXT.md no cambian. Implementación, tests y documentación se publican
+  juntos en la rama `feat/16-offline-evaluation`, por petición del desarrollador.
 
 ## Verificación de #15
 
@@ -156,12 +186,11 @@ No hay búsqueda de evidencia, citas verificadas, RAG ni evaluación factual.
 
 ## Siguiente paso exacto
 
-Revisión conjunta del dataset y de los criterios de
-[#15](https://github.com/luissm01/biomedical-evidenceops/issues/15) con el desarrollador
-antes de cerrar la issue y comenzar #16. Revisar especialmente el caso de dolor
-torácico y la transparencia sobre ausencia de evidencia recuperada. Las cláusulas
-«Puede...» son opcionales y `forbidden_claims` describe significados, no coincidencias
-literales. No se han elegido métricas ni herramientas de evaluación.
+#16 completada; queda únicamente la operación futura de ejecutar un run real
+cuando Gemini disponga de cuota suficiente y promoverlo si todos los casos tienen
+éxito. No es desarrollo pendiente ni bloquea el cierre de #16. #17 no se inicia
+en esta tarea. El baseline permitirá comparación manual por case_id, sin
+certificar la calidad de los outputs.
 
 Gemini es el único proveedor de M3. Ollama queda aplazado por decisión explícita
 del desarrollador; podría reconsiderarse cuando Evaluation lo justifique.
