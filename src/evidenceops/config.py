@@ -2,7 +2,7 @@ from pydantic import Field, PostgresDsn, SecretStr, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
-class Settings(BaseSettings):
+class GenerationSettings(BaseSettings):
     model_config = SettingsConfigDict(
         env_file=".env",
         env_prefix="EVIDENCEOPS_",
@@ -11,7 +11,6 @@ class Settings(BaseSettings):
         hide_input_in_errors=True,
     )
 
-    database_url: PostgresDsn
     gemini_api_key: SecretStr | None = None
     gemini_model: str = Field(default="gemini-3.6-flash", min_length=1)
     gemini_max_output_tokens: int = Field(default=2048, gt=0)
@@ -28,6 +27,10 @@ class Settings(BaseSettings):
         if value is None or not value.get_secret_value().strip():
             return None
         return value
+
+
+class Settings(GenerationSettings):
+    database_url: PostgresDsn
 
     @field_validator("database_url")
     @classmethod
