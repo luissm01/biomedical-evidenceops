@@ -1,14 +1,19 @@
 # EvidenceOps — Current State
 
-Última actualización: 2026-09-25.
+Última actualización: 2026-09-28.
 
 ## Milestone actual
 
-M0, M1, M2 y M3 completados. La persistencia PostgreSQL se integró mediante PR #7.
+M0, M1, M2, M3 y M4 completados. La persistencia PostgreSQL se integró mediante PR #7.
 
-Milestone actual: [M4 — Evaluation Foundations](https://github.com/luissm01/biomedical-evidenceops/milestone/4),
-abierta y sin fecha límite. El dataset de #15 está integrado en `main` mediante
-PR #18. La implementación de #16 está validada y se publica para revisión.
+[M4 — Evaluation Foundations](https://github.com/luissm01/biomedical-evidenceops/milestone/4)
+y #17 cerrados en GitHub tras validación final y confirmación del aprendizaje
+por el desarrollador. El dataset de #15 está integrado mediante PR #18 y #16
+está completada. Los cambios de #17 se publican para revisión en la rama
+`feat/17-human-evaluation`, por petición del desarrollador.
+
+Siguiente milestone: **M5 — Observability**, pendiente de iniciar. No cambia la
+secuencia canónica ni se implementa trabajo de M5 en esta tarea.
 
 - [M3 — First LLM Integration](https://github.com/luissm01/biomedical-evidenceops/milestone/3)
   está cerrada; #8–#11 completadas y cerradas.
@@ -27,7 +32,13 @@ PR #18. La implementación de #16 está validada y se publica para revisión.
   Gemini explícito mediante `--live`, JSON por run y promoción validada de baseline.
   Baseline real pendiente únicamente de ejecución/promoción cuando Gemini disponga
   de cuota suficiente; no queda desarrollo pendiente de #16.
-  Sin scores, evaluadores ni LLM-as-a-judge. Instrucciones en `evaluation/README.md`.
+  El runner conserva outputs sin emitir juicios de calidad.
+- #17: revisión humana estructurada en `evaluation_review.py`: prepare/aggregate/
+  compare, pass/fail por dimensión declarada, notas obligatorias en fail y
+  borradores null rechazados al agregar/comparar. Verifica identidad/contenido del
+  run y dataset exacto; rechaza incompletos, errores y pares ausentes/extra/duplicados.
+  Informa conteos, casos aprobados, resultados individuales y transiciones
+  explícitas. Sin scores ni LLM-as-a-judge. Procedimiento en `evaluation/README.md`.
 - `GenerationSettings` reutiliza la configuración de Gemini sin exigir PostgreSQL;
   `Settings` conserva la configuración y requisitos de la API.
 
@@ -78,6 +89,27 @@ PR #18. La implementación de #16 está validada y se publica para revisión.
   de la inferencia. UUID inválido (`422`) y pregunta ausente (`404`) no invocan
   al generador. Devuelve `answer`, `limitations` y `external_sources_consulted:
   false`, establecido por EvidenceOps. No persiste respuestas ni hace retrieval.
+
+## Verificación de #17
+
+- Suite relevante: `uv run --locked pytest tests/test_evaluation_review.py
+  tests/test_evaluation.py tests/test_evaluation_dataset.py -q`: **55 passed**.
+- Suite completa: **141 passed, 2 DeprecationWarning conocidos**, con acceso a
+  PostgreSQL local y `PGCONNECT_TIMEOUT=3`. El intento restringido encontró
+  errores de conexión/setup y se interrumpió; la ejecución con acceso pasó.
+- 30 tests nuevos sin inferencias reales: flujo runner fake → revisión →
+  agregación/comparación, validación de notas, revisiones incompletas, pares
+  inválidos, runs alterados/con errores y dataset incompatible; CLI y exit codes.
+- Demostración controlada: `a + factual_correctness` pass → fail y
+  `b + relevance` fail → pass, con idénticos totales globales. La regresión se
+  lista explícitamente y no queda compensada por la mejora.
+- Validación final de cierre: **141 passed, 2 warnings conocidos**.
+  `git diff --check` correcto. #17 y M4 cerrados en GitHub por petición explícita.
+- D015 registra las decisiones y el cierre. LEARNING recoge la confirmación del
+  desarrollador: revisión por dimensiones, rúbrica semántica, contenido adicional
+  aceptable frente a afirmaciones que justifican fail y juicios por caso/dimensión
+  en vez de puntuación global. ROADMAP y PROJECT_CONTEXT no cambian.
+- Sin dependencias nuevas, cambios del dataset ni llamadas a Gemini. Baseline real pendiente de cuota; no se afirma calidad real del modelo.
 
 ## Verificación de #16
 
@@ -182,15 +214,20 @@ de terceros para resolverlos.
 
 Una caída de PostgreSQL posterior al arranque aún produce un error no controlado
 en los endpoints de datos. Readiness y recuperación corresponden a M14.
-No hay búsqueda de evidencia, citas verificadas, RAG ni evaluación factual.
+No hay búsqueda de evidencia, citas verificadas ni RAG. Hay revisión factual
+humana respecto a la rúbrica; no validación factual automática ni evaluación
+real completada del modelo.
 
 ## Siguiente paso exacto
 
-#16 completada; queda únicamente la operación futura de ejecutar un run real
-cuando Gemini disponga de cuota suficiente y promoverlo si todos los casos tienen
-éxito. No es desarrollo pendiente ni bloquea el cierre de #16. #17 no se inicia
-en esta tarea. El baseline permitirá comparación manual por case_id, sin
-certificar la calidad de los outputs.
+Acordar el primer incremento de M5 — Observability en una próxima tarea.
+Revisar e integrar la PR de `feat/17-human-evaluation` para publicar en main
+la implementación de #17. El cierre de M4 no implica que la PR esté integrada.
+
+Cuando Gemini recupere cuota, ejecutar/promover un run exitoso, revisar sus 28
+pares y usarlo como baseline de calidad. Esta operación futura no bloquea el
+cierre de M4 ni autoriza inferencias en esta tarea. La demostración artificial
+valida el mecanismo, no la calidad real del modelo.
 
 Gemini es el único proveedor de M3. Ollama queda aplazado por decisión explícita
 del desarrollador; podría reconsiderarse cuando Evaluation lo justifique.

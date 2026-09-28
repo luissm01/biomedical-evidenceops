@@ -547,6 +547,50 @@ La limitación externa no justifica modificar el runner, cambiar de proveedor,
 pagar cuota ni añadir retries artificiales para conseguir el baseline. Se
 mantienen los requisitos de promoción y el alcance de #17.
 
+D015 — Revisión humana estructurada y regresiones por dimensión (#17)
+
+Status
+
+Accepted por instrucciones explícitas del desarrollador el 2026-09-25.
+
+Problem and decision
+
+La calidad de contenido exige interpretar la rúbrica y el contexto; estructura
+válida y matching textual no demuestran factualidad. Revisión humana inicial
+por `case_id + dimension`, solo dimensiones declaradas, con pass/fail sin scores,
+pesos ni umbrales. Todo fail exige notas. Los borradores usan null y no admiten
+agregación/comparación hasta completarse e identificar revisor.
+
+Un JSON separado vincula los juicios al ID y hash canónico del run y al dataset
+exacto. Se reutiliza la validación de runs completos de #16. La comparación
+exige el mismo dataset y revisiones completas: pass → fail es regresión y
+fail → pass es mejora. Conserva todas las transiciones y notas, conteos por
+dimensión, casos completamente aprobados y resultados individuales. No se
+compensan regresiones con mejoras. Modelo/código/configuración pueden variar.
+
+Trade-offs
+
+La revisión manual es manejable para diez casos, pero exige consistencia humana.
+Los cálculos son deterministas; los juicios no garantizan reproducibilidad ni
+validez clínica. El hash detecta cambios del run, no autentica al revisor.
+Se rechazan runs incompletos/con errores en vez de confundir fallos operativos
+con calidad. Cambiar el dataset exige nuevos runs/revisiones compatibles.
+
+No se implementa LLM-as-a-judge: coste, variabilidad, sesgos y dependencia de
+modelo/proveedor no se justifican frente a esta muestra pequeña. Tampoco matching
+automático de forbidden_claims, tracking genérico ni persistencia nueva.
+El baseline real sigue pendiente de cuota; la demostración usa outputs y juicios
+artificiales, sin inferencias y sin afirmar calidad biomédica del sistema.
+
+Cierre de M4 (2026-09-25)
+
+El desarrollador confirma completado el aprendizaje importante de #17 y solicita
+cerrar la issue y M4 tras la validación final. El baseline real completo queda
+como operación futura condicionada a cuota, sin bloquear este cierre y sin
+certificar calidad del modelo. La secuencia no cambia: el siguiente milestone
+es M5; no se implementa observabilidad en esta tarea. La implementación quedó inicialmente local. El 2026-09-28 el desarrollador
+autoriza commit, push y PR para publicarla; no autoriza su merge automático.
+
 Future decisions
 
 Todavía NO se han tomado decisiones sobre:
