@@ -1,45 +1,36 @@
 # EvidenceOps
 
-Proyecto de aprendizaje de AI Engineering aplicado a evidencia biomédica pública.
-
-## Estado
-
-M3 completado: API FastAPI con registro y consulta de preguntas en PostgreSQL, y cliente
-Gemini con salida estructurada validada mediante
-`POST /questions/{question_id}/generate`.
-
-M4 — Evaluation Foundations activo. [Dataset inicial](evaluation/cases.json)
-versión `0.1`: diez casos manuales con `relevance`, `factual_correctness` y
-`prudence_and_limitations`, pendientes de revisión del desarrollador en
-[#15](https://github.com/luissm01/biomedical-evidenceops/issues/15).
-
-Los hechos de referencia, comportamientos esperados y afirmaciones prohibidas
-describen la calidad del contenido; no son una respuesta ideal ni resultados.
-Las afirmaciones prohibidas se interpretan semánticamente y los comportamientos
-«Puede...» son opcionales. Los tests protegen la estructura del JSON; contrato
-HTTP, schema, tipos, errores y lifecycle siguen siendo software testing, no
-métricas principales de calidad de IA. No hay runner ni evaluadores todavía.
+Proyecto de AI Engineering aplicado a evidencia biomédica pública.
+[Visión](docs/PROJECT_CONTEXT.md) · [Estado y próximo paso](docs/CURRENT_STATE.md) ·
+[Mapa documental](docs/README.md) · [Instrucciones para agentes](AGENTS.md).
 
 ## Requisitos e instalación
 
-- Python 3.14.
+- Python compatible con [pyproject.toml](pyproject.toml); versión local en [.python-version](.python-version).
 - uv instalado.
 - Docker con Docker Compose para ejecutar PostgreSQL localmente.
 
 Desde la raíz del proyecto:
 
 ```bash
-uv sync --locked
+uv sync --locked --dev
 ```
 
 Este comando prepara `.venv/` con las dependencias de ejecución y desarrollo
 registradas en `uv.lock`. No es necesario activar el entorno para usar `uv run`.
 
-Crea la configuración local a partir del ejemplo y arranca PostgreSQL:
+Si aún no tienes `.env`, créalo a partir del ejemplo (no sobrescribas uno existente):
 
 ```bash
 cp .env.example .env
-docker compose up -d postgres
+```
+
+Configura personalmente `EVIDENCEOPS_GEMINI_API_KEY` antes de arrancar la API.
+Los nombres y valores iniciales están en [.env.example](.env.example); las
+variables de entorno prevalecen sobre `.env`. Después:
+
+```bash
+docker compose up -d --wait postgres
 uv run alembic upgrade head
 ```
 
@@ -116,157 +107,64 @@ Una pregunta inexistente devuelve `404`; un UUID inválido, `422`. Ninguno
 invoca al generador. La respuesta no se persiste y repetir la operación puede
 producir otra respuesta. No se han consultado fuentes biomédicas externas.
 
-## Integración Gemini
 
-Gemini es el único proveedor de M3. El SDK oficial `google-genai` se instala
-con `uv sync --locked`. Configura en
-`.env` los valores del ejemplo; introduce personalmente la clave en
-`EVIDENCEOPS_GEMINI_API_KEY` y mantenla fuera de Git.
+## Operar Gemini
 
-| Variable | Valor inicial |
-| --- | --- |
-| `EVIDENCEOPS_GEMINI_API_KEY` | Sin valor; necesaria para arrancar la API y la llamada manual |
-| `EVIDENCEOPS_GEMINI_MODEL` | `gemini-3.6-flash` |
-| `EVIDENCEOPS_GEMINI_MAX_OUTPUT_TOKENS` | `2048` |
-| `EVIDENCEOPS_GEMINI_TIMEOUT_SECONDS` | `60` |
+La API requiere clave configurada salvo que se inyecte un generador, como hacen
+los tests. No hay inferencia al importar ni al arrancar; startup comprueba
+PostgreSQL, pero no la validez remota de la clave. No publiques `.env` ni claves.
 
-`Settings` exige modelo no vacío, tokens positivos y timeout positivo y finito.
-La clave usa `SecretStr`; una clave vacía se trata como ausente. Sin un generador inyectado, la API
-falla al arrancar si falta la clave; no realiza inferencias durante startup.
-El script manual también detecta su ausencia antes de crear el cliente. Las variables de entorno prevalecen
-sobre `.env`. La configuración común exige también la URL de PostgreSQL,
-aunque esta llamada manual no conecta a la base de datos.
-
-Para repetir voluntariamente la inferencia real:
+Para una inferencia manual explícita que consume cuota:
 
 ```bash
 uv run --locked python test_gemini.py
 ```
 
-El desarrollador ya confirmó una primera llamada real correcta, con instrucción
-separada de la pregunta, JSON Schema y validación Pydantic. El script utiliza
-los límites configurados y cierra el cliente con `contextlib.closing`, también
-si la generación falla. Importarlo o ejecutar pytest no hace inferencias.
-El desarrollador confirmó también la demostración manual real del flujo HTTP
-completo de #11 con Gemini. Esta comprobación no demuestra calidad factual.
+Ese script usa `Settings`: exige la URL de PostgreSQL aunque no conecte a la DB.
+El runner de [evaluation](evaluation/README.md) usa `GenerationSettings` y no la exige.
+La respuesta tiene validación estructural, no garantía de veracidad biomédica.
 
-`GeminiGenerator` reutiliza un cliente síncrono entre llamadas. Devuelve
-`GeneratedContent(answer, limitations)` o `GenerationError`, conservando la
-excepción original con `raise ... from ...`. Una salida inválida se clasifica
-como `INVALID_OUTPUT`; timeouts, rate limit, autenticación e indisponibilidad
-se clasifican por separado. Los errores restantes son `UNKNOWN`.
-Los mensajes propios no incluyen credenciales ni el cuerpo del proveedor;
-la cadena original es diagnóstica y no debe exponerse como respuesta HTTP.
+Errores HTTP: timeout → 504; cuota → 429; autenticación/indisponibilidad del
+proveedor → 503; salida inválida u otro fallo de generación → 502. Los mensajes
+públicos son fijos y seguros; contrato exacto en OpenAPI y tests de generación.
+Política de retries y ausencia de deadline total en [D011](docs/decisions/D011-gemini.md).
+Flujo y recursos en [arquitectura](docs/ARCHITECTURE.md).
 
-Se utiliza `interactions.create` con `store=False`. No se guardan respuestas en
-PostgreSQL. Un esquema válido no demuestra veracidad biomédica; no hay búsqueda
-de fuentes externas. EvidenceOps añade `external_sources_consulted: false`
-al contrato HTTP, fuera de los campos generados por Gemini.
+## Diagnóstico y evaluación
 
-Errores de generación: el cuerpo es `{"detail": {"code": "...", "message": "..."}}`,
-con mensajes públicos fijos, sin detalles del proveedor ni credenciales.
+- [Observabilidad](docs/subsystems/observability.md): eventos JSON, X-Request-ID,
+  diagnóstico y límites; estado de entrega en el plan M5.
+- [Evaluación](evaluation/README.md): dataset, runs, promoción, revisión humana
+  y comparación. Un baseline de outputs no certifica calidad biomédica.
 
-| Situación | HTTP | `detail.code` |
-| --- | --- | --- |
-| Timeout de transporte o HTTP 408 | 504 | `generation_timeout` |
-| Cuota/rate limit (429) | 429 | `generation_rate_limited` |
-| Credenciales del proveedor (401/403), conexión o 5xx | 503 | `generation_unavailable` |
-| Contenido que no cumple el esquema | 502 | `invalid_generation` |
-| Otro fallo de generación | 502 | `generation_failed` |
+## Pruebas y CI
 
-Política comprobada con `google-genai` 2.23.0: cero retries propios y como máximo
-un retry del SDK (dos intentos totales), solo para HTTP 408/500/502/503/504.
-400/401/403/429 y salida inválida no se reintentan. En esta versión, los errores
-de transporte se convierten antes del mecanismo de retry y tampoco se reintentan.
-Un retry puede duplicar inferencia y consumo de cuota aunque no llegue la respuesta.
-
-El backoff configurado es 0,5 s sin jitter; `Retry-After` o `retry-after-ms`
-del proveedor pueden imponer una espera mayor. `EVIDENCEOPS_GEMINI_TIMEOUT_SECONDS`
-configura el timeout de transporte de cada intento, no un presupuesto total.
-Con retry, la duración puede superar ese valor; **120,5 s no es un máximo
-garantizado** para la configuración inicial.
-No se añade un timeout externo ni cancelación en M3. Véase la
-[semántica de timeouts de HTTPX](https://www.python-httpx.org/advanced/timeouts/).
-
-## Ejecutar las pruebas
-
-Antes, comprueba que PostgreSQL está arrancado con `docker compose up -d --wait postgres`.
-Los tests usan exclusivamente la base `evidenceops_test` y aplican allí las
-migraciones automáticamente.
+La suite completa usa PostgreSQL local; las fixtures exigen `evidenceops_test`,
+aplican migraciones y limpian preguntas antes/después de cada test de datos.
+Configura `EVIDENCEOPS_TEST_DATABASE_URL` según el ejemplo.
 
 ```bash
-uv run pytest
-```
-
-Las pruebas utilizan `TestClient` y la base dedicada `evidenceops_test` para
-verificar salud, creación, persistencia tras reinicio, IDs distintos, límites de
-longitud y errores. La generación HTTP utiliza FakeGenerator, sin API key ni
-inferencias reales; se comprueban contrato, llamadas y liberación de PostgreSQL
-antes de generar. También se prueba el ownership del generador durante lifespan.
-Cada test de datos comienza y termina sin preguntas almacenadas.
-
-Aviso conocido: Starlette utiliza el alias obsoleto `anyio.abc.BlockingPortal`.
-El SDK Gemini también avisa del uso de `typing._UnionGenericAlias`, obsoleto
-para Python 3.17. Son dos `DeprecationWarning` de dependencias; no se ocultan.
-
-## Integración continua
-
-El workflow [CI](.github/workflows/ci.yml) ejecuta las pruebas en GitHub Actions
-en cada push y pull request. Utiliza Ubuntu, la versión de Python indicada en
-`.python-version` (3.14), uv 0.11.29 y un servicio PostgreSQL efímero.
-Aplica las migraciones antes de ejecutar la suite.
-
-Para reproducir sus comandos en local:
-
-```bash
-uv sync --locked --dev
-uv run --locked alembic upgrade head
+docker compose up -d --wait postgres
 uv run --locked pytest
 ```
 
-`--locked` exige que `uv.lock` esté actualizado respecto a `pyproject.toml`;
-si no lo está, el comando falla en lugar de modificarlo automáticamente.
-La sincronización incluye las dependencias de desarrollo necesarias para pytest.
+Las pruebas usan fakes y transporte simulado: no requieren API key ni hacen
+inferencias reales. Para trabajar solo en evaluación, sin PostgreSQL:
 
-Tras publicar los cambios, abre la pestaña **Actions** del repositorio y revisa
-el workflow **CI**, trabajo **Tests**. Si falla, abre el paso que aparece en rojo:
-un error de instalación ocurre antes de ejecutar los tests y debe investigarse
-por separado de un fallo de sus assertions. Este workflow ejecuta pruebas;
-no despliega la aplicación. La primera versión de CI pasó 16 tests; la suite
-actual incluye además pruebas de Gemini con transporte HTTP simulado, sin
-clave real ni acceso al proveedor, y se ejecuta también contra PostgreSQL.
-
-## Estructura
-
-```text
-src/evidenceops/       Paquete Python de la aplicación
-  config.py           Configuración validada desde variables de entorno
-  database.py         Engine y ciclo de vida de sesiones SQLAlchemy
-  generation.py       Protocol, contenido validado y error de aplicación
-  gemini.py           Adaptador Gemini, prompt y validación de salida
-  main.py             Aplicación FastAPI y endpoints
-  models.py           Modelos persistentes de SQLAlchemy
-  schemas.py          Contratos HTTP de Pydantic
-migrations/           Evolución reproducible del esquema PostgreSQL
-docker/               Inicialización de servicios locales
-tests/                Pruebas automatizadas
-.github/workflows/    Automatización de pruebas en GitHub Actions
-docs/                 Contexto, estado, aprendizaje, decisiones y roadmap
-test_gemini.py        Llamada manual explícita; sin inferencia al importar
-compose.yaml          PostgreSQL local para desarrollo y pruebas
-pyproject.toml        Configuración y dependencias declaradas
-uv.lock               Versiones resueltas de las dependencias
-.python-version       Versión local de Python
-AGENTS.md             Reglas de colaboración y aprendizaje
+```bash
+uv run --locked pytest tests/test_evaluation.py tests/test_evaluation_dataset.py tests/test_evaluation_review.py
 ```
 
-Se versionan la configuración y `uv.lock`; `.venv/`, cachés y archivos `.env`
-locales se excluyen mediante `.gitignore`.
+[CI](.github/workflows/ci.yml) define comandos y servicios exactos para pushes/PRs;
+no despliega. `--locked` exige coherencia del lock sin modificarlo. Distingue errores
+de preparación del entorno, assertions fallidas y warnings. Limitaciones vigentes
+en [estado](docs/CURRENT_STATE.md); no se mantiene aquí un contador de tests.
 
-## Documentación del proyecto
+## Navegación del código
 
-- [Estado actual y próximo paso](docs/CURRENT_STATE.md)
-- [Contexto y objetivos](docs/PROJECT_CONTEXT.md)
-- [Conceptos trabajados](docs/LEARNING.md)
-- [Decisiones técnicas](docs/DECISIONS.md)
-- [Roadmap](docs/ROADMAP.md)
+[src/evidenceops](src/evidenceops): aplicación; [tests](tests): comportamiento
+verificado; [migrations](migrations): esquema; [compose.yaml](compose.yaml):
+servicios locales; [evaluation](evaluation): dataset y runbook.
+El mapa de responsabilidades está en [arquitectura](docs/ARCHITECTURE.md),
+los motivos en [ADRs](docs/decisions/README.md) y la dirección en el
+[roadmap](docs/ROADMAP.md).

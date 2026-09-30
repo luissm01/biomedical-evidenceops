@@ -1,403 +1,155 @@
-EvidenceOps — Roadmap
+# Roadmap canónico
 
-Este roadmap representa la dirección general del proyecto.
+Única fuente de la secuencia y alcance M0–M19. Se conserva la secuencia acordada;
+las antiguas “Phase 1–10” eran agrupaciones superpuestas y dejan de usarse.
+El [estado](CURRENT_STATE.md) identifica el milestone activo; los planes detallan
+ejecución. Lee la sección necesaria, no todas las fases.
 
-NO significa que todas las tecnologías aquí mencionadas deban implementarse.
+El roadmap expresa dirección, no autorización. Introduce tecnologías cuando
+un problema real lo justifique; discute dependencias futuras antes de implementarlas.
+Cambiar orden o alcance requiere acuerdo explícito, ADR y actualización de los
+milestones de GitHub. No exige cambios remotos esta reorganización documental.
 
-Cada fase se introducirá únicamente cuando exista una necesidad real.
+Los servicios elegidos deben poder usarse gratis: cloud y despliegue estudiarán
+arquitectura sin depender de servicios gestionados de pago ni free tiers temporales.
+AWS es la orientación inicial; conocer servicios gestionados no autoriza contratarlos.
 
-Milestone 0 — Project foundation
+## M0 — Project Foundation
 
-Objetivo:
+Repository, uv, project structure, FastAPI basics, health endpoint,
+testing fundamentals, Git and basic documentation.
 
-Crear una base mínima, profesional y comprensible.
+## M1 — Production Python & API Foundations
 
-Temas:
+Pydantic, request/response contracts, validation, error handling,
+typing, API design and relevant Python production practices.
 
-uv;
-estructura del proyecto;
-dependencies;
-FastAPI;
-Uvicorn;
-primer endpoint;
-pytest;
-TestClient;
-Git;
-README.
+## M2 — Application Architecture & Persistence
 
-Resultado esperado:
+Separation of responsibilities, service boundaries, persistence,
+PostgreSQL, configuration, database access and migrations when the
+project creates a real need for them.
 
-Una aplicación FastAPI mínima con:
+## M3 — First LLM Integration
 
-GET /health
+Introduce an LLM behind a clean application boundary.
+Learn model APIs, structured outputs, configuration, failures,
+timeouts and provider abstraction where justified.
 
-y tests automáticos.
+## M4 — Evaluation Foundations
 
-Phase 1 — Software Engineering Foundations
+Golden datasets, baselines, deterministic evaluation,
+regression testing, human evaluation and evaluation-driven
+development.
 
-Objetivo:
+## M5 — Observability
 
-Pasar de utilizar Python principalmente para IA/notebooks a utilizarlo para construir software de producción.
+Structured logging, metrics, traces, spans, latency, errors,
+token/cost tracking and OpenTelemetry / LLM observability concepts.
 
-Aprender progresivamente:
+## M6 — Biomedical Data Ingestion
 
-Python typing;
-project structure;
-Pydantic;
-request / response models;
-FastAPI;
-HTTP;
-REST;
-status codes;
-exception handling;
-configuration;
-environment variables;
-secrets;
-logging;
-pytest;
-fixtures;
-mocking;
-unit tests;
-integration tests;
-async / await;
-dependency injection;
-Docker;
-CI.
+Public biomedical sources, document acquisition, parsing,
+normalization, metadata and ingestion pipelines.
 
-No introducir complejidad que no esté justificada.
+## M7 — Retrieval & Embeddings
 
-Phase 2 — Evaluation & Observability
+Embeddings, similarity search, chunking, vector storage,
+metadata filtering and retrieval metrics.
 
-Objetivo:
+## M8 — RAG v1
 
-Aprender a responder:
+Build the first complete retrieval-augmented generation pipeline
+using previously learned retrieval and evaluation concepts.
 
-¿Cómo sabemos que nuestro sistema funciona?
+## M9 — Advanced Retrieval & RAG Evaluation
 
-Evaluation
+BM25, hybrid search, reranking, query rewriting and systematic
+comparison of retrieval/RAG strategies.
 
-Introducir progresivamente:
+## M10 — Tool Calling
 
-golden datasets;
-offline evaluation;
-regression evaluation;
-deterministic evaluators;
-human evaluation;
-LLM-as-a-judge;
-evaluation pipelines.
+Structured tools, JSON schemas, validation, tool selection,
+retries, permissions, timeouts and error handling.
 
-Más adelante, para retrieval:
+## M11 — Agent Fundamentals
 
-Recall@K;
-Precision@K;
-Hit Rate;
-MRR;
-NDCG.
+Agent loops, ReAct, state, routing, planner/executor patterns,
+iteration limits and failure handling before introducing
+high-level agent frameworks.
 
-Para generación:
+## M12 — MCP Integration
 
-groundedness;
-answer relevance;
-factuality;
-citation correctness;
-hallucination analysis.
-Observability
+MCP architecture, clients, servers, tools, resources and prompts.
+Expose useful EvidenceOps capabilities through MCP.
 
-Aprender:
+## M13 — Async Processing & Distributed Systems
 
-logs;
-metrics;
-traces;
-spans;
-distributed tracing;
-latency;
-errors;
-retries;
-token usage;
-cost.
+Workers, queues, asynchronous jobs, retries, idempotency,
+caching, eventual consistency and practical distributed-system
+failure modes.
 
-Herramientas posibles:
+## M14 — Production Hardening
 
-OpenTelemetry;
-Langfuse.
+Security, authentication/authorization where justified,
+secrets, rate limiting, resilience, health/readiness checks,
+operational testing and production failure scenarios.
 
-Las herramientas concretas pueden cambiar.
+## M15 — Cloud Deployment
 
-Los conceptos son prioritarios.
-
-Phase 3 — RAG
-
-Objetivo:
-
-Construir un sistema serio de recuperación de evidencia biomédica.
-
-Aprender:
-
-document ingestion;
-parsing;
-chunking;
-embeddings;
-similarity;
-vector search;
-metadata;
-semantic retrieval;
-BM25;
-hybrid retrieval;
-reranking;
-query rewriting;
-contextual retrieval;
-retrieval evaluation.
-
-Posible infraestructura:
-
-PostgreSQL;
-pgvector.
-
-No introducir una vector database dedicada salvo que exista una razón.
-
-Las decisiones de retrieval deberán medirse mediante evaluation.
-
-Phase 4 — Tool Calling
-
-Objetivo:
-
-Permitir que el modelo interactúe de forma segura y estructurada con capacidades externas.
-
-Aprender:
-
-function calling;
-tool calling;
-structured outputs;
-JSON Schema;
-validation;
-tool selection;
-retries;
-timeouts;
-permissions;
-error handling;
-fallback.
-
-Tools potenciales de EvidenceOps:
-
-búsqueda bibliográfica;
-recuperación de metadata;
-acceso a artículos;
-comparación estructurada de estudios.
-Phase 5 — Agents
-
-Objetivo:
-
-Entender los agentes desde fundamentos antes de depender de frameworks.
-
-Aprender:
-
-agent loop;
-ReAct;
-state;
-routing;
-planner / executor;
-iteration limits;
-tool execution;
-memory;
-failure handling;
-orchestration.
-
-Solo después considerar frameworks como:
-
-LangGraph;
-LangChain;
-AutoGen;
-CrewAI.
-Phase 6 — MCP
-
-Objetivo:
-
-Entender cómo integrar EvidenceOps dentro de arquitecturas basadas en Model Context Protocol.
-
-Aprender:
-
-MCP architecture;
-MCP client;
-MCP server;
-tools;
-resources;
-prompts.
-
-Construir un MCP server sencillo para EvidenceOps.
-
-Phase 7 — Production Architecture
-
-Objetivo:
-
-Aprender los fundamentos prácticos necesarios para sistemas distribuidos.
-
-Introducir cuando sea necesario:
-
-asynchronous processing;
-queues;
-workers;
-retries;
-idempotency;
-caching;
-event-driven architecture;
-eventual consistency;
-fault tolerance.
-
-No estudiar sistemas distribuidos únicamente de forma teórica.
-
-Introducir conceptos a partir de problemas reales del proyecto.
-
-Phase 8 — Cloud
-
-Objetivo:
-
-Ser capaz de desplegar y operar EvidenceOps.
-
-Aprender únicamente lo relevante para AI Engineering:
-
-compute;
-containers;
-object storage;
-managed databases;
-IAM;
-secrets;
-networking básico;
-container registries;
-monitoring;
-deployment.
-
-Cloud preferente inicialmente:
-
-AWS.
-Phase 9 — Kubernetes
-
-Objetivo:
-
-Comprender el nivel práctico necesario para desplegar servicios containerizados.
-
-Aprender:
-
-Pod;
-Deployment;
-Service;
-ConfigMap;
-Secret;
-health probes;
-resource requests / limits;
-horizontal autoscaling.
-
-No buscamos convertirnos en Kubernetes administrators.
-
-Phase 10 — Advanced LLM Engineering
-
-Objetivo:
-
-Profundizar en los fundamentos una vez dominada la construcción de sistemas.
-
-Aprender progresivamente:
-
-tokenization;
-embeddings;
-self-attention;
-transformers;
-positional information;
-pretraining;
-decoding;
-inference;
-KV cache;
-quantization.
-
-Después experimentar con:
-
-PEFT;
-LoRA;
-QLoRA;
-instruction tuning;
-fine-tuning.
-
-Comparar cuándo utilizar:
-
-prompting;
-RAG;
-tool calling;
-fine-tuning.
-
-Finalmente comprender a nivel conceptual/práctico:
-
-RLHF;
-preference optimization;
-reward models;
-DPO;
-PPO;
-GRPO.
-End goal
-
-Al finalizar el proyecto, el desarrollador debería poder explicar:
-
-cómo diseñaría un sistema de IA;
-cómo lo evaluaría;
-cómo lo observaría;
-cómo investigaría fallos;
-cómo lo desplegaría;
-cómo protegería sus dependencias;
-cómo diseñaría RAG;
-cómo diseñaría herramientas;
-cómo diseñaría un agente;
-cómo escalaría el servicio;
-qué trade-offs existen.
-
-
-Estas son las milestones que vamos a seguir en GitHub:
-Los servicios elegidos deberán poder utilizarse gratis; los milestones de
-cloud y despliegue estudiarán la arquitectura sin depender de servicios
-gestionados de pago ni free tiers temporales.
-M0  Project Foundation
-M1  Production Python & API Foundations
-M2  Application Architecture & Persistence
-M3  First LLM Integration
-M4  Evaluation Foundations
-M5  Observability
-M6  Biomedical Data Ingestion
-M7  Retrieval & Embeddings
-M8  RAG v1
-M9  Advanced Retrieval & RAG Evaluation
-M10 Tool Calling
-M11 Agent Fundamentals
-M12 MCP Integration
-M13 Async Processing & Distributed Systems
-M14 Production Hardening
-M15 Cloud Deployment
-M16 Kubernetes Foundations
-M17 Advanced LLM Engineering
-M18 Fine-tuning & Model Adaptation
-M19 Final Production System & Portfolio
-
-## M3 — First LLM Integration: alcance detallado
-
-Objetivo: generar una primera respuesta estructurada a una pregunta registrada,
-con un LLM detrás de un límite de aplicación sencillo y comprobable.
-
-Secuencia de trabajo:
-
-1. #8: acordar el contrato de generación efímera para una pregunta persistida y
-   elegir con el desarrollador un modelo Gemini utilizable gratis (completada).
-2. #9: integrar Gemini con configuración validada, salida estructurada, frontera
-   mínima, lifecycle y pruebas sin red; primera llamada real realizada.
-3. #10: conectar el generador con la API y las preguntas persistidas, manteniendo
-   breve el acceso a PostgreSQL.
-4. #11: completar errores, timeouts, presupuesto total y política de retries;
-   validar y documentar el flujo completo.
-
-Criterio de cierre: flujo documentado y ejecutable con Gemini, contrato
-estructurado validado, fallos controlados y tests deterministas en CI sin
-credenciales ni inferencias reales. La demostración manual comprueba la
-integración, sin demostrar todavía calidad factual.
-
-Por decisión explícita del desarrollador, Gemini es el único proveedor de M3.
-Ollama queda aplazado hasta que exista una necesidad de comparación, posiblemente
-en Evaluation. No se altera la secuencia canónica de milestones.
-
-La respuesta inicial no incorpora evidencia recuperada ni citas verificadas.
-Evaluation sistemática corresponde a M4; observabilidad a M5; ingestion,
-retrieval, RAG, tools, agentes y workers quedan en sus milestones respectivos.
-No se introduce un framework de orquestación ni persistencia de respuestas.
+Containers, compute, storage, managed databases, IAM,
+networking, secrets, monitoring and deployment in AWS.
+
+## M16 — Kubernetes Foundations
+
+Pods, Deployments, Services, ConfigMaps, Secrets, probes,
+resources and autoscaling at the level relevant to an AI Engineer.
+
+## M17 — Advanced LLM Engineering
+
+Tokenization, transformers, inference, KV cache, quantization
+and deeper understanding of foundation-model behavior.
+
+## M18 — Fine-tuning & Model Adaptation
+
+PEFT, LoRA, QLoRA, dataset preparation, evaluation and explicit
+comparison between prompting, RAG, tool use and fine-tuning.
+RLHF/DPO/PPO/GRPO are introduced according to their professional
+relevance, primarily conceptually unless practical experimentation
+is justified.
+
+## M19 — Final Production System & Portfolio
+
+Integrate and harden EvidenceOps as a coherent product.
+Final evaluation, architecture documentation, deployment,
+portfolio-quality README, diagrams and interview preparation.
+
+
+## Detalles y límites de progresión
+
+- **M3:** generar para una pregunta persistida, contrato validado, proveedor tras
+  frontera mínima, errores y pruebas sin red. Gemini es el único proveedor acordado;
+  Ollama aplazado hasta que una comparación lo justifique. No persistir respuestas
+  ni introducir orquestación. La demostración de integración no demuestra factualidad.
+  Se acepta timeout de transporte sin deadline global: [D011](decisions/D011-gemini.md).
+- **M4:** dataset, outputs trazables y revisión humana/regresiones. Métodos
+  deterministas y evaluación humana antes de añadir LLM-as-a-judge si se justifica.
+  Los motivos del método inicial están en D013–D015; no se mide retrieval sin tenerlo.
+- **M5:** logs, métricas y trazas para investigar latencia, errores, retries,
+  uso de tokens y coste. OpenTelemetry/Langfuse son opciones, no elecciones impuestas.
+  Secuencia de trabajo existente en el [plan activo](plans/active/m5-observability.md).
+- **M7/M9:** Recall@K, Precision@K, Hit Rate, MRR y NDCG cuando exista retrieval;
+  metadata, query rewriting y contextual retrieval según fallos medidos. PostgreSQL
+  con pgvector es una posibilidad; DB vectorial dedicada solo con justificación.
+- **M8/M9:** medir groundedness, relevancia, factualidad, citas y alucinaciones sobre
+  el pipeline completo. Comparar estrategias con baseline y datasets reproducibles.
+- **M10:** tools potenciales de búsqueda bibliográfica, metadata, artículos y
+  comparación de estudios; fallback, validación y límites ante fallos reales.
+- **M11:** memoria y orquestación después del loop básico. LangGraph, LangChain,
+  AutoGen o CrewAI solo tras comprender mecanismos y justificar la abstracción.
+- **M13:** async/await, event-driven architecture y tolerancia a fallos cuando el
+  flujo necesite procesos distribuidos; no como ejercicios aislados.
+- **M17:** profundizar también en self-attention, información posicional,
+  pretraining y decoding para explicar comportamiento e inferencia.
+- **M18:** instruction tuning, reward models y optimización de preferencias según
+  relevancia; comparación medida con prompting, RAG y tools antes de adoptar tuning.
