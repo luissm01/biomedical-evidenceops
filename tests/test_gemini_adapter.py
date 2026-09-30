@@ -217,3 +217,25 @@ def test_http_database_and_real_adapter_flow(
         }
     else:
         assert response.json()["detail"]["code"] == "generation_unavailable"
+
+
+def test_model_event_uses_safe_metadata(transport, caplog):
+    import logging
+    from evidenceops.observability import JsonFormatter, request_id
+
+    with caplog.at_level(logging.INFO, logger="evidenceops.gemini"):
+        token = request_id.set("test-request")
+        try:
+            with closing(GeminiGenerator(api_key="test-only-key", model="test-model")) as generator:
+                generator.generate("private-question")
+            records = [record for record in caplog.records if record.name == "evidenceops.gemini"]
+            events = [json.loads(JsonFormatter().format(record)) for record in records]
+        finally:
+            request_id.reset(token)
+    assert len(events) == 1
+    assert events[0]["event"] == "gemini.generation.started"
+    assert events[0]["model"] == "test-model"
+    assert events[0]["request_id"] == "test-request"
+    serialized = json.dumps(events)
+    for secret in ("test-only-key", "private-question", "Respuesta prudente", "limitations"):
+        assert secret not in serialized

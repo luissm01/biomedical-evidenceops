@@ -1,3 +1,6 @@
+import logging
+from time import perf_counter
+
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 from typing import cast
@@ -16,12 +19,16 @@ from evidenceops.generation import (
     Generator,
 )
 from evidenceops.models import Question
+from evidenceops.observability import CorrelatedFastAPI, configure_logging
 from evidenceops.schemas import (
     GenerationResponse,
     HealthCheckResponse,
     QuestionCreate,
     QuestionResponse,
 )
+
+
+logger = logging.getLogger(__name__)
 
 
 _GENERATION_HTTP_ERRORS = {
@@ -133,10 +140,26 @@ def generate_answer(
     question_text: str = Depends(get_question_text),
     generator: Generator = Depends(get_generator),
 ) -> GenerationResponse:
+    started = perf_counter()
+    logger.info("generation.started")
     try:
         generated = generator.generate(question_text)
     except GenerationError as exc:
+        logger.warning("generation.failed", extra={
+            "duration_ms": (perf_counter() - started) * 1000,
+            "outcome": "error", "cause": exc.cause.value,
+        })
         raise _generation_http_exception(exc) from exc
+    except Exception:
+        logger.error("generation.failed", extra={
+            "duration_ms": (perf_counter() - started) * 1000,
+            "outcome": "error", "cause": "unexpected_application_error",
+        })
+        raise
+    logger.info("generation.succeeded", extra={
+        "duration_ms": (perf_counter() - started) * 1000,
+        "outcome": "success",
+    })
 
     return GenerationResponse(
         answer=generated.answer,
@@ -150,6 +173,7 @@ def create_app(
 ) -> FastAPI:
     @asynccontextmanager
     async def lifespan(app: FastAPI) -> AsyncIterator[None]:
+        configure_logging()
         configured_settings = settings or Settings()
         engine, session_factory = create_database(configured_settings)
 
@@ -183,7 +207,7 @@ def create_app(
             finally:
                 engine.dispose()
 
-    application = FastAPI(lifespan=lifespan)
+    application = CorrelatedFastAPI(lifespan=lifespan)
     application.include_router(router)
 
     return application
