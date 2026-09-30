@@ -1,5 +1,11 @@
 # Evaluación offline de Generator
 
+Fuente del procedimiento de dataset, ejecución, promoción y revisión. El dataset
+[cases.json](cases.json) contiene la rúbrica; no es una respuesta ideal ni un
+benchmark completo. No incluye fuentes de referencia en su versión inicial.
+El contrato HTTP y la estructura de salida se prueban en la suite de software;
+los juicios de contenido se realizan aquí. No hay retrieval ni evaluación de citas.
+
 Desde la raíz del repositorio, con las variables `EVIDENCEOPS_GEMINI_*`
 habituales en el entorno o `.env`:
 
@@ -68,19 +74,14 @@ Tests sin Gemini, credenciales ni PostgreSQL:
 uv run --locked pytest tests/test_evaluation.py tests/test_evaluation_dataset.py
 ```
 
-## Estado del baseline
+## Disponibilidad de un baseline
 
-#16 está completada y validada. En la ejecución real confirmada por el
-desarrollador hubo un caso exitoso y nueve con `rate_limit`; la promoción fue
-rechazada correctamente porque no todos los casos tuvieron éxito.
+Consulta el [estado operativo](../docs/CURRENT_STATE.md) antes de asumir que
+existe un baseline real. Los nombres de archivos de esta guía son ejemplos;
+reemplázalos por artefactos existentes y compatibles. Las decisiones del método
+están en [D013–D015](../docs/decisions/README.md).
 
-El baseline real queda pendiente de ejecución/promoción cuando Gemini disponga
-de cuota suficiente, como operación futura y no como desarrollo pendiente.
-Se usarán los comandos anteriores sin modificar el runner, cambiar de proveedor,
-pagar cuota ni introducir retries artificiales. No hay baseline válido todavía.
-
-
-## Revisión humana estructurada (#17)
+## Revisión humana estructurada
 
 Estos comandos son locales, sin Gemini ni PostgreSQL. `prepare` exige un run
 completo y exitoso contra el dataset exacto. Los casos ausentes o con error de
