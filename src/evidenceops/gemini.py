@@ -1,5 +1,6 @@
 """Gemini adapter: structured inference and validation at the provider boundary."""
 
+import logging
 from collections.abc import Iterator
 
 import httpx
@@ -12,6 +13,9 @@ from evidenceops.generation import (
     GenerationError,
     GenerationErrorCause,
 )
+
+
+logger = logging.getLogger(__name__)
 
 
 SYSTEM_INSTRUCTION = """
@@ -162,6 +166,7 @@ class GeminiGenerator:
             ) from exc
 
     def generate(self, question_text: str) -> GeneratedContent:
+        logger.info("gemini.generation.started", extra={"model": self._model})
         try:
             interaction = self._client.interactions.create(
                 model=self._model,
