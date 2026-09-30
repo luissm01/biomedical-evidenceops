@@ -8,6 +8,7 @@ from google import genai
 from google.genai import types
 from pydantic import ValidationError
 
+from evidenceops.generation_prompt import SYSTEM_INSTRUCTION
 from evidenceops.generation import (
     GeneratedContent,
     GenerationError,
@@ -18,24 +19,6 @@ from evidenceops.generation import (
 logger = logging.getLogger(__name__)
 
 
-SYSTEM_INSTRUCTION = """
-Eres un asistente especializado en preguntas biomédicas.
-
-Responde a la pregunta de forma clara, prudente y útil utilizando únicamente
-el conocimiento disponible en el modelo.
-
-El campo `answer` debe contener la respuesta a la pregunta biomédica.
-
-No proporciones estudios, citas, cifras o resultados específicos si no tienes
-suficiente certeza. Expresa la incertidumbre cuando corresponda.
-
-El campo `limitations` debe contener una lista de limitaciones relevantes de
-la respuesta o de la propia pregunta. Incluye, cuando corresponda, información
-importante que falte para poder responder con mayor precisión.
-
-No afirmes que has consultado, buscado o verificado información en fuentes
-externas.
-"""
 
 
 _RETRIABLE_STATUS_CODES = [
@@ -166,7 +149,7 @@ class GeminiGenerator:
             ) from exc
 
     def generate(self, question_text: str) -> GeneratedContent:
-        logger.info("gemini.generation.started", extra={"model": self._model})
+        logger.info("llm.generation.started", extra={"provider": "gemini", "model": self._model})
         try:
             interaction = self._client.interactions.create(
                 model=self._model,

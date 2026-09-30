@@ -2,7 +2,8 @@
 
 ## Status
 
-Aceptada por diseño explícito del desarrollador. Entrega en el plan activo M5.
+Aceptada por diseño explícito del desarrollador; #21 cerrada.
+La metadata LLM actual se amplía en [D018](D018-multiple-llm-providers.md).
 
 ## Decision and trade-offs
 

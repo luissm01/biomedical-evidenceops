@@ -1,9 +1,6 @@
 # Observabilidad: diagnosticar una generación
 
 Estado de entrega en el [plan M5](../plans/active/m5-observability.md).
-Este runbook corresponde al código local pendiente de #21. La PR documental
-conserva estas instrucciones, pero no incorpora esa implementación ni sus tests;
-sus eventos y cabeceras no están disponibles en un checkout de esa PR.
 
 La API configura `logging` de Python para emitir eventos de EvidenceOps como
 una línea JSON por evento a stdout. No modifica los handlers del servidor ni
@@ -19,7 +16,7 @@ de FastAPI para añadir la cabecera a los 500 sin cambiar su respuesta.
 | Evento | Nivel | Campos específicos |
 | --- | --- | --- |
 | `generation.started` | INFO | — |
-| `gemini.generation.started` | INFO | `model` |
+| `llm.generation.started` | INFO | `provider`, `model` |
 | `generation.succeeded` | INFO | `duration_ms`, `outcome: success` |
 | `generation.failed` | WARNING | `duration_ms`, `outcome: error`, `cause` segura |
 | `generation.failed` ante error inesperado de aplicación | ERROR | `duration_ms`, `outcome: error`, `cause: unexpected_application_error` |
@@ -51,13 +48,13 @@ curl -sS -D - -o /dev/null -X POST \
   http://127.0.0.1:8000/questions/UUID_DE_LA_PREGUNTA/generate
 ```
 
-Esta operación manual sí llama a Gemini y puede consumir cuota. Copiar el valor de `X-Request-ID`:
+Esta operación manual sí llama al proveedor configurado y puede consumir cuota. Copiar el valor de `X-Request-ID`:
 
 ```bash
 rg 'ID_COPIADO' /tmp/evidenceops-events.jsonl
 ```
 
-Deben aparecer inicio, modelo Gemini y resultado con el mismo identificador.
+Deben aparecer inicio, proveedor/modelo y resultado con el mismo identificador.
 `generation.succeeded` confirma éxito; `generation.failed` muestra la causa
 segura y `duration_ms` permite identificar una operación lenta. Si falla por
 cuota, se conserva `rate_limit` sin exponer el mensaje del proveedor. Un UUID
@@ -66,7 +63,7 @@ inválido o una pregunta ausente no inicia generación, aunque recibe cabecera.
 La comprobación automatizada equivalente utiliza fakes y transporte simulado:
 
 ```bash
-uv run --locked pytest tests/test_observability.py tests/test_gemini_adapter.py -q
+uv run --locked pytest tests/test_observability.py tests/test_gemini_adapter.py tests/test_deepseek_adapter.py -q
 ```
 
 Los dos tests del adaptador que recorren HTTP y persistencia necesitan PostgreSQL;
@@ -74,7 +71,7 @@ ninguno realiza inferencias reales.
 
 ## Límites
 
-- Se observa la operación de generación, no cada intento interno del SDK.
+- Se observa la operación de generación, no cada intento interno del proveedor.
   No se cambia su política ni se usan APIs privadas para instrumentar retries.
 - Fuera de HTTP, `request_id` es null si se configura este formatter. Esta issue
   configura la salida en el arranque de la API; no instrumenta el runner offline.
@@ -84,4 +81,8 @@ ninguno realiza inferencias reales.
   debug del SDK con datos sensibles. Los errores inesperados siguen pudiendo
   producir diagnósticos del servidor; los errores del SDK se traducen a las
   causas seguras existentes antes de llegar a esa capa.
+- Gemini usa el retry configurado en su SDK para 408/5xx; DeepSeek hace una sola
+  petición, sin retry propio. Ambos tienen timeout de transporte, sin deadline
+  total. DeepSeek usa JSON mode y Pydantic valida el esquema; Gemini envía
+  además JSON Schema al proveedor.
 - No hay métricas, tokens, coste, tracing ni plataforma de observabilidad.

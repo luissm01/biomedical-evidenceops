@@ -96,9 +96,9 @@ def run_evaluation(
         run_id=uuid4(), timestamp_utc=datetime.now(UTC),
         dataset_version=dataset.dataset_version, dataset_sha256=digest,
         git_commit=commit, working_tree_dirty=dirty,
-        model=settings.gemini_model,
-        max_output_tokens=settings.gemini_max_output_tokens,
-        timeout_seconds=settings.gemini_timeout_seconds, cases=[],
+        model=settings.selected_model,
+        max_output_tokens=settings.selected_max_output_tokens,
+        timeout_seconds=settings.selected_timeout_seconds, cases=[],
     )
     output_dir.mkdir(parents=True, exist_ok=True)
     path = output_dir / f"{run.run_id}.json"
@@ -143,7 +143,7 @@ def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     commands = parser.add_subparsers(dest="command", required=True)
     run_parser = commands.add_parser("run")
-    run_parser.add_argument("--live", action="store_true", help="Explicitly call Gemini")
+    run_parser.add_argument("--live", action="store_true", help="Explicitly call the configured LLM provider")
     run_parser.add_argument("--output-dir", type=Path, default=Path("evaluation/runs"))
     promote_parser = commands.add_parser("promote")
     promote_parser.add_argument("source", type=Path)
@@ -152,7 +152,7 @@ def main(argv: list[str] | None = None) -> int:
         command.add_argument("--dataset", type=Path, default=Path("evaluation/cases.json"))
     args = parser.parse_args(argv)
     if args.command == "run" and not args.live:
-        parser.error("run requires --live; this command calls Gemini")
+        parser.error("run requires --live; this command calls the configured LLM provider")
     try:
         if args.command == "promote":
             promote_baseline(args.source, args.destination, args.dataset)
@@ -162,16 +162,13 @@ def main(argv: list[str] | None = None) -> int:
         load_dataset(args.dataset)
         git_state(Path.cwd())
         settings = GenerationSettings()
-        if settings.gemini_api_key is None:
-            parser.error("EVIDENCEOPS_GEMINI_API_KEY is required with --live")
-        from evidenceops.gemini import GeminiGenerator
+        selected_key = (settings.gemini_api_key if settings.llm_provider == "gemini"
+                        else settings.deepseek_api_key)
+        if selected_key is None:
+            parser.error(f"EVIDENCEOPS_{settings.llm_provider.upper()}_API_KEY is required with --live")
+        from evidenceops.generator_factory import create_generator
 
-        with closing(GeminiGenerator(
-            api_key=settings.gemini_api_key.get_secret_value(),
-            model=settings.gemini_model,
-            max_output_tokens=settings.gemini_max_output_tokens,
-            timeout_seconds=settings.gemini_timeout_seconds,
-        )) as generator:
+        with closing(create_generator(settings)) as generator:
             path = run_evaluation(
                 generator, dataset_path=args.dataset, settings=settings,
                 repo=Path.cwd(), output_dir=args.output_dir,

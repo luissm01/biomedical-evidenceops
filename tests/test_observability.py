@@ -183,9 +183,10 @@ def test_http_and_gemini_share_id_without_provider_content(events, monkeypatch, 
     assert response.status_code == (502 if failed else 200)
     output = events()
     assert [item["event"] for item in output] == [
-        "generation.started", "gemini.generation.started",
+        "generation.started", "llm.generation.started",
         "generation.failed" if failed else "generation.succeeded",
     ]
     assert {item["request_id"] for item in output} == {response.headers["X-Request-ID"]}
     assert output[1]["model"] == "test-model"
+    assert output[1]["provider"] == "gemini"
     assert "private-" not in json.dumps(output)

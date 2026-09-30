@@ -12,7 +12,7 @@ from sqlalchemy.orm import Session, sessionmaker
 
 from evidenceops.config import Settings
 from evidenceops.database import create_database, get_session
-from evidenceops.gemini import GeminiGenerator
+from evidenceops.generator_factory import create_generator
 from evidenceops.generation import (
     GenerationError,
     GenerationErrorCause,
@@ -177,7 +177,7 @@ def create_app(
         configured_settings = settings or Settings()
         engine, session_factory = create_database(configured_settings)
 
-        owned_generator: GeminiGenerator | None = None
+        owned_generator = None
         try:
             with engine.connect() as connection:
                 connection.execute(text("SELECT 1"))
@@ -186,17 +186,7 @@ def create_app(
             if generator is not None:
                 configured_generator = generator
             else:
-                if configured_settings.gemini_api_key is None:
-                    raise RuntimeError(
-                        "EVIDENCEOPS_GEMINI_API_KEY is required for generation"
-                    )
-
-                owned_generator = GeminiGenerator(
-                    api_key=configured_settings.gemini_api_key.get_secret_value(),
-                    model=configured_settings.gemini_model,
-                    max_output_tokens=configured_settings.gemini_max_output_tokens,
-                    timeout_seconds=configured_settings.gemini_timeout_seconds,
-                )
+                owned_generator = create_generator(configured_settings)
                 configured_generator = owned_generator
             app.state.generator = configured_generator
             yield

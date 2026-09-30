@@ -22,6 +22,7 @@ en Git/issues. El estado de entrega vive en GitHub y el trabajo local en los pla
 | [D015](D015-human-review.md) | Revisión humana estructurada y regresiones por dimensión (#17) | Aceptada |
 | [D016](D016-structured-logging.md) | Logging estructurado y correlación HTTP mínima (#21) | Aceptada |
 | [D017](D017-context-architecture.md) | Arquitectura documental y carga progresiva | Aceptada por el encargo de refactor |
+| [D018](D018-multiple-llm-providers.md) | Gemini y DeepSeek tras Generator | Aceptada |
 
 Nueva decisión: siguiente ID, problema, alternativas, decisión, consecuencias
 y estado. Cambios de dirección enlazan a la decisión sustituida; no reescribas

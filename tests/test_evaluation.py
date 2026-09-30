@@ -128,7 +128,7 @@ def test_cli_requires_live_before_loading_settings(monkeypatch):
 
 
 def test_cli_live_uses_effective_settings_and_closes(tmp_path, dataset, settings, monkeypatch):
-    from evidenceops import gemini
+    from evidenceops import generator_factory
     fake = FakeGenerator()
     closed = []
     fake.close = lambda: closed.append(True)
@@ -136,10 +136,10 @@ def test_cli_live_uses_effective_settings_and_closes(tmp_path, dataset, settings
     settings = settings.model_copy(update={"gemini_api_key": SecretStr("test-key")})
     monkeypatch.setattr(evaluation, "GenerationSettings", lambda: settings)
     monkeypatch.setattr(evaluation, "git_state", lambda _: ("a" * 40, False))
-    def create(**kwargs):
-        assert kwargs == dict(api_key="test-key", model="fake", max_output_tokens=123, timeout_seconds=7)
+    def create(configured_settings):
+        assert configured_settings is settings
         return fake
-    monkeypatch.setattr(gemini, "GeminiGenerator", create)
+    monkeypatch.setattr(generator_factory, "create_generator", create)
     assert evaluation.main(["run", "--live", "--dataset", str(dataset),
                             "--output-dir", str(tmp_path / "runs")]) == 0
     assert closed == [True] and len(fake.calls) == 3
@@ -172,7 +172,7 @@ def test_invalid_dataset_prevents_inference(tmp_path, dataset, settings, monkeyp
 
 
 def test_cli_failure_exit_and_close(tmp_path, dataset, settings, monkeypatch):
-    from evidenceops import gemini
+    from evidenceops import generator_factory
     from pydantic import SecretStr
     fake = FakeGenerator(RuntimeError("secret"))
     closed = []
@@ -180,7 +180,7 @@ def test_cli_failure_exit_and_close(tmp_path, dataset, settings, monkeypatch):
     settings = settings.model_copy(update={"gemini_api_key": SecretStr("test-key")})
     monkeypatch.setattr(evaluation, "GenerationSettings", lambda: settings)
     monkeypatch.setattr(evaluation, "git_state", lambda _: ("a" * 40, False))
-    monkeypatch.setattr(gemini, "GeminiGenerator", lambda **_: fake)
+    monkeypatch.setattr(generator_factory, "create_generator", lambda _: fake)
     assert evaluation.main(["run", "--live", "--dataset", str(dataset),
                             "--output-dir", str(tmp_path / "runs")]) == 1
     assert closed == [True]

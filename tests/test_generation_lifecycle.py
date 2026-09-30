@@ -16,7 +16,7 @@ def resources(monkeypatch):
         "evidenceops.main.create_database", Mock(return_value=(engine, Mock()))
     )
     constructor = Mock()
-    monkeypatch.setattr("evidenceops.main.GeminiGenerator", constructor)
+    monkeypatch.setattr("evidenceops.gemini.GeminiGenerator", constructor)
     return engine, constructor
 
 

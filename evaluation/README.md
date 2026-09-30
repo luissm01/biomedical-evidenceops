@@ -6,20 +6,19 @@ benchmark completo. No incluye fuentes de referencia en su versión inicial.
 El contrato HTTP y la estructura de salida se prueban en la suite de software;
 los juicios de contenido se realizan aquí. No hay retrieval ni evaluación de citas.
 
-Desde la raíz del repositorio, con las variables `EVIDENCEOPS_GEMINI_*`
-habituales en el entorno o `.env`:
+Desde la raíz del repositorio, con `EVIDENCEOPS_LLM_PROVIDER` y las variables del proveedor elegido en el entorno o `.env`:
 
 ```bash
 uv run --locked python -m evidenceops.evaluation run --live
 ```
 
-`--live` es obligatorio y consume cuota de Gemini. «Offline» significa fuera
-del servicio HTTP: Gemini necesita red; FastAPI y PostgreSQL no intervienen y
+`--live` es obligatorio y consume cuota del proveedor elegido. «Offline» significa fuera
+del servicio HTTP: el proveedor necesita red; FastAPI y PostgreSQL no intervienen y
 no se requiere `DATABASE_URL`. Se reutiliza `GenerationSettings`, también base
 de la configuración de la API. No hay inferencia al importar el módulo.
 
 El runner llama secuencialmente a `Generator.generate(case.question)` con
-`GeminiGenerator`. Nunca envía la rúbrica del dataset. Conserva un JSON por run
+el adapter configurado. Nunca envía la rúbrica del dataset. Conserva un JSON por run
 en `evaluation/runs/` (ignorado por Git) e imprime su ruta. `--dataset` y
 `--output-dir` permiten seleccionar otras rutas; si se cambia la salida, quien
 ejecuta debe mantener sus runs fuera de Git.
@@ -28,14 +27,15 @@ El archivo contiene UUID, fecha UTC de inicio, versión y SHA-256 de los bytes
 exactos del dataset, commit y estado dirty/clean al inicio, modelo, tokens y
 timeout efectivos. Cada caso contiene ID, pregunta y output o causa segura.
 No contiene scores ni evaluadores. No se serializan mensajes de excepciones,
-credenciales ni respuestas brutas del SDK.
+credenciales ni respuestas brutas del proveedor. El modelo registrado es el
+seleccionado; el esquema histórico del run no incluye todavía un campo `provider`.
 
 Se guarda un checkpoint tras cada caso, sustituyendo atómicamente el archivo.
 Los errores ordinarios no detienen los casos restantes; el comando devuelve 1
 si hay casos fallidos y 0 si todos tienen éxito. Una interrupción conserva los
 casos ya terminados; no hay reanudación automática ni retries propios. Se
 mantiene la política del adaptador: el timeout es de transporte, no un deadline
-total, y el SDK puede reintentar determinados fallos una vez.
+total, Gemini puede reintentar determinados fallos una vez; DeepSeek no reintenta.
 
 ## Seleccionar y usar un baseline
 
@@ -63,12 +63,12 @@ git diff --no-index evaluation/baselines/m4-initial.json evaluation/runs/<nuevo_
 
 El diff también muestra metadata distinta y devuelve 1 cuando hay diferencias;
 no representa una regresión automáticamente. Usa la revisión estructurada
-descrita abajo para detectar cambios de calidad. Las respuestas de Gemini pueden variar con el mismo código y dataset.
+descrita abajo para detectar cambios de calidad. Las respuestas del proveedor pueden variar con el mismo código y dataset.
 El hash identifica el artefacto de entrada; el commit identifica el código y
 `SYSTEM_INSTRUCTION` cuando el árbol está limpio. `working_tree_dirty=true`
 advierte de cambios locales: el commit por sí solo no permite reconstruirlos.
 
-Tests sin Gemini, credenciales ni PostgreSQL:
+Tests sin inferencias reales, credenciales ni PostgreSQL:
 
 ```bash
 uv run --locked pytest tests/test_evaluation.py tests/test_evaluation_dataset.py
@@ -83,7 +83,7 @@ están en [D013–D015](../docs/decisions/README.md).
 
 ## Revisión humana estructurada
 
-Estos comandos son locales, sin Gemini ni PostgreSQL. `prepare` exige un run
+Estos comandos son locales, sin proveedor LLM ni PostgreSQL. `prepare` exige un run
 completo y exitoso contra el dataset exacto. Los casos ausentes o con error de
 generación invalidan la evaluación de calidad: no se convierten en juicios fail.
 
@@ -178,7 +178,7 @@ Cambia artificialmente `a + factual_correctness` de pass a fail y `b + relevance
 de fail a pass. Los totales siguen siendo 2 pass y 2 fail, pero se detectan y
 listan una regresión y una mejora, además de unchanged pass y unchanged fail.
 Prueba la detección sobre juicios introducidos, no un evaluador biomédico
-automático ni calidad de Gemini.
+automático ni calidad del proveedor.
 
 La revisión humana es manejable para diez casos y permite valorar semántica y
 contexto, pero tiene coste manual y variabilidad entre revisores. Mantén criterios
