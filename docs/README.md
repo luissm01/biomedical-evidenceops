@@ -1,8 +1,9 @@
 # Mapa del conocimiento
 
 Entrada del agente: [AGENTS](../AGENTS.md) + encargo recibido → solo la
-fuente pertinente segun este mapa. Este índice sirve para descubrir contexto; no es una lista de lectura
-obligatoria. Los enlaces tampoco implican cargar sus destinos en cascada.
+fuente pertinente según este mapa. Este índice sirve para descubrir contexto;
+no es una lista de lectura obligatoria. Los enlaces tampoco implican cargar sus
+destinos en cascada.
 
 | Necesidad | Fuente de verdad | Cuándo leer |
 | --- | --- | --- |

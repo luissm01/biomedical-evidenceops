@@ -8,7 +8,7 @@ comprender las decisiones importantes, sin escribir manualmente todo el código.
 
 - Empieza por este archivo y el encargo recibido. Abre después solo las fuentes
   necesarias según el mapa inferior.
-- Consulta [estado_actual](docs/CURRENT_STATE) cuando la tarea dependa del estado del proyecto,
+- Consulta [estado actual](docs/CURRENT_STATE.md) cuando la tarea dependa del estado del proyecto,
   del milestone actual, del trabajo pendiente o de cambios locales en curso.
 - Trabaja dentro del milestone actual y el encargo. El [roadmap](docs/ROADMAP.md)
   es la única secuencia canónica M0–M19: consulta la sección relevante al definir

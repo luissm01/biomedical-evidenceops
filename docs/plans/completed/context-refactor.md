@@ -3,6 +3,8 @@
 Refactor documental solicitado explícitamente. No cambia comportamiento,
 producto, decisiones de aplicación ni orden M0–M19. Se completó primero en local;
 el desarrollador autorizó después commit, push y PR de estos cambios estructurales.
+Al publicar se conserva el ajuste del desarrollador: leer CURRENT_STATE solo
+cuando la tarea dependa del presente, milestone o trabajo pendiente del proyecto.
 La publicación excluye el código y tests locales de M5; su estado pendiente se
 indica en CURRENT_STATE, el plan y el runbook.
 
@@ -78,14 +80,16 @@ consumen tokens; este refactor reduce principalmente lecturas de sesiones futura
 
 Antes se exigían AGENTS + estado + roadmap al proponer/implementar y aprendizaje
 al graduar explicaciones: 3–4 documentos extensos, más decisiones cuando aplicaba.
-Ahora la entrada son 2 documentos cortos y la sección o fuente necesaria.
+Tras el ajuste de publicación la entrada es AGENTS y el encargo; se añade estado
+cuando la tarea lo requiere. La comparación anterior corresponde a leer ambos.
 Hay más archivos en total porque decisiones e historial se pueden leer por separado;
 reducir su número total no era el objetivo.
 
 ## Prueba conceptual de navegación
 
-En todos los casos AGENTS y CURRENT_STATE son la entrada. Código/tests se consultan
-según alcance; los enlaces no requieren cargar destinos en cascada.
+En todos los casos AGENTS y el encargo son la entrada. CURRENT_STATE se consulta
+si hay dependencia del estado actual; código/tests según alcance. Los enlaces
+no requieren cargar destinos en cascada.
 
 | Escenario | Contexto adicional necesario |
 | --- | --- |
