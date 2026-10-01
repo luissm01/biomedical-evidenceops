@@ -143,7 +143,7 @@ Flujo y recursos en [arquitectura](docs/ARCHITECTURE.md).
 - [Evaluación](evaluation/README.md): dataset, runs, promoción, revisión humana
   y comparación. Un baseline de outputs no certifica calidad biomédica.
 
-## Adquisición PubMed (M6)
+## Ingestión PubMed (M6)
 
 `PubMedClient` en [pubmed.py](src/evidenceops/pubmed.py) usa ESearch para obtener
 PMIDs desde una query con `limit` obligatorio (1–100) y EFetch XML para adquirir
@@ -153,10 +153,53 @@ o respuesta XML inválida lanza `PubMedError` y puede invalidar el lote completo
 El cliente PubMed no persiste ni se conecta con la generación.
 
 La persistencia de #30 está en [publications.py](src/evidenceops/publications.py):
-`upsert_publication(session, document)` ejecuta una sola sentencia PostgreSQL
+`upsert_publication(session, document, candidate_id=...)` ejecuta una sola sentencia PostgreSQL
 y deja el commit o rollback al llamador. Aplica las migraciones con
 `uv run alembic upgrade head` antes de usarla. `as_biomedical_document` copia
-una fila al contrato normalizado. Aún no hay CLI ni pipeline de ingestión.
+una fila al contrato normalizado. La CLI compone cliente y PostgreSQL sobre
+[ingest_pubmed](src/evidenceops/ingestion.py), reutilizable sin HTTP.
+
+Con `.env`, PostgreSQL y las migraciones preparados:
+
+```bash
+uv run --locked evidenceops ingest --pmid 12345 67890
+uv run --locked evidenceops ingest --pmid 12345 --pmid 67890
+uv run --locked evidenceops ingest --query 'asthma[Title]' --limit 5
+```
+
+Estos comandos **sí consultan PubMed**; son instrucciones operativas, no tests.
+No requieren claves LLM ni arrancar la API. `--pmid` y `--query` son excluyentes;
+`--limit` es obligatorio para query (1–100) y no se admite con PMIDs. Los PMIDs
+son cadenas decimales no vacías. ESearch puede devolver menos resultados o ninguno;
+la query no es un snapshot reproducible. Usa PMIDs explícitos para repetir las
+identidades; PubMed puede actualizar su metadata.
+
+El servicio deduplica antes de adquirir, coordina lotes de hasta 200 y abre una
+transacción por documento después de recibir y normalizar el lote. Una caída
+externa marca todos sus PMIDs como fallidos y permite continuar otros lotes.
+Un error de persistencia revierte ese documento y permite continuar los demás.
+No hay retries automáticos ni rollback global de documentos ya confirmados.
+
+La última línea de stdout es un resumen JSON con `created`, `updated`, `omitted`,
+`failed`, `requested` (entradas, incluidos duplicados), `unique`, `batches`,
+`unidentified_invalid`, `failures` (PMID cuando se conoce y causa segura),
+`run_id`, `source` y `duration_ms`. Antes se emiten eventos JSON de inicio/fin.
+
+- `created`: inserción confirmada con el UUID candidato de la escritura.
+- `updated`: escritura confirmada que devuelve el UUID existente, incluso si la
+  metadata no cambia. No hay consulta previa ni pérdida de atomicidad.
+- `omitted`: ocurrencias repetidas de un PMID en esta ejecución, procesado una vez.
+- `failed`: registros inválidos/ausentes, afectados por fallo del lote o persistencia.
+  Un registro cuyo PMID no se puede identificar añade un fallo y aumenta
+  `unidentified_invalid`; no se adivina qué PMID solicitado representa. Puede
+  contarse tanto ese registro como los PMIDs ausentes de la respuesta.
+  Si ESearch falla, cuenta una operación fallida sin PMID; `requested` queda en 0.
+
+Exit code: **0** sin fallos (también búsqueda vacía), **1** con fallos o error
+de configuración y **2** con argumentos inválidos. Errores de preparación
+emiten diagnóstico JSON seguro a stderr. La duración cubre búsqueda, espera
+NCBI, adquisición, parsing y commits. Política en
+[D023](docs/decisions/D023-biomedical-ingestion-pipeline.md).
 
 `PubMedSettings` no requiere base de datos. Sus variables opcionales están en
 [.env.example](.env.example): clave API, email de contacto, nombre de herramienta

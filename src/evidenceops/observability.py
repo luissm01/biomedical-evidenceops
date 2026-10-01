@@ -30,9 +30,13 @@ class JsonFormatter(logging.Formatter):
             event["trace_id"] = format(context.trace_id, "032x")
             event["span_id"] = format(context.span_id, "016x")
         # Only explicitly selected operational metadata; never exception text/stack.
-        for field in ("duration_ms", "outcome", "cause", "provider", "model"):
+        for field in ("duration_ms", "outcome", "cause", "provider", "model",
+                      "source", "run_id", "requested", "unique", "batches",
+                      "updated", "omitted", "failed", "unidentified_invalid"):
             if hasattr(record, field):
                 event[field] = getattr(record, field)
+        if hasattr(record, "created_count"):
+            event["created"] = record.created_count
         return json.dumps(event, ensure_ascii=False, allow_nan=False)
 
 
