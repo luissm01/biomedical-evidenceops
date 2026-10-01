@@ -1,20 +1,22 @@
 # Estado actual
 
-Actualizado: 2026-09-30. Distingue código versionado de trabajo local pendiente.
+Actualizado: 2026-10-01. Distingue código versionado de trabajo local pendiente.
 
 ## Presente
 
-- Milestone activo: **M5 — Observability**. M0–M4 completados según las
-  confirmaciones conservadas; el [plan activo](plans/active/m5-observability.md)
-  concentra orden de issues, revisión pendiente y criterios de continuación.
+- **M5 — Observability** implementado y validado; la entrega de #23 se prepara
+  en una PR. El [plan M5](plans/completed/m5-observability.md) conserva su orden.
+  M6 es el siguiente milestone de la secuencia, aún sin iniciar.
 - API para registrar/consultar preguntas persistidas en PostgreSQL y generar
   respuestas efímeras mediante Gemini o DeepSeek, seleccionados por configuración. [Límites y flujo](ARCHITECTURE.md).
 - Evaluación offline con runs trazables, promoción de baseline y revisión humana
   por caso/dimensión, con agregación y comparación de regresiones.
   [Procedimiento](../evaluation/README.md).
-- #21 cerrada: logs JSON y correlación HTTP. #22 implementada localmente:
+- #21 cerrada: logs JSON y correlación HTTP. #22 cerrada:
   métricas Prometheus de generaciones, errores, latencia y tokens observados
-  para Gemini y DeepSeek en `GET /metrics`. Tracing sigue pendiente.
+  para Gemini y DeepSeek en `GET /metrics`. #23 implementada y validada en rama:
+  spans OpenTelemetry para HTTP, generación y proveedor, con correlación en logs
+  y exportación opcional a consola.
 
 ## Limitaciones relevantes
 
@@ -37,7 +39,7 @@ Actualizado: 2026-09-30. Distingue código versionado de trabajo local pendiente
 
 ## Siguiente trabajo
 
-Tras revisar y entregar #22, corresponde #23 según el plan activo.
+Integrar la PR de #23; después iniciar M6 según el roadmap cuando se encargue.
 Cuando exista cuota y se solicite, obtener/promover/revisar el baseline real.
 Los comandos y requisitos de pruebas viven en el [README](../README.md);
 el alcance pendiente, en el plan activo.

@@ -15,6 +15,7 @@ from evidenceops.generation import (
     GenerationErrorCause,
 )
 from evidenceops.metrics import GenerationMetrics
+from evidenceops.tracing import traced_provider
 
 
 logger = logging.getLogger(__name__)
@@ -151,6 +152,7 @@ class GeminiGenerator:
                 message="Could not close the Gemini client",
             ) from exc
 
+    @traced_provider("gemini")
     def generate(self, question_text: str) -> GeneratedContent:
         logger.info("llm.generation.started", extra={"provider": "gemini", "model": self._model})
         try:

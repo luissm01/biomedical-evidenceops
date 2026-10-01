@@ -8,6 +8,7 @@ from pydantic import ValidationError
 from evidenceops.generation_prompt import SYSTEM_INSTRUCTION
 from evidenceops.generation import GeneratedContent, GenerationError, GenerationErrorCause
 from evidenceops.metrics import GenerationMetrics
+from evidenceops.tracing import traced_provider
 
 logger = logging.getLogger(__name__)
 _ENDPOINT = "https://api.deepseek.com/chat/completions"
@@ -45,6 +46,7 @@ class DeepSeekGenerator:
         except Exception as exc:
             raise GenerationError(GenerationErrorCause.UNKNOWN, "Could not close the DeepSeek client") from exc
 
+    @traced_provider("deepseek")
     def generate(self, question_text: str) -> GeneratedContent:
         logger.info("llm.generation.started", extra={"provider": "deepseek", "model": self._model})
         try:

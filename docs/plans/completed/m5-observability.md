@@ -1,4 +1,4 @@
-# M5 — Observability: plan activo
+# M5 — Observability: plan completado
 
 ## Alcance y dependencias
 
@@ -8,17 +8,16 @@ en [roadmap](../../ROADMAP.md#m5--observability); arquitectura de aplicación in
 1. [#21: logging y correlación](https://github.com/luissm01/biomedical-evidenceops/issues/21):
    cerrada. Eventos LLM comunes para Gemini y DeepSeek.
 2. [#22: métricas de generación, latencia y uso](https://github.com/luissm01/biomedical-evidenceops/issues/22):
-   implementada localmente sobre Gemini y DeepSeek; pendiente revisión/entrega.
+   implementada sobre Gemini y DeepSeek; cerrada.
 3. [#23: tracing y diagnóstico end-to-end](https://github.com/luissm01/biomedical-evidenceops/issues/23):
-   después de #21 y #22; sin implementar.
+   implementada con OpenTelemetry y validada para entrega.
 
-## Decisiones abiertas y salida
+## Decisiones y salida
 
 Métricas acordadas en [D019](../../decisions/D019-prometheus-metrics.md).
-Tracing aún requiere diseño; OpenTelemetry/Langfuse no se han adoptado.
+[D020](../../decisions/D020-opentelemetry-tracing.md) documenta el diseño de tracing.
 No instrumentar intentos internos ni cambiar retries/timeouts al abordar #22.
 
-Para cerrar M5, contrastar criterios de sus issues y aprendizaje realmente
-trabajado, validar el comportamiento implementado y conservar límites operativos
-en runbooks/ADRs. Mover este plan a completados cuando el trabajo se cierre,
-actualizar el estado y evitar arrastrar su historial al milestone siguiente.
+Las verificaciones y los límites operativos permanecen en
+[observabilidad](../../subsystems/observability.md) y [D020](../../decisions/D020-opentelemetry-tracing.md).
+Este archivo conserva el orden de M5; GitHub refleja la entrega de issues y PRs.

@@ -53,6 +53,7 @@ class GenerationSettings(BaseSettings):
 
 class Settings(GenerationSettings):
     database_url: PostgresDsn
+    trace_console: bool = False
 
     @field_validator("database_url")
     @classmethod

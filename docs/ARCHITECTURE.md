@@ -60,9 +60,11 @@ dataset → run → revisión humana → comparación. Dataset, outputs y juicio
 artefactos diferentes. Estructura válida no implica contenido correcto.
 
 La [observabilidad](subsystems/observability.md) registra eventos comunes de
-generación y expone métricas Prometheus en `/metrics`; los adapters aportan el
-usage real de cada proveedor sin cambiar contratos de negocio.
-Sus límites y diagnóstico se conservan en el [plan M5](plans/active/m5-observability.md).
+generación, expone métricas Prometheus en `/metrics` y traza con OpenTelemetry
+HTTP → generación → adapter del proveedor; los adapters aportan el usage real
+sin cambiar contratos de negocio.
+Sus límites y diagnóstico se conservan en el [subsistema](subsystems/observability.md)
+y el [plan M5 completado](plans/completed/m5-observability.md).
 
 No hay capa Repository, framework de agentes ni orquestación anticipada.
 Consulta el [índice ADR](decisions/README.md) antes de cambiar estos límites.

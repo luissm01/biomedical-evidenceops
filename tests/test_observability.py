@@ -189,4 +189,7 @@ def test_http_and_gemini_share_id_without_provider_content(events, monkeypatch, 
     assert {item["request_id"] for item in output} == {response.headers["X-Request-ID"]}
     assert output[1]["model"] == "test-model"
     assert output[1]["provider"] == "gemini"
+    assert len({item["trace_id"] for item in output}) == 1
+    assert output[0]["span_id"] == output[-1]["span_id"]
+    assert output[1]["span_id"] != output[0]["span_id"]
     assert "private-" not in json.dumps(output)
