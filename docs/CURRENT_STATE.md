@@ -10,7 +10,9 @@ Actualizado: 2026-10-01. Distingue código versionado de trabajo local pendiente
   decisiones documentadas. PubMed/NCBI E-utilities es la fuente
   inicial; el contrato normalizado y la identidad de ingestión están en
   [D021](decisions/D021-biomedical-ingestion-source-and-contract.md).
-  [Plan M6](plans/m6-biomedical-data-ingestion.md). Aún no hay implementación.
+  [Plan M6](plans/m6-biomedical-data-ingestion.md). #29 está completada: cliente
+  PubMed ESearch/EFetch, parser y contrato normalizado, con tests sin red. No
+  incluye persistencia ni CLI.
 - API para registrar/consultar preguntas persistidas en PostgreSQL y generar
   respuestas efímeras mediante Gemini o DeepSeek, seleccionados por configuración. [Límites y flujo](ARCHITECTURE.md).
 - Evaluación offline con runs trazables, promoción de baseline y revisión humana
@@ -42,8 +44,7 @@ Actualizado: 2026-10-01. Distingue código versionado de trabajo local pendiente
 
 ## Siguiente trabajo
 
-Continuar M6 por #29 (adquisición, parsing y normalización), seguida de #30
-(persistencia idempotente) y #31 (pipeline).
+Siguiente issue: #30 (persistencia idempotente); #31 abordará el pipeline.
 Cuando exista cuota y se solicite, obtener/promover/revisar el baseline real.
 Los comandos y requisitos de pruebas viven en el [README](../README.md);
 el alcance pendiente, en el plan activo.

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PubmedArticleSet>
+  <PubmedArticle>
+    <MedlineCitation>
+      <PMID>12345</PMID>
+      <Article>
+        <Journal><JournalIssue><PubDate><Year>2024</Year></PubDate></JournalIssue><Title>Journal of Evidence</Title></Journal>
+        <ArticleTitle>Effect of <i>treatment</i> in adults.</ArticleTitle>
+        <Abstract>
+          <AbstractText Label="BACKGROUND">Clinical <b>context</b>.</AbstractText>
+          <AbstractText Label="METHODS">A randomized trial.</AbstractText>
+          <AbstractText Label="RESULTS">Improved outcomes.</AbstractText>
+        </Abstract>
+        <AuthorList>
+          <Author><LastName>García</LastName><ForeName>Ana María</ForeName></Author>
+          <Author><CollectiveName>Evidence Study Group</CollectiveName></Author>
+          <Author><LastName>Lee</LastName><Initials>J</Initials><Suffix>Jr</Suffix></Author>
+        </AuthorList>
+      </Article>
+    </MedlineCitation>
+    <PubmedData><ArticleIdList><ArticleId IdType="doi">10.1234/example</ArticleId></ArticleIdList></PubmedData>
+  </PubmedArticle>
+  <PubmedArticle>
+    <MedlineCitation>
+      <PMID>67890</PMID>
+      <Article><Journal><JournalIssue><PubDate><MedlineDate>2021 Jan-Feb</MedlineDate></PubDate></JournalIssue><ISOAbbreviation>J Evid</ISOAbbreviation></Journal><ArticleTitle>Article without abstract</ArticleTitle></Article>
+    </MedlineCitation>
+  </PubmedArticle>
+</PubmedArticleSet>

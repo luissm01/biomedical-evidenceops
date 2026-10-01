@@ -55,6 +55,15 @@ propios y libera el Engine incluso si falla el cierre del generador.
 
 ## Subsistemas independientes
 
+La adquisición PubMed se mantiene fuera de FastAPI, DB y generación:
+[pubmed.py](../src/evidenceops/pubmed.py) hace ESearch/EFetch y clasifica errores
+externos; [pubmed_parser.py](../src/evidenceops/pubmed_parser.py) interpreta XML
+y separa registros inválidos; [biomedical.py](../src/evidenceops/biomedical.py)
+define el contrato interno sin tipos de PubMed. `PubMedSettings` tiene entorno
+independiente. La identidad documental es `(source, source_id)`; en PubMed,
+`("pubmed", PMID)`. El cliente no persiste ni alimenta la generación.
+Motivos y alcance en [D021](decisions/D021-biomedical-ingestion-source-and-contract.md).
+
 La [evaluación](../evaluation/README.md) usa Generator sin FastAPI ni PostgreSQL:
 dataset → run → revisión humana → comparación. Dataset, outputs y juicios son
 artefactos diferentes. Estructura válida no implica contenido correcto.

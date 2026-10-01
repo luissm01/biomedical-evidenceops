@@ -61,3 +61,37 @@ class Settings(GenerationSettings):
         if database_url.scheme != "postgresql+psycopg":
             raise ValueError("database URL must use the postgresql+psycopg scheme")
         return database_url
+
+
+class PubMedSettings(BaseSettings):
+    """Settings for the standalone PubMed adapter; no database is required."""
+
+    model_config = SettingsConfigDict(
+        env_file=".env",
+        env_prefix="EVIDENCEOPS_PUBMED_",
+        extra="ignore",
+        frozen=True,
+        hide_input_in_errors=True,
+    )
+
+    api_key: SecretStr | None = None
+    email: str | None = None
+    tool: str = Field(default="EvidenceOps", pattern=r"^[A-Za-z0-9_.-]+$")
+    timeout_seconds: float = Field(default=15.0, gt=0, allow_inf_nan=False)
+
+    @field_validator("api_key")
+    @classmethod
+    def normalize_empty_api_key(cls, value: SecretStr | None) -> SecretStr | None:
+        if value is None or not value.get_secret_value().strip():
+            return None
+        return value
+
+    @field_validator("email")
+    @classmethod
+    def normalize_email(cls, value: str | None) -> str | None:
+        if value is None or not value.strip():
+            return None
+        value = value.strip()
+        if "@" not in value or any(char.isspace() for char in value):
+            raise ValueError("PubMed email must be a contact email address")
+        return value
