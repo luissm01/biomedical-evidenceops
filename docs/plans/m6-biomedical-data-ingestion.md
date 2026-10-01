@@ -8,8 +8,7 @@ en el [roadmap](../ROADMAP.md#m6--biomedical-data-ingestion). Las decisiones
 duraderas están en [D021](../decisions/D021-biomedical-ingestion-source-and-contract.md).
 
 1. [#28: fuente y contrato](https://github.com/luissm01/biomedical-evidenceops/issues/28):
-   decisiones tomadas y documentadas en D021; cierre remoto pendiente de
-   revisión humana.
+   completada; decisiones tomadas y documentadas en D021.
 2. [#29: adquisición, parsing y normalización](https://github.com/luissm01/biomedical-evidenceops/issues/29):
    siguiente trabajo. Depende de #28.
 3. [#30: persistencia e idempotencia](https://github.com/luissm01/biomedical-evidenceops/issues/30):
