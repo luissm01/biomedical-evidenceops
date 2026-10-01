@@ -27,6 +27,20 @@ Mide la llamada al generador, incluida su validación de salida y posibles
 esperas/retries del SDK, excluyendo la consulta previa a PostgreSQL y la
 serialización HTTP. No es la duración completa de la petición.
 
+## Ingestión biomédica por CLI
+
+`evidenceops ingest` configura el mismo logger JSON. `ingestion.started` incluye
+`source` y `run_id`; `ingestion.finished` conserva ambos y añade `duration_ms`,
+`outcome`, `requested`, `unique`, `batches`, `created`, `updated`, `omitted`,
+`failed` y `unidentified_invalid`. La duración cubre toda la ejecución del
+servicio, incluida búsqueda y commits. El `run_id` correlaciona inicio/fin;
+`request_id` es null fuera de HTTP. El resumen final añade causas seguras y
+PMIDs conocidos; los eventos no incluyen títulos, abstracts, query, credenciales
+ni mensajes de excepciones. Errores inesperados de programación se propagan con
+evento final `outcome: error` y causa segura. No se añaden métricas ni spans de
+ingestión. Operación y semántica en el
+[README](../../README.md#ingestión-pubmed-m6).
+
 ## Métricas agregadas
 
 `GET /metrics` devuelve formato Prometheus mediante `prometheus-client`. El
@@ -156,8 +170,8 @@ ninguno realiza inferencias reales.
 
 - Se observa la operación de generación, no cada intento interno del proveedor.
   No se cambia su política ni se usan APIs privadas para instrumentar retries.
-- Fuera de HTTP, `request_id` es null si se configura este formatter. Esta issue
-  configura la salida en el arranque de la API; no instrumenta el runner offline.
+- Fuera de HTTP, `request_id` es null si se configura este formatter. La API y la CLI de ingestión
+  configuran la salida; el runner offline no está instrumentado.
 - Los logs propios son JSON; los logs de Uvicorn y librerías mantienen su
   configuración. La lista de campos no sanea mensajes arbitrarios: al añadir
   eventos deben mantenerse nombres constantes y metadata segura. No activar

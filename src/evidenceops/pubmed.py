@@ -20,7 +20,7 @@ from evidenceops.pubmed_parser import (
 
 
 _BASE_URL = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/"
-_BATCH_SIZE = 200
+PUBMED_BATCH_SIZE = 200
 _MAX_SEARCH_RESULTS = 100
 
 
@@ -134,8 +134,8 @@ class PubMedClient:
             raise ValueError("PMIDs must be nonempty decimal strings")
         documents: list[BiomedicalDocument] = []
         invalid: list[InvalidPubMedRecord] = []
-        for offset in range(0, len(ids), _BATCH_SIZE):
-            batch = ids[offset:offset + _BATCH_SIZE]
+        for offset in range(0, len(ids), PUBMED_BATCH_SIZE):
+            batch = ids[offset:offset + PUBMED_BATCH_SIZE]
             xml = self._request("efetch.fcgi", {
                 "id": ",".join(batch), "retmode": "xml",
             }, post=True)
@@ -145,10 +145,10 @@ class PubMedClient:
                 raise PubMedError(PubMedErrorCause.INVALID_RESPONSE, str(exc)) from exc
             requested = set(batch)
             returned = {doc.source_id for doc in parsed.documents}
-            returned.update(item.source_id for item in parsed.invalid_records if item.source_id)
-            if not returned <= requested or len(returned) != len(parsed.documents) + sum(
-                item.source_id is not None for item in parsed.invalid_records
-            ):
+            identified_invalid = [item.source_id for item in parsed.invalid_records
+                                  if item.source_id and item.source_id.isdecimal()]
+            returned.update(identified_invalid)
+            if not returned <= requested or len(returned) != len(parsed.documents) + len(identified_invalid):
                 raise PubMedError(PubMedErrorCause.INVALID_RESPONSE, "EFetch returned unexpected or duplicate PMIDs")
             documents.extend(parsed.documents)
             invalid.extend(parsed.invalid_records)

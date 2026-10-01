@@ -1,6 +1,6 @@
 """Atomic PostgreSQL persistence for normalized biomedical documents."""
 
-from uuid import uuid4
+from uuid import UUID, uuid4
 
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.orm import Session
@@ -25,14 +25,18 @@ def as_biomedical_document(publication: Publication) -> BiomedicalDocument:
     )
 
 
-def upsert_publication(session: Session, document: BiomedicalDocument) -> Publication:
+def upsert_publication(
+    session: Session, document: BiomedicalDocument, *, candidate_id: UUID | None = None,
+) -> Publication:
     """Write one document in the caller's transaction; never commit here.
 
     The conflict target is the external identity. A new UUID is ignored on
     conflict, preserving the existing row and its first ingestion timestamp.
+    A caller supplying a fresh candidate_id can compare it to the returned
+    row's ID to distinguish insertion from update without a preceding SELECT.
     """
     values = {
-        "id": uuid4(),
+        "id": candidate_id if candidate_id is not None else uuid4(),
         "source": document.source,
         "source_id": document.source_id,
         "title": document.title,

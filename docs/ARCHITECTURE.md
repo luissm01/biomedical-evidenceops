@@ -63,9 +63,21 @@ define el contrato interno sin tipos de PubMed. `PubMedSettings` tiene entorno
 independiente. [publications.py](../src/evidenceops/publications.py) hace el
 upsert atómico en PostgreSQL dentro de la transacción del llamador; el modelo y
 la migración protegen `(source, source_id)` y conservan un UUID interno. El
-cliente PubMed no persiste ni alimenta la generación. Motivos y alcance en
+cliente PubMed no persiste ni alimenta la generación.
+[ingestion_cli.py](../src/evidenceops/ingestion_cli.py) implementa `evidenceops ingest`
+y posee/cierra cliente y Engine; [ingestion.py](../src/evidenceops/ingestion.py)
+coordina búsqueda opcional, deduplicación, lotes y fallos parciales sin poseer
+los recursos inyectados. Cada documento tiene su transacción y solo cuenta éxito
+tras el commit. El UUID candidato frente al devuelto distingue crear/actualizar
+sin leer antes de escribir. Flujo:
+
+`CLI → ESearch opcional → PMIDs únicos → EFetch por lote → parser → BiomedicalDocument → upsert → commit → resumen`
+
+No se retiene conexión DB durante adquisición. No hay endpoint de ingestión;
+los documentos persistidos no se conectan aún con generación. Motivos y alcance en
 [D021](decisions/D021-biomedical-ingestion-source-and-contract.md) y
-[D022](decisions/D022-biomedical-publication-persistence.md).
+[D022](decisions/D022-biomedical-publication-persistence.md) y
+[D023](decisions/D023-biomedical-ingestion-pipeline.md).
 
 La [evaluación](../evaluation/README.md) usa Generator sin FastAPI ni PostgreSQL:
 dataset → run → revisión humana → comparación. Dataset, outputs y juicios son

@@ -4,16 +4,17 @@ Actualizado: 2026-10-01. Distingue código versionado de trabajo local pendiente
 
 ## Presente
 
-- **M5 — Observability** completado: #21, #22 y #23 cerradas, con sus PRs
-  integradas. El [plan M5](plans/completed/m5-observability.md) conserva su orden.
-  **M6 — Biomedical Data Ingestion** está iniciada: #28 está cerrada y sus
-  decisiones documentadas. PubMed/NCBI E-utilities es la fuente
-  inicial; el contrato normalizado y la identidad de ingestión están en
-  [D021](decisions/D021-biomedical-ingestion-source-and-contract.md).
-  [Plan M6](plans/m6-biomedical-data-ingestion.md). #29 está completada: cliente
-  PubMed ESearch/EFetch, parser y contrato normalizado, con tests sin red. #30
-  está completada: modelo y migración de publicaciones, con upsert atómico e
-  identidad única. No incluye CLI.
+- **M6 — Biomedical Data Ingestion** implementado: PubMed/NCBI E-utilities,
+  parsing y contrato normalizado, persistencia con upsert atómico y CLI
+  `evidenceops ingest` sobre un servicio reutilizable. El pipeline coordina lotes,
+  transacciones por documento, fallos parciales y resumen de resultados.
+  [Plan M6 completado](plans/completed/m6-biomedical-data-ingestion.md).
+  Decisiones en [D021](decisions/D021-biomedical-ingestion-source-and-contract.md),
+  [D022](decisions/D022-biomedical-publication-persistence.md) y
+  [D023](decisions/D023-biomedical-ingestion-pipeline.md).
+  Validación determinista sin red; no se ha realizado una demo real de PubMed.
+- **M5 — Observability** completado. El
+  [plan M5](plans/completed/m5-observability.md) conserva su orden.
 - API para registrar/consultar preguntas persistidas en PostgreSQL y generar
   respuestas efímeras mediante Gemini o DeepSeek, seleccionados por configuración. [Límites y flujo](ARCHITECTURE.md).
 - Evaluación offline con runs trazables, promoción de baseline y revisión humana
@@ -45,7 +46,8 @@ Actualizado: 2026-10-01. Distingue código versionado de trabajo local pendiente
 
 ## Siguiente trabajo
 
-Siguiente issue: #31 (pipeline de ingestión).
+M7 — Retrieval & Embeddings es el siguiente milestone del roadmap;
+su alcance concreto requiere un nuevo encargo. No se ha iniciado.
 Cuando exista cuota y se solicite, obtener/promover/revisar el baseline real.
 Los comandos y requisitos de pruebas viven en el [README](../README.md);
-el alcance pendiente, en el plan activo.
+la secuencia futura, en el roadmap.

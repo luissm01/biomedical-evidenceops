@@ -28,6 +28,8 @@ en Git/issues. El estado de entrega vive en GitHub y el trabajo local en los pla
 | [D021](D021-biomedical-ingestion-source-and-contract.md) | Fuente PubMed y contrato de ingestión biomédica (#28) | Accepted |
 | [D022](D022-biomedical-publication-persistence.md) | Persistencia atómica de publicaciones biomédicas (#30) | Aceptada |
 
+| [D023](D023-biomedical-ingestion-pipeline.md) | Pipeline local, fallos parciales y semántica del resumen (#31) | Aceptada |
+
 Nueva decisión: siguiente ID, problema, alternativas, decisión, consecuencias
 y estado. Cambios de dirección enlazan a la decisión sustituida; no reescribas
 el razonamiento histórico como si siempre hubiera sido el actual.
