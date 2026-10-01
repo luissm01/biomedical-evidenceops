@@ -1,0 +1,5 @@
+<PubmedArticleSet>
+  <PubmedArticle><MedlineCitation><PMID>12345</PMID><Article><ArticleTitle>Valid article</ArticleTitle></Article></MedlineCitation></PubmedArticle>
+  <PubmedArticle><MedlineCitation><PMID>67890</PMID><Article /></MedlineCitation></PubmedArticle>
+  <PubmedArticle><MedlineCitation><Article><ArticleTitle>No PMID</ArticleTitle></Article></MedlineCitation></PubmedArticle>
+</PubmedArticleSet>

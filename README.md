@@ -143,6 +143,25 @@ Flujo y recursos en [arquitectura](docs/ARCHITECTURE.md).
 - [Evaluación](evaluation/README.md): dataset, runs, promoción, revisión humana
   y comparación. Un baseline de outputs no certifica calidad biomédica.
 
+## Adquisición PubMed (M6)
+
+`PubMedClient` en [pubmed.py](src/evidenceops/pubmed.py) usa ESearch para obtener
+PMIDs desde una query con `limit` obligatorio (1–100) y EFetch XML para adquirir
+PMIDs explícitos en lotes de hasta 200. `fetch(pmids)` devuelve documentos
+`BiomedicalDocument` y errores de registros individuales; un fallo HTTP, timeout
+o respuesta XML inválida lanza `PubMedError` y puede invalidar el lote completo.
+No hay persistencia, CLI ni conexión con la generación en esta fase.
+
+`PubMedSettings` no requiere base de datos. Sus variables opcionales están en
+[.env.example](.env.example): clave API, email de contacto, nombre de herramienta
+y timeout. La clave permite un límite por instancia de 10 peticiones/s; sin ella,
+3 peticiones/s. Cada proceso o cliente independiente comparte el límite de la IP
+ante NCBI y debe coordinarse si se ejecuta en paralelo. NCBI recomienda registrar
+`tool` y `email` antes de usos sostenidos; configurar los parámetros no equivale
+a registrarlos. No hay retries automáticos ni llamadas reales en tests. Los
+abstracts pueden tener condiciones de copyright; respeta las condiciones de
+uso de NCBI y del contenido. [Reglas de E-utilities](https://www.ncbi.nlm.nih.gov/books/NBK25497/).
+
 ## Pruebas y CI
 
 La suite completa usa PostgreSQL local; las fixtures exigen `evidenceops_test`,
