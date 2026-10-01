@@ -172,12 +172,15 @@ class GeminiGenerator:
 
             output_text = interaction.output_text
 
-            usage = interaction.usage
-            if self._metrics is not None and usage is not None:
-                self._metrics.record_usage(
-                    "gemini", self._model,
-                    usage.total_input_tokens, usage.total_output_tokens, usage.total_tokens,
-                )
+            if self._metrics is not None:
+                usage = getattr(interaction, "usage", None)
+                if usage is not None:
+                    self._metrics.record_usage(
+                        "gemini", self._model,
+                        getattr(usage, "total_input_tokens", None),
+                        getattr(usage, "total_output_tokens", None),
+                        getattr(usage, "total_tokens", None),
+                    )
 
         except Exception as exc:
             cause = _classify_provider_error(exc)

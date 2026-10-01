@@ -2,6 +2,8 @@
 
 import json
 from contextlib import closing
+from types import SimpleNamespace
+from unittest.mock import Mock
 
 import httpx
 import pytest
@@ -78,6 +80,16 @@ def test_gemini_usage_from_interaction(monkeypatch, usage, expected):
     labels = {"provider": "gemini", "model": "test-gemini"}
     for name, value in zip(("input", "output", "total"), expected or (None, None, None)):
         assert metrics.registry.get_sample_value(f"evidenceops_llm_{name}_tokens_total", labels) == value
+
+
+def test_gemini_response_without_usage_attribute(monkeypatch):
+    interaction = SimpleNamespace(output_text=json.dumps({"answer": "ok", "limitations": []}))
+    sdk = SimpleNamespace(interactions=SimpleNamespace(create=Mock(return_value=interaction)), close=Mock())
+    monkeypatch.setattr("evidenceops.gemini.genai.Client", Mock(return_value=sdk))
+    metrics = GenerationMetrics()
+    with closing(GeminiGenerator("test-key", metrics=metrics)) as generator:
+        assert generator.generate("question").answer == "ok"
+    assert 'evidenceops_llm_input_tokens_total{' not in metrics.render().decode()
 
 
 @pytest.mark.parametrize("usage,expected", [
