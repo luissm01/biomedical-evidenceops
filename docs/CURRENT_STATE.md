@@ -8,14 +8,13 @@ Actualizado: 2026-09-30. Distingue código versionado de trabajo local pendiente
   confirmaciones conservadas; el [plan activo](plans/active/m5-observability.md)
   concentra orden de issues, revisión pendiente y criterios de continuación.
 - API para registrar/consultar preguntas persistidas en PostgreSQL y generar
-  respuestas efímeras mediante Gemini. [Límites y flujo](ARCHITECTURE.md).
+  respuestas efímeras mediante Gemini o DeepSeek, seleccionados por configuración. [Límites y flujo](ARCHITECTURE.md).
 - Evaluación offline con runs trazables, promoción de baseline y revisión humana
   por caso/dimensión, con agregación y comparación de regresiones.
   [Procedimiento](../evaluation/README.md).
-- #21 está implementada localmente: logs JSON y correlación HTTP.
-  Su código y tests no se incluyen en la PR de refactorización documental;
-  siguen pendientes de revisión y publicación/cierre. Un checkout de esa PR
-  no incorpora logging ni correlación. Métricas y tracing no implementados.
+- #21 cerrada: logs JSON y correlación HTTP. #22 implementada localmente:
+  métricas Prometheus de generaciones, errores, latencia y tokens observados
+  para Gemini y DeepSeek en `GET /metrics`. Tracing sigue pendiente.
 
 ## Limitaciones relevantes
 
@@ -38,8 +37,7 @@ Actualizado: 2026-09-30. Distingue código versionado de trabajo local pendiente
 
 ## Siguiente trabajo
 
-Revisar la implementación local de #21 y su comprobación práctica según el plan
-activo antes de publicarla/cerrarla. Después corresponde #22, seguida de #23.
+Tras revisar y entregar #22, corresponde #23 según el plan activo.
 Cuando exista cuota y se solicite, obtener/promover/revisar el baseline real.
 Los comandos y requisitos de pruebas viven en el [README](../README.md);
-los resultados de la validación previa de #21, en el plan activo.
+el alcance pendiente, en el plan activo.

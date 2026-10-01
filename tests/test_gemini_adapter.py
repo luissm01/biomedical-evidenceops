@@ -233,8 +233,9 @@ def test_model_event_uses_safe_metadata(transport, caplog):
         finally:
             request_id.reset(token)
     assert len(events) == 1
-    assert events[0]["event"] == "gemini.generation.started"
+    assert events[0]["event"] == "llm.generation.started"
     assert events[0]["model"] == "test-model"
+    assert events[0]["provider"] == "gemini"
     assert events[0]["request_id"] == "test-request"
     serialized = json.dumps(events)
     for secret in ("test-only-key", "private-question", "Respuesta prudente", "limitations"):

@@ -8,34 +8,18 @@ from google import genai
 from google.genai import types
 from pydantic import ValidationError
 
+from evidenceops.generation_prompt import SYSTEM_INSTRUCTION
 from evidenceops.generation import (
     GeneratedContent,
     GenerationError,
     GenerationErrorCause,
 )
+from evidenceops.metrics import GenerationMetrics
 
 
 logger = logging.getLogger(__name__)
 
 
-SYSTEM_INSTRUCTION = """
-Eres un asistente especializado en preguntas biomédicas.
-
-Responde a la pregunta de forma clara, prudente y útil utilizando únicamente
-el conocimiento disponible en el modelo.
-
-El campo `answer` debe contener la respuesta a la pregunta biomédica.
-
-No proporciones estudios, citas, cifras o resultados específicos si no tienes
-suficiente certeza. Expresa la incertidumbre cuando corresponda.
-
-El campo `limitations` debe contener una lista de limitaciones relevantes de
-la respuesta o de la propia pregunta. Incluye, cuando corresponda, información
-importante que falte para poder responder con mayor precisión.
-
-No afirmes que has consultado, buscado o verificado información en fuentes
-externas.
-"""
 
 
 _RETRIABLE_STATUS_CODES = [
@@ -123,6 +107,7 @@ class GeminiGenerator:
         model: str = "gemini-3.6-flash",
         max_output_tokens: int = 2048,
         timeout_seconds: float = 60.0,
+        metrics: GenerationMetrics | None = None,
     ) -> None:
         if not api_key or not api_key.strip():
             raise ValueError(
@@ -132,6 +117,7 @@ class GeminiGenerator:
         self._model = model
         self._max_output_tokens = max_output_tokens
         self._timeout_seconds = timeout_seconds
+        self._metrics = metrics
 
         try:
             self._client = genai.Client(
@@ -166,7 +152,7 @@ class GeminiGenerator:
             ) from exc
 
     def generate(self, question_text: str) -> GeneratedContent:
-        logger.info("gemini.generation.started", extra={"model": self._model})
+        logger.info("llm.generation.started", extra={"provider": "gemini", "model": self._model})
         try:
             interaction = self._client.interactions.create(
                 model=self._model,
@@ -185,6 +171,16 @@ class GeminiGenerator:
             )
 
             output_text = interaction.output_text
+
+            if self._metrics is not None:
+                usage = getattr(interaction, "usage", None)
+                if usage is not None:
+                    self._metrics.record_usage(
+                        "gemini", self._model,
+                        getattr(usage, "total_input_tokens", None),
+                        getattr(usage, "total_output_tokens", None),
+                        getattr(usage, "total_tokens", None),
+                    )
 
         except Exception as exc:
             cause = _classify_provider_error(exc)

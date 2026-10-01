@@ -22,7 +22,7 @@ class JsonFormatter(logging.Formatter):
             "request_id": request_id.get(),
         }
         # Only explicitly selected operational metadata; never exception text/stack.
-        for field in ("duration_ms", "outcome", "cause", "model"):
+        for field in ("duration_ms", "outcome", "cause", "provider", "model"):
             if hasattr(record, field):
                 event[field] = getattr(record, field)
         return json.dumps(event, ensure_ascii=False, allow_nan=False)

@@ -108,13 +108,17 @@ invoca al generador. La respuesta no se persiste y repetir la operación puede
 producir otra respuesta. No se han consultado fuentes biomédicas externas.
 
 
-## Operar Gemini
+## Operar la generación
 
-La API requiere clave configurada salvo que se inyecte un generador, como hacen
+La API usa Gemini por defecto; selecciona DeepSeek con
+`EVIDENCEOPS_LLM_PROVIDER=deepseek` y `EVIDENCEOPS_DEEPSEEK_API_KEY`.
+Modelo por defecto: `deepseek-flash`; ajusta modelo, tokens y timeout con las
+variables `EVIDENCEOPS_DEEPSEEK_*` de [.env.example](.env.example). La API
+requiere la clave del proveedor elegido salvo que se inyecte un generador, como hacen
 los tests. No hay inferencia al importar ni al arrancar; startup comprueba
 PostgreSQL, pero no la validez remota de la clave. No publiques `.env` ni claves.
 
-Para una inferencia manual explícita que consume cuota:
+El script manual existente llama exclusivamente a Gemini y consume cuota:
 
 ```bash
 uv run --locked python test_gemini.py
@@ -127,13 +131,15 @@ La respuesta tiene validación estructural, no garantía de veracidad biomédica
 Errores HTTP: timeout → 504; cuota → 429; autenticación/indisponibilidad del
 proveedor → 503; salida inválida u otro fallo de generación → 502. Los mensajes
 públicos son fijos y seguros; contrato exacto en OpenAPI y tests de generación.
-Política de retries y ausencia de deadline total en [D011](docs/decisions/D011-gemini.md).
+Gemini conserva el retry del SDK documentado en [D011](docs/decisions/D011-gemini.md);
+DeepSeek hace una petición sin retry propio. Ambos usan timeout de transporte
+sin deadline total.
 Flujo y recursos en [arquitectura](docs/ARCHITECTURE.md).
 
 ## Diagnóstico y evaluación
 
 - [Observabilidad](docs/subsystems/observability.md): eventos JSON, X-Request-ID,
-  diagnóstico y límites; estado de entrega en el plan M5.
+  `GET /metrics`, diagnóstico y límites; estado de entrega en el plan M5.
 - [Evaluación](evaluation/README.md): dataset, runs, promoción, revisión humana
   y comparación. Un baseline de outputs no certifica calidad biomédica.
 
