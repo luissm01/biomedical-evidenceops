@@ -1,6 +1,6 @@
 # Observabilidad: diagnosticar una generación
 
-Estado de entrega en el [plan M5](../plans/active/m5-observability.md).
+Orden de entrega en el [plan M5 completado](../plans/completed/m5-observability.md).
 
 La API configura `logging` de Python para emitir eventos de EvidenceOps como
 una línea JSON por evento a stdout. No modifica los handlers del servidor ni
@@ -62,6 +62,60 @@ Los mensajes de eventos son constantes. `GenerationError` utiliza sus causas
 existentes; su mensaje y su cadena interna no se serializan. Un error inesperado
 se vuelve a lanzar para mantener la política HTTP existente.
 
+## Traces de una generación
+
+Un **trace** es el recorrido de una ejecución concreta; un **span** representa
+una operación de ese recorrido. La relación **padre/hijo** muestra qué operación
+contiene a otra. Aquí, OpenTelemetry crea tres spans:
+
+```text
+POST /questions/{question_id}/generate (SERVER)
+└── generation
+    └── llm.gemini  (o llm.deepseek)
+```
+
+El span HTTP cubre la petición; `generation` cubre la llamada a `Generator` y
+la respuesta de la ruta; el del proveedor cubre su llamada y validación. Cada
+span lleva duración de OpenTelemetry y `evidenceops.outcome=success|error`.
+El del proveedor añade `evidenceops.provider` y `evidenceops.model`; ante fallo,
+este y sus padres quedan en estado ERROR. `record_exception` recibe una
+excepción sintética con una causa estable, pues mensajes y cadenas originales
+del SDK podrían incluir contenido sensible. Ni prompts, respuestas, UUID de
+pregunta ni mensajes originales entran en spans. La ruta usa una plantilla sin
+UUID. No se instrumentan intentos internos o funciones adicionales.
+
+Los logs cuentan **qué ocurrió**, las métricas **cuánto ocurre** entre muchas
+ejecuciones y los traces **dónde ocurrió** en una ejecución. Los eventos JSON
+emitidos dentro de spans añaden `trace_id` y `span_id`; `request_id` permanece.
+Los logs fuera de spans mantienen su formato anterior.
+
+La exportación está desactivada por defecto. Para demostrar #23 con la API y
+PostgreSQL preparados, iniciar en una terminal (con la clave del proveedor en
+`.env`):
+
+```bash
+EVIDENCEOPS_TRACE_CONSOLE=true uv run --locked uvicorn evidenceops.main:app --no-access-log \
+  > /tmp/evidenceops-events.jsonl 2> /tmp/evidenceops-traces.jsonl
+```
+
+En otra terminal, sustituir el UUID por una pregunta ya registrada:
+
+```bash
+curl -sS -D - -o /dev/null -X POST \
+  http://127.0.0.1:8000/questions/UUID_DE_LA_PREGUNTA/generate
+rg 'llm.gemini|llm.deepseek|generation|trace_id|duration|evidenceops.outcome' \
+  /tmp/evidenceops-traces.jsonl
+```
+
+El exportador de consola escribe un objeto por span en stderr. Los tres objetos
+comparten `trace_id`; `parent_id` enlaza proveedor → generación → HTTP. El span
+`llm.gemini` o `llm.deepseek` muestra modelo, `start_time`, `end_time` (su
+diferencia es la duración) y outcome. Si falla, muestra causa y excepción
+segura. Copiar `trace_id` a los logs y comparar
+con `generation.succeeded` o `generation.failed`; consultar `GET /metrics` para
+los agregados. La petición manual llama al proveedor y puede consumir cuota.
+El formato exacto del exportador de consola no es estable.
+
 ## Comprobación manual corta
 
 Con PostgreSQL y la configuración local preparados, iniciar en una terminal:
@@ -114,4 +168,4 @@ ninguno realiza inferencias reales.
   petición, sin retry propio. Ambos tienen timeout de transporte, sin deadline
   total. DeepSeek usa JSON mode y Pydantic valida el esquema; Gemini envía
   además JSON Schema al proveedor.
-- No hay coste monetario, tracing ni plataforma de observabilidad desplegada.
+- No hay cálculo de coste monetario ni plataforma de observabilidad desplegada.

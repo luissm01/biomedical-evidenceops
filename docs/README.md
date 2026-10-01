@@ -13,7 +13,7 @@ destinos en cascada.
 | Presente y próximo paso | [Estado](CURRENT_STATE.md) | Cuando la tarea dependa del estado, milestone o trabajo en curso |
 | Orden y alcance M0–M19 | [Roadmap](ROADMAP.md) | Sección del milestone afectado |
 | Por qué una elección | [ADRs](decisions/README.md) | Índice y decisión del área |
-| Trabajo en curso | [Plan M5](plans/active/m5-observability.md) | Continuar observabilidad |
+| Trabajo completado | [Archivo M5](plans/completed/m5-observability.md) | Consultar secuencia y cierre de observabilidad |
 | Trabajo histórico útil | [Planes completados](plans/completed/README.md) | Investigación histórica |
 | Cómo enseñar / qué se ha trabajado | [Aprendizaje](learning/README.md) | Solo tareas pedagógicas |
 | Dataset, runs y revisión | [Evaluation](../evaluation/README.md) | Evaluación del generador |

@@ -137,7 +137,7 @@ portfolio-quality README, diagrams and interview preparation.
   Los motivos del método inicial están en D013–D015; no se mide retrieval sin tenerlo.
 - **M5:** logs, métricas y trazas para investigar latencia, errores, retries,
   uso de tokens y coste. OpenTelemetry/Langfuse son opciones, no elecciones impuestas.
-  Secuencia de trabajo existente en el [plan activo](plans/active/m5-observability.md).
+  Secuencia de trabajo conservada en el [plan completado](plans/completed/m5-observability.md).
 - **M7/M9:** Recall@K, Precision@K, Hit Rate, MRR y NDCG cuando exista retrieval;
   metadata, query rewriting y contextual retrieval según fallos medidos. PostgreSQL
   con pgvector es una posibilidad; DB vectorial dedicada solo con justificación.

@@ -24,6 +24,7 @@ en Git/issues. El estado de entrega vive en GitHub y el trabajo local en los pla
 | [D017](D017-context-architecture.md) | Arquitectura documental y carga progresiva | Aceptada por el encargo de refactor |
 | [D018](D018-multiple-llm-providers.md) | Gemini y DeepSeek tras Generator | Aceptada |
 | [D019](D019-prometheus-metrics.md) | Métricas Prometheus de generación y tokens observados (#22) | Aceptada |
+| [D020](D020-opentelemetry-tracing.md) | Spans OpenTelemetry mínimos para generaciones (#23) | Aceptada localmente |
 
 Nueva decisión: siguiente ID, problema, alternativas, decisión, consecuencias
 y estado. Cambios de dirección enlazan a la decisión sustituida; no reescribas

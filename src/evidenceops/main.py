@@ -28,6 +28,7 @@ from evidenceops.schemas import (
     QuestionCreate,
     QuestionResponse,
 )
+from evidenceops.tracing import configure_tracing, finish_error, finish_success, tracer
 
 
 logger = logging.getLogger(__name__)
@@ -152,38 +153,44 @@ def generate_answer(
     generator: Generator = Depends(get_generator),
     metrics: GenerationMetrics = Depends(get_metrics),
 ) -> GenerationResponse:
-    started = perf_counter()
-    logger.info("generation.started")
-    try:
-        generated = generator.generate(question_text)
-    except GenerationError as exc:
+    with tracer.start_as_current_span(
+        "generation", record_exception=False, set_status_on_exception=False
+    ) as span:
+        started = perf_counter()
+        logger.info("generation.started")
+        try:
+            generated = generator.generate(question_text)
+        except GenerationError as exc:
+            duration_seconds = perf_counter() - started
+            finish_error(span, exc.cause.value)
+            metrics.record_generation("error", duration_seconds, exc.cause)
+            logger.warning("generation.failed", extra={
+                "duration_ms": duration_seconds * 1000,
+                "outcome": "error", "cause": exc.cause.value,
+            })
+            raise _generation_http_exception(exc) from exc
+        except Exception:
+            duration_seconds = perf_counter() - started
+            finish_error(span, "unexpected_application_error")
+            metrics.record_unexpected_error(duration_seconds)
+            logger.error("generation.failed", extra={
+                "duration_ms": duration_seconds * 1000,
+                "outcome": "error", "cause": "unexpected_application_error",
+            })
+            raise
         duration_seconds = perf_counter() - started
-        metrics.record_generation("error", duration_seconds, exc.cause)
-        logger.warning("generation.failed", extra={
+        finish_success(span)
+        metrics.record_generation("success", duration_seconds)
+        logger.info("generation.succeeded", extra={
             "duration_ms": duration_seconds * 1000,
-            "outcome": "error", "cause": exc.cause.value,
+            "outcome": "success",
         })
-        raise _generation_http_exception(exc) from exc
-    except Exception:
-        duration_seconds = perf_counter() - started
-        metrics.record_unexpected_error(duration_seconds)
-        logger.error("generation.failed", extra={
-            "duration_ms": duration_seconds * 1000,
-            "outcome": "error", "cause": "unexpected_application_error",
-        })
-        raise
-    duration_seconds = perf_counter() - started
-    metrics.record_generation("success", duration_seconds)
-    logger.info("generation.succeeded", extra={
-        "duration_ms": duration_seconds * 1000,
-        "outcome": "success",
-    })
 
-    return GenerationResponse(
-        answer=generated.answer,
-        limitations=generated.limitations,
-        external_sources_consulted=False,
-    )
+        return GenerationResponse(
+            answer=generated.answer,
+            limitations=generated.limitations,
+            external_sources_consulted=False,
+        )
 
 
 def create_app(
@@ -193,6 +200,7 @@ def create_app(
     async def lifespan(app: FastAPI) -> AsyncIterator[None]:
         configure_logging()
         configured_settings = settings or Settings()
+        configure_tracing(configured_settings.trace_console)
         engine, session_factory = create_database(configured_settings)
 
         owned_generator = None
