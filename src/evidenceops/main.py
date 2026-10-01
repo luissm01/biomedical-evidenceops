@@ -7,6 +7,7 @@ from typing import cast
 from uuid import UUID, uuid4
 
 from fastapi import APIRouter, Depends, FastAPI, HTTPException, Request, Response
+from prometheus_client import CONTENT_TYPE_LATEST
 from sqlalchemy import text
 from sqlalchemy.orm import Session, sessionmaker
 
@@ -19,6 +20,7 @@ from evidenceops.generation import (
     Generator,
 )
 from evidenceops.models import Question
+from evidenceops.metrics import GenerationMetrics
 from evidenceops.observability import CorrelatedFastAPI, configure_logging
 from evidenceops.schemas import (
     GenerationResponse,
@@ -84,6 +86,10 @@ def get_generator(request: Request) -> Generator:
     return cast(Generator, request.app.state.generator)
 
 
+def get_metrics(request: Request) -> GenerationMetrics:
+    return cast(GenerationMetrics, request.app.state.metrics)
+
+
 def get_question_text(question_id: UUID, request: Request) -> str:
     session_factory = cast(
         sessionmaker[Session],
@@ -105,6 +111,11 @@ def get_question_text(question_id: UUID, request: Request) -> str:
 @router.get("/health", response_model=HealthCheckResponse)
 def health_check() -> HealthCheckResponse:
     return HealthCheckResponse(status="ok")
+
+
+@router.get("/metrics")
+def metrics_endpoint(metrics: GenerationMetrics = Depends(get_metrics)) -> Response:
+    return Response(content=metrics.render(), media_type=CONTENT_TYPE_LATEST)
 
 
 @router.post("/questions", response_model=QuestionResponse, status_code=201)
@@ -139,25 +150,32 @@ def get_question(
 def generate_answer(
     question_text: str = Depends(get_question_text),
     generator: Generator = Depends(get_generator),
+    metrics: GenerationMetrics = Depends(get_metrics),
 ) -> GenerationResponse:
     started = perf_counter()
     logger.info("generation.started")
     try:
         generated = generator.generate(question_text)
     except GenerationError as exc:
+        duration_seconds = perf_counter() - started
+        metrics.record_generation("error", duration_seconds, exc.cause)
         logger.warning("generation.failed", extra={
-            "duration_ms": (perf_counter() - started) * 1000,
+            "duration_ms": duration_seconds * 1000,
             "outcome": "error", "cause": exc.cause.value,
         })
         raise _generation_http_exception(exc) from exc
     except Exception:
+        duration_seconds = perf_counter() - started
+        metrics.record_unexpected_error(duration_seconds)
         logger.error("generation.failed", extra={
-            "duration_ms": (perf_counter() - started) * 1000,
+            "duration_ms": duration_seconds * 1000,
             "outcome": "error", "cause": "unexpected_application_error",
         })
         raise
+    duration_seconds = perf_counter() - started
+    metrics.record_generation("success", duration_seconds)
     logger.info("generation.succeeded", extra={
-        "duration_ms": (perf_counter() - started) * 1000,
+        "duration_ms": duration_seconds * 1000,
         "outcome": "success",
     })
 
@@ -186,7 +204,7 @@ def create_app(
             if generator is not None:
                 configured_generator = generator
             else:
-                owned_generator = create_generator(configured_settings)
+                owned_generator = create_generator(configured_settings, app.state.metrics)
                 configured_generator = owned_generator
             app.state.generator = configured_generator
             yield
@@ -198,6 +216,7 @@ def create_app(
                 engine.dispose()
 
     application = CorrelatedFastAPI(lifespan=lifespan)
+    application.state.metrics = GenerationMetrics()
     application.include_router(router)
 
     return application

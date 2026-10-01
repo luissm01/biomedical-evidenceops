@@ -8,14 +8,14 @@ en [roadmap](../../ROADMAP.md#m5--observability); arquitectura de aplicación in
 1. [#21: logging y correlación](https://github.com/luissm01/biomedical-evidenceops/issues/21):
    cerrada. Eventos LLM comunes para Gemini y DeepSeek.
 2. [#22: métricas de generación, latencia y uso](https://github.com/luissm01/biomedical-evidenceops/issues/22):
-   después de #21; sin implementar.
+   implementada localmente sobre Gemini y DeepSeek; pendiente revisión/entrega.
 3. [#23: tracing y diagnóstico end-to-end](https://github.com/luissm01/biomedical-evidenceops/issues/23):
    después de #21 y #22; sin implementar.
 
 ## Decisiones abiertas y salida
 
-Métricas y tracing aún requieren diseño con el desarrollador. No están elegidas
-plataformas de observabilidad; OpenTelemetry/Langfuse no se han adoptado.
+Métricas acordadas en [D019](../../decisions/D019-prometheus-metrics.md).
+Tracing aún requiere diseño; OpenTelemetry/Langfuse no se han adoptado.
 No instrumentar intentos internos ni cambiar retries/timeouts al abordar #22.
 
 Para cerrar M5, contrastar criterios de sus issues y aprendizaje realmente

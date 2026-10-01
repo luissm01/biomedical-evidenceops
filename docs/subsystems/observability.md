@@ -4,7 +4,7 @@ Estado de entrega en el [plan M5](../plans/active/m5-observability.md).
 
 La API configura `logging` de Python para emitir eventos de EvidenceOps como
 una línea JSON por evento a stdout. No modifica los handlers del servidor ni
-los de librerías externas. No requiere dependencias nuevas.
+los de librerías externas.
 
 Cada petición HTTP recibe un UUID nuevo, incluso si el cliente envía
 `X-Request-ID`. Se devuelve en esa cabecera tanto en éxito como en errores,
@@ -26,6 +26,35 @@ sirve para situar el evento; la duración usa `perf_counter()` y milisegundos.
 Mide la llamada al generador, incluida su validación de salida y posibles
 esperas/retries del SDK, excluyendo la consulta previa a PostgreSQL y la
 serialización HTTP. No es la duración completa de la petición.
+
+## Métricas agregadas
+
+`GET /metrics` devuelve formato Prometheus mediante `prometheus-client`. El
+registro es propio de cada instancia de API. Los logs permiten seguir una
+operación con `request_id`; las métricas suman observaciones entre operaciones.
+
+| Métrica | Tipo | Labels |
+| --- | --- | --- |
+| `evidenceops_generations_total` | Counter | `outcome=success|error` |
+| `evidenceops_generation_errors_total` | Counter | `cause` estable de `GenerationErrorCause` o `unexpected_application_error` |
+| `evidenceops_generation_duration_seconds` | Histogram | `outcome=success|error` |
+| `evidenceops_llm_input_tokens_total` | Counter | `provider`, `model` |
+| `evidenceops_llm_output_tokens_total` | Counter | `provider`, `model` |
+| `evidenceops_llm_total_tokens_total` | Counter | `provider`, `model` |
+
+El histograma cubre el mismo tramo que `duration_ms`; sus buckets llegan a
+120 segundos y conservan la cola superior. Permite derivar percentiles
+aproximados a partir de buckets agregados. Un Gauge representaría un valor
+instantáneo, por ejemplo trabajo en curso; aquí interesan acumulados y
+distribuciones, por eso se usan Counter e Histogram.
+
+`provider` y `model` tienen cardinalidad acotada en la configuración actual.
+`request_id`, `question_id`, textos, respuestas y errores crudos no son labels:
+crearían series numerosas o expondrían contenido. Gemini aporta `usage` de la
+interacción; DeepSeek, `usage` de la respuesta JSON. Se registran los tres
+contadores de tokens solo cuando existen input, output y total reales. No se
+deducen campos ausentes ni se llama a `count_tokens`. Tokens observados no son
+coste facturado: el pricing y tier externos no se conocen de forma fiable.
 
 Se seleccionan explícitamente los campos operativos. No se registran preguntas,
 respuestas, limitations, claves, cuerpos del proveedor ni excepciones/tracebacks.
@@ -85,4 +114,4 @@ ninguno realiza inferencias reales.
   petición, sin retry propio. Ambos tienen timeout de transporte, sin deadline
   total. DeepSeek usa JSON mode y Pydantic valida el esquema; Gemini envía
   además JSON Schema al proveedor.
-- No hay métricas, tokens, coste, tracing ni plataforma de observabilidad.
+- No hay coste monetario, tracing ni plataforma de observabilidad desplegada.

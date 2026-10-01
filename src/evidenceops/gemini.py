@@ -14,6 +14,7 @@ from evidenceops.generation import (
     GenerationError,
     GenerationErrorCause,
 )
+from evidenceops.metrics import GenerationMetrics
 
 
 logger = logging.getLogger(__name__)
@@ -106,6 +107,7 @@ class GeminiGenerator:
         model: str = "gemini-3.6-flash",
         max_output_tokens: int = 2048,
         timeout_seconds: float = 60.0,
+        metrics: GenerationMetrics | None = None,
     ) -> None:
         if not api_key or not api_key.strip():
             raise ValueError(
@@ -115,6 +117,7 @@ class GeminiGenerator:
         self._model = model
         self._max_output_tokens = max_output_tokens
         self._timeout_seconds = timeout_seconds
+        self._metrics = metrics
 
         try:
             self._client = genai.Client(
@@ -168,6 +171,13 @@ class GeminiGenerator:
             )
 
             output_text = interaction.output_text
+
+            usage = interaction.usage
+            if self._metrics is not None and usage is not None:
+                self._metrics.record_usage(
+                    "gemini", self._model,
+                    usage.total_input_tokens, usage.total_output_tokens, usage.total_tokens,
+                )
 
         except Exception as exc:
             cause = _classify_provider_error(exc)

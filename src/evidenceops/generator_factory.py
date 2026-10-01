@@ -4,13 +4,14 @@ from typing import Protocol
 
 from evidenceops.config import GenerationSettings
 from evidenceops.generation import Generator
+from evidenceops.metrics import GenerationMetrics
 
 
 class OwnedGenerator(Generator, Protocol):
     def close(self) -> None: ...
 
 
-def create_generator(settings: GenerationSettings) -> OwnedGenerator:
+def create_generator(settings: GenerationSettings, metrics: GenerationMetrics | None = None) -> OwnedGenerator:
     if settings.llm_provider == "gemini":
         if settings.gemini_api_key is None:
             raise RuntimeError("EVIDENCEOPS_GEMINI_API_KEY is required for generation")
@@ -21,6 +22,7 @@ def create_generator(settings: GenerationSettings) -> OwnedGenerator:
             model=settings.gemini_model,
             max_output_tokens=settings.gemini_max_output_tokens,
             timeout_seconds=settings.gemini_timeout_seconds,
+            metrics=metrics,
         )
     if settings.llm_provider == "deepseek":
         if settings.deepseek_api_key is None:
@@ -32,5 +34,6 @@ def create_generator(settings: GenerationSettings) -> OwnedGenerator:
             model=settings.deepseek_model,
             max_output_tokens=settings.deepseek_max_output_tokens,
             timeout_seconds=settings.deepseek_timeout_seconds,
+            metrics=metrics,
         )
     raise ValueError("Unsupported EVIDENCEOPS_LLM_PROVIDER")

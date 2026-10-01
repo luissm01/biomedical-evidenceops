@@ -139,7 +139,7 @@ Flujo y recursos en [arquitectura](docs/ARCHITECTURE.md).
 ## Diagnóstico y evaluación
 
 - [Observabilidad](docs/subsystems/observability.md): eventos JSON, X-Request-ID,
-  diagnóstico y límites; estado de entrega en el plan M5.
+  `GET /metrics`, diagnóstico y límites; estado de entrega en el plan M5.
 - [Evaluación](evaluation/README.md): dataset, runs, promoción, revisión humana
   y comparación. Un baseline de outputs no certifica calidad biomédica.
 

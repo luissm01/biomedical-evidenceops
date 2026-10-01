@@ -12,8 +12,9 @@ Actualizado: 2026-09-30. Distingue código versionado de trabajo local pendiente
 - Evaluación offline con runs trazables, promoción de baseline y revisión humana
   por caso/dimensión, con agregación y comparación de regresiones.
   [Procedimiento](../evaluation/README.md).
-- #21 cerrada: logs JSON y correlación HTTP. El evento LLM de inicio incluye
-  `provider` y `model`; métricas y tracing siguen sin implementar.
+- #21 cerrada: logs JSON y correlación HTTP. #22 implementada localmente:
+  métricas Prometheus de generaciones, errores, latencia y tokens observados
+  para Gemini y DeepSeek en `GET /metrics`. Tracing sigue pendiente.
 
 ## Limitaciones relevantes
 
@@ -36,7 +37,7 @@ Actualizado: 2026-09-30. Distingue código versionado de trabajo local pendiente
 
 ## Siguiente trabajo
 
-Corresponde #22, seguida de #23, según el plan activo.
+Tras revisar y entregar #22, corresponde #23 según el plan activo.
 Cuando exista cuota y se solicite, obtener/promover/revisar el baseline real.
 Los comandos y requisitos de pruebas viven en el [README](../README.md);
 el alcance pendiente, en el plan activo.

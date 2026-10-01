@@ -7,6 +7,7 @@ from pydantic import ValidationError
 
 from evidenceops.generation_prompt import SYSTEM_INSTRUCTION
 from evidenceops.generation import GeneratedContent, GenerationError, GenerationErrorCause
+from evidenceops.metrics import GenerationMetrics
 
 logger = logging.getLogger(__name__)
 _ENDPOINT = "https://api.deepseek.com/chat/completions"
@@ -23,11 +24,13 @@ class DeepSeekGenerator:
     def __init__(
         self, api_key: str, model: str = "deepseek-flash",
         max_output_tokens: int = 2048, timeout_seconds: float = 60.0,
+        metrics: GenerationMetrics | None = None,
     ) -> None:
         if not api_key or not api_key.strip():
             raise ValueError("EVIDENCEOPS_DEEPSEEK_API_KEY is required for generation")
         self._model = model
         self._max_output_tokens = max_output_tokens
+        self._metrics = metrics
         try:
             self._client = httpx.Client(
                 timeout=timeout_seconds,
@@ -64,6 +67,13 @@ class DeepSeekGenerator:
 
         try:
             payload = response.json()
+            usage = payload.get("usage") if isinstance(payload, dict) else None
+            if self._metrics is not None and isinstance(usage, dict):
+                self._metrics.record_usage(
+                    "deepseek", self._model,
+                    usage.get("prompt_tokens"), usage.get("completion_tokens"),
+                    usage.get("total_tokens"),
+                )
             choice = payload["choices"][0]
             if choice["finish_reason"] != "stop":
                 raise ValueError("Incomplete output")
