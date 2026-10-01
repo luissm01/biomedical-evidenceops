@@ -4,19 +4,22 @@ Actualizado: 2026-10-01. Distingue código versionado de trabajo local pendiente
 
 ## Presente
 
-- **M5 — Observability** implementado y validado; la entrega de #23 se prepara
-  en una PR. El [plan M5](plans/completed/m5-observability.md) conserva su orden.
-  M6 es el siguiente milestone de la secuencia, aún sin iniciar.
+- **M5 — Observability** completado: #21, #22 y #23 cerradas, con sus PRs
+  integradas. El [plan M5](plans/completed/m5-observability.md) conserva su orden.
+  **M6 — Biomedical Data Ingestion** está iniciada: #28 tiene decisiones
+  documentadas para revisión humana. PubMed/NCBI E-utilities es la fuente
+  inicial; el contrato normalizado y la identidad de ingestión están en
+  [D021](decisions/D021-biomedical-ingestion-source-and-contract.md).
+  [Plan M6](plans/m6-biomedical-data-ingestion.md). Aún no hay implementación.
 - API para registrar/consultar preguntas persistidas en PostgreSQL y generar
   respuestas efímeras mediante Gemini o DeepSeek, seleccionados por configuración. [Límites y flujo](ARCHITECTURE.md).
 - Evaluación offline con runs trazables, promoción de baseline y revisión humana
   por caso/dimensión, con agregación y comparación de regresiones.
   [Procedimiento](../evaluation/README.md).
-- #21 cerrada: logs JSON y correlación HTTP. #22 cerrada:
-  métricas Prometheus de generaciones, errores, latencia y tokens observados
-  para Gemini y DeepSeek en `GET /metrics`. #23 implementada y validada en rama:
-  spans OpenTelemetry para HTTP, generación y proveedor, con correlación en logs
-  y exportación opcional a consola.
+- #21: logs JSON y correlación HTTP. #22: métricas Prometheus de generaciones,
+  errores, latencia y tokens observados para Gemini y DeepSeek en `GET /metrics`.
+  #23: spans OpenTelemetry para HTTP, generación y proveedor, con correlación
+  en logs y exportación opcional a consola.
 
 ## Limitaciones relevantes
 
@@ -39,7 +42,8 @@ Actualizado: 2026-10-01. Distingue código versionado de trabajo local pendiente
 
 ## Siguiente trabajo
 
-Integrar la PR de #23; después iniciar M6 según el roadmap cuando se encargue.
+Revisar y cerrar humanamente #28; después #29 (adquisición, parsing y
+normalización), seguida de #30 (persistencia idempotente) y #31 (pipeline).
 Cuando exista cuota y se solicite, obtener/promover/revisar el baseline real.
 Los comandos y requisitos de pruebas viven en el [README](../README.md);
 el alcance pendiente, en el plan activo.
