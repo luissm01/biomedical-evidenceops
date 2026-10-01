@@ -11,8 +11,9 @@ Actualizado: 2026-10-01. Distingue código versionado de trabajo local pendiente
   inicial; el contrato normalizado y la identidad de ingestión están en
   [D021](decisions/D021-biomedical-ingestion-source-and-contract.md).
   [Plan M6](plans/m6-biomedical-data-ingestion.md). #29 está completada: cliente
-  PubMed ESearch/EFetch, parser y contrato normalizado, con tests sin red. No
-  incluye persistencia ni CLI.
+  PubMed ESearch/EFetch, parser y contrato normalizado, con tests sin red. #30
+  está completada: modelo y migración de publicaciones, con upsert atómico e
+  identidad única. No incluye CLI.
 - API para registrar/consultar preguntas persistidas en PostgreSQL y generar
   respuestas efímeras mediante Gemini o DeepSeek, seleccionados por configuración. [Límites y flujo](ARCHITECTURE.md).
 - Evaluación offline con runs trazables, promoción de baseline y revisión humana
@@ -44,7 +45,7 @@ Actualizado: 2026-10-01. Distingue código versionado de trabajo local pendiente
 
 ## Siguiente trabajo
 
-Siguiente issue: #30 (persistencia idempotente); #31 abordará el pipeline.
+Siguiente issue: #31 (pipeline de ingestión).
 Cuando exista cuota y se solicite, obtener/promover/revisar el baseline real.
 Los comandos y requisitos de pruebas viven en el [README](../README.md);
 el alcance pendiente, en el plan activo.

@@ -12,15 +12,17 @@ duraderas están en [D021](../decisions/D021-biomedical-ingestion-source-and-con
 2. [#29: adquisición, parsing y normalización](https://github.com/luissm01/biomedical-evidenceops/issues/29):
    completada. Depende de #28.
 3. [#30: persistencia e idempotencia](https://github.com/luissm01/biomedical-evidenceops/issues/30):
-   siguiente issue; depende del contrato y de #29. Proteger `(source, source_id)`
-   y aplicar reingestión mediante update.
+   completada. Depende del contrato y de #29;
+   decisiones de almacenamiento en [D022](../decisions/D022-biomedical-publication-persistence.md).
 4. [#31: pipeline y validación end-to-end](https://github.com/luissm01/biomedical-evidenceops/issues/31):
-   depende de #29 y #30; CLI fina, fallos parciales y resumen de ejecución.
+   siguiente issue; depende de #29 y #30. CLI fina, fallos parciales y resumen
+   de ejecución.
 
 ## Decisiones abiertas y evidencia
 
 No queda abierta la elección de fuente, contrato conceptual, identidad,
-reingestión ni interfaz: ver D021. #30 y #31 concretarán persistencia y pipeline.
+reingestión ni interfaz: ver D021. #30 concreta persistencia en D022; #31
+concretará el pipeline.
 Tests y CI no harán llamadas reales; una demo pequeña requiere autorización
 explícita. No introducir retrieval, embeddings, chunks, RAG ni infraestructura
 de milestones posteriores.

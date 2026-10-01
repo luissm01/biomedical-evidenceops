@@ -150,7 +150,13 @@ PMIDs desde una query con `limit` obligatorio (1–100) y EFetch XML para adquir
 PMIDs explícitos en lotes de hasta 200. `fetch(pmids)` devuelve documentos
 `BiomedicalDocument` y errores de registros individuales; un fallo HTTP, timeout
 o respuesta XML inválida lanza `PubMedError` y puede invalidar el lote completo.
-No hay persistencia, CLI ni conexión con la generación en esta fase.
+El cliente PubMed no persiste ni se conecta con la generación.
+
+La persistencia de #30 está en [publications.py](src/evidenceops/publications.py):
+`upsert_publication(session, document)` ejecuta una sola sentencia PostgreSQL
+y deja el commit o rollback al llamador. Aplica las migraciones con
+`uv run alembic upgrade head` antes de usarla. `as_biomedical_document` copia
+una fila al contrato normalizado. Aún no hay CLI ni pipeline de ingestión.
 
 `PubMedSettings` no requiere base de datos. Sus variables opcionales están en
 [.env.example](.env.example): clave API, email de contacto, nombre de herramienta
@@ -165,7 +171,7 @@ uso de NCBI y del contenido. [Reglas de E-utilities](https://www.ncbi.nlm.nih.go
 ## Pruebas y CI
 
 La suite completa usa PostgreSQL local; las fixtures exigen `evidenceops_test`,
-aplican migraciones y limpian preguntas antes/después de cada test de datos.
+aplican migraciones y limpian los datos afectados antes/después de cada test.
 Configura `EVIDENCEOPS_TEST_DATABASE_URL` según el ejemplo.
 
 ```bash
