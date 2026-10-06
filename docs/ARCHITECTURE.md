@@ -79,6 +79,20 @@ los documentos persistidos no se conectan aún con generación. Motivos y alcanc
 [D022](decisions/D022-biomedical-publication-persistence.md) y
 [D023](decisions/D023-biomedical-ingestion-pipeline.md).
 
+La representación de publicaciones en [chunking.py](../src/evidenceops/chunking.py)
+es una transformación pura: `build_retrievable_unit(document, publication_id=...)`
+recibe `BiomedicalDocument` y el UUID de origen; devuelve una `RetrievableUnit`
+inmutable o `None` si no hay contenido. Una fila persistida puede convertirse con
+`as_biomedical_document` sin añadir acceso a DB a la transformación. Conserva
+título, abstract y procedencia. Une solo campos con contenido: título y abstract
+con `"\n\n"` entre ambos, solo título o solo abstract si falta el otro; si ninguno
+tiene contenido devuelve `None`. No normaliza Unicode, divide,
+trunca ni impone tamaño mínimo. La identidad depende de `(source, source_id)`,
+estrategia versionada e índice cero; el fingerprint depende del texto efectivo.
+El UUID interno sirve de vínculo con la fila y no participa en esos hashes.
+No se integra aún en ingestión, API, embeddings o generación.
+[Decisión y detalles de reproducibilidad](decisions/D024-retrieval-baseline-and-embeddings.md).
+
 La [evaluación](../evaluation/README.md) usa Generator sin FastAPI ni PostgreSQL:
 dataset → run → revisión humana → comparación. Dataset, outputs y juicios son
 artefactos diferentes. Estructura válida no implica contenido correcto.
