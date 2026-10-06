@@ -90,7 +90,8 @@ tiene contenido devuelve `None`. No normaliza Unicode, divide,
 trunca ni impone tamaño mínimo. La identidad depende de `(source, source_id)`,
 estrategia versionada e índice cero; el fingerprint depende del texto efectivo.
 El UUID interno sirve de vínculo con la fila y no participa en esos hashes.
-No se integra aún en ingestión, API, embeddings o generación.
+Se reutiliza en indexación y retrieval de #39; ingestión y generación siguen
+independientes.
 [Decisión y detalles de reproducibilidad](decisions/D024-retrieval-baseline-and-embeddings.md).
 
 La [evaluación](../evaluation/README.md) usa Generator sin FastAPI ni PostgreSQL:
@@ -106,3 +107,31 @@ y el [plan M5 completado](plans/completed/m5-observability.md).
 
 No hay capa Repository, framework de agentes ni orquestación anticipada.
 Consulta el [índice ADR](decisions/README.md) antes de cambiar estos límites.
+
+## Indexación y búsqueda vectorial local
+
+`Publication → chunking → LocalMedCPT Article Encoder → UnitEmbedding → pgvector`.
+[embeddings.py](../src/evidenceops/embeddings.py) define una frontera pequeña
+para MedCPT con dos métodos y configuración explícita, sustituible por dobles.
+Carga PyTorch/Transformers y pesos de forma diferida; revisiones fijadas, CPU,
+CLS y entrada título/abstract como par. El tokenizer trunca la entrada del
+encoder a 512 tokens de artículo o 64 de query; la unidad conserva todo el texto. No hay
+factoría multiproveedor.
+
+[retrieval.py](../src/evidenceops/retrieval.py) posee las transacciones de
+indexación: lee snapshot, cierra sesión, codifica, bloquea publicación y valida
+que el snapshot siga vigente antes de sustituir el vector. Una fila por unidad
+y publicación; FK con cascade. Fingerprint y configuración determinan reuse
+o reindexación; un cambio incompatible requiere autorización explícita mediante
+`replace_incompatible=True`. No conserva histórico de vectores.
+
+`query → Query Encoder → filtro SQL por año → dot product → top_k`.
+La búsqueda exacta de pgvector usa `<#>` (producto interno negativo), orden
+ascendente y score con signo invertido; desempate por identidad de unidad.
+Rechaza configuraciones incompatibles y excluye snapshots obsoletos antes del
+LIMIT. Une metadata vigente y devuelve unidad trazable más score. Sin HTTP,
+GraphQL ni integración LLM.
+
+[retrieval_demo.py](../src/evidenceops/retrieval_demo.py) compone recursos para
+una prueba manual sobre publicaciones ya ingeridas. Contratos, límites y comandos
+en el [README](../README.md#embeddings-y-retrieval-local-m7--39); motivos en D024.
