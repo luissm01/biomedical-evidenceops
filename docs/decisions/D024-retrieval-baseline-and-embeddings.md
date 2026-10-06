@@ -4,7 +4,7 @@
 
 Aceptada por las decisiones explícitas del desarrollador en el encargo de cierre
 documental de #37. Representación de #38 implementada; embeddings, almacenamiento
-y retrieval siguen siendo diseño.
+y retrieval de #39 implementados y aprobados por el desarrollador.
 
 ## Contexto
 
@@ -134,10 +134,58 @@ La dirección acordada es `publicación → título + abstract → Article Encod
 vector de 768 dimensiones → PostgreSQL + pgvector`; la consulta seguirá
 `query → Query Encoder → candidatos filtrados por año → dot product → top-K`.
 La representación de una unidad por publicación está implementada en
-#38, sin segmentación interna ni integración con ingestión. El resto de esos
-componentes aún no existe. #39 integrará embeddings/almacenamiento y #40 medirá retrieval.
+#38, sin segmentación interna ni integración con ingestión. La implementación local de #39 añade embeddings/almacenamiento y búsqueda;
+#40 medirá retrieval.
 
 M7 acaba en evidencia recuperada y baseline, sin alimentar Gemini/DeepSeek.
 RAG corresponde a M8; BM25, hybrid search, reranking y query rewriting a M9.
 No se añaden agentes, LangChain/LangGraph, DB vectorial dedicada ni infraestructura
 distribuida. CI seguirá sin inferencias reales ni descargas de modelos pesados.
+
+## Concreción local de #39
+
+Se persiste una fila por publicación/unidad, con vector fijo de 768 dimensiones,
+fingerprint, estrategia, texto, snapshot del título/abstract y configuración JSONB
+del par de encoders. Revisiones de pesos/tokenizer fijadas a commits de Hugging
+Face; CLS, sin normalización, título/abstract como par. La unidad íntegra continúa
+siendo el texto trazable; su representación del encoder usa los dos campos como
+entrada estructurada siguiendo el ejemplo oficial.
+
+Los límites son 512 tokens de artículo y 64 de query, incluidos tokens especiales.
+Se aplica `truncation=True` con `max_length=512` para artículos y
+`max_length=64` para queries, siguiendo el uso oficial de MedCPT y la corrección
+explícita del desarrollador para #39. El truncamiento pertenece solo a la entrada
+efectiva del encoder: `RetrievableUnit`, fingerprint y procedencia conservan el
+texto completo. La política `truncate-longest-first` (comportamiento de
+`truncation=True`) y ambos límites se registran en la configuración para detectar
+incompatibilidad con embeddings anteriores. No añade segmentación, overlap ni
+nuevas estrategias.
+
+El ranking es exacto, sin HNSW/IVFFlat: suficiente para el corpus inicial y sin
+recall aproximado que complique el baseline. El filtro inclusivo opera sobre el
+año vigente antes del top-K; desconocidos quedan fuera cuando se filtra. Empates
+por unit_id.
+
+La indexación libera la conexión durante inferencia y verifica el snapshot bajo
+bloqueo de la publicación antes de guardar. Evita escribir sobre una actualización
+concurrente, aunque dos indexadores simultáneos pueden calcular el mismo vector;
+la restricción única y el bloqueo evitan duplicarlo. Serializar la inferencia exigiría
+retener conexión/bloqueo o añadir coordinación, sin necesidad demostrada en M7.
+
+Reindexar sustituye el vector sin histórico. Cambiar configuración requiere
+`replace_incompatible=True` explícito; un corpus mixto falla en búsqueda hasta
+completar reconstrucción. Se prefiere este error visible a devolver solo un
+subconjunto compatible sin avisar. Los snapshots de contenido obsoleto se excluyen
+antes del ranking; la metadata se obtiene de la publicación vigente.
+
+Se añaden pgvector en dependencias normales y PyTorch/Transformers en un extra
+opcional de demo, con PyTorch CPU en Linux/Windows. Compose/CI usan PostgreSQL 18
+con pgvector; la migración crea la extensión y el downgrade conserva la extensión
+compartible. No se modifica el contrato HTTP ni se añade GraphQL.
+
+Además del fingerprint del texto de #38, la reutilización verifica el par efectivo
+que recibe el Article Encoder a partir del snapshot. Dos repartos distintos de
+texto entre título y abstract pueden producir el mismo texto unido (`a\n\nb`),
+pero diferentes tokens/segmentos del modelo. Ese caso requiere recalcular; cambios
+de whitespace en campos vacíos que siguen codificando como vacío sí reutilizan.
+No se cambia el contrato ni el fingerprint de #38.

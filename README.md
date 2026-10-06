@@ -242,3 +242,75 @@ servicios locales; [evaluation](evaluation): dataset y runbook.
 El mapa de responsabilidades está en [arquitectura](docs/ARCHITECTURE.md),
 los motivos en [ADRs](docs/decisions/README.md) y la dirección en el
 [roadmap](docs/ROADMAP.md).
+
+## Embeddings y retrieval local (M7 / #39)
+
+PostgreSQL debe incluir pgvector; Compose y CI usan la imagen oficial
+`pgvector/pgvector:0.8.7-pg18-trixie`. La migración
+`20261006_01` instala `vector` (requiere permisos para crear la extensión) y
+crea `unit_embeddings` con `vector(768)`. Conserva el volumen existente de
+PostgreSQL 18 al recrear el servicio; no borres volúmenes para actualizarlo.
+
+```bash
+docker compose up -d --wait postgres
+uv run --locked alembic upgrade head
+```
+
+[index_publication](src/evidenceops/retrieval.py) recibe una factory de sesiones,
+UUID de publicación y encoder. Indexa una publicación ya persistida y confirma
+su propia transacción. Devuelve `indexed`, `unchanged` u `omitted` (sin texto).
+Mismo ID/fingerprint/configuración y par efectivo título/abstract reutiliza el
+vector; contenido diferente lo
+sustituye. Si el contenido desaparece elimina su vector. Una publicación que
+cambia durante la inferencia aborta la escritura; se puede repetir la operación.
+La ingestión no indexa automáticamente.
+
+`search(sessions, encoder, query=..., top_k=..., published_from=...)` devuelve
+hasta `top_k` resultados con `unit: RetrievableUnit` y `score` (dot product).
+Incluye UUID, PMID, texto, título/abstract, fingerprint, estrategia y procedencia.
+Orden descendente; empates por `unit_id`. Año mínimo inclusivo, aplicado antes del
+LIMIT; año desconocido no pasa el filtro. Corpus vacío, filtro sin coincidencias
+o menos candidatos devuelven respectivamente `[]`, `[]` o los disponibles.
+Query vacía, `top_k` no entero positivo (también bool) o año no entero positivo
+lanzan `ValueError`. Se valida la query con el encoder incluso con corpus vacío.
+
+La configuración registrada incluye ambos modelos y revisiones, dimensiones,
+política de entrada/pooling, límites, normalización, estrategia y métrica.
+Incompatibilidad lanza `EmbeddingCompatibilityError`; no se mezclan espacios
+por compartir dimensiones. `replace_incompatible=True` en la indexación autoriza
+regenerar esa publicación; completa todas las filas incompatibles antes de buscar.
+Los vectores obsoletos por cambios de título/abstract se excluyen de búsqueda
+antes del ranking, aunque no se haya vuelto a indexar. La metadata devuelta y el
+año del filtro son los actuales de `Publication`.
+
+### Demo manual con MedCPT real
+
+Los tests/CI solo instalan dependencias normales y usan dobles. El extra
+`medcpt` incorpora PyTorch CPU (Linux/Windows) y Transformers; el adapter carga
+cada encoder al primer uso. No necesitas claves LLM, API ni endpoint de retrieval.
+Con algunas publicaciones públicas ya ingeridas (por ejemplo, siguiendo M6):
+
+```bash
+uv sync --locked --dev --extra medcpt
+uv run --locked --extra medcpt python -m evidenceops.retrieval_demo \
+  --query 'diabetes treatment' --index-limit 5 --top-k 3 --published-from 2020
+```
+
+La primera ejecución descarga los dos encoders de Hugging Face a su caché;
+requiere red, espacio y memoria local. Las siguientes reutilizan las revisiones
+fijadas y los vectores compatibles. `--index-limit` limita publicaciones a indexar,
+no el corpus consultado: la búsqueda incluye todas las filas indexadas compatibles.
+Emite estado por publicación y resultados JSON. No adquiere documentos nuevos.
+Se prepara esta prueba, sin ejecutarla como parte de la implementación.
+
+MedCPT codifica título/abstract como par y toma CLS sin normalizar; queries como
+texto simple. Límites: 512 tokens para artículo y 64 para query, incluidos tokens
+especiales. El tokenizer aplica `truncation=True` y el `max_length` correspondiente
+solo a la entrada efectiva del encoder; la unidad y su procedencia conservan el
+texto completo. Esta política de truncamiento y los límites forman parte de la
+configuración persistida. Referencias oficiales:
+[Article Encoder](https://huggingface.co/ncbi/MedCPT-Article-Encoder) y
+[Query Encoder](https://huggingface.co/ncbi/MedCPT-Query-Encoder).
+Ranking exacto de pgvector, sin índice aproximado ni umbral de score. Un score
+mayor ordena antes; no representa probabilidad ni calidad biomédica. La calidad
+retrieval se medirá en #40.

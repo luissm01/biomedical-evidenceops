@@ -9,11 +9,14 @@ Actualizado: 2026-10-06. Distingue código versionado de trabajo local pendiente
   título + abstract, identidad determinista, fingerprint del texto y procedencia.
   Sin contenido recuperable devuelve `None`; no divide ni trunca el texto.
   [Contrato y transformación](../src/evidenceops/chunking.py).
-  Diseño posterior: MedCPT local con encoders de consultas/artículos,
+  MedCPT local con encoders de consultas/artículos,
   dot product, PostgreSQL + pgvector y filtro inicial por año de publicación.
   Decisiones acordadas en [D024](decisions/D024-retrieval-baseline-and-embeddings.md).
-  Todavía no hay
-  embeddings, persistencia de unidades ni búsqueda vectorial.
+  #39 implementada: frontera MedCPT sustituible,
+  indexación idempotente/reindexación, persistencia pgvector y retrieval exacto
+  con filtro por año. Revisión de modelos/configuración y exclusión de contenido
+  obsoleto; demo manual preparada, sin ejecutar MedCPT real.
+  [Operación y contratos](../README.md#embeddings-y-retrieval-local-m7--39).
 - **M6 — Biomedical Data Ingestion** implementado: PubMed/NCBI E-utilities,
   parsing y contrato normalizado, persistencia con upsert atómico y CLI
   `evidenceops ingest` sobre un servicio reutilizable. El pipeline coordina lotes,
@@ -41,7 +44,8 @@ Actualizado: 2026-10-06. Distingue código versionado de trabajo local pendiente
   completar el run. Obtenerlo es una operación futura, no desarrollo pendiente
   de M4 ni prueba de calidad del modelo. No cambiar proveedor, pagar cuota o
   añadir retries artificiales para conseguirlo.
-- Sin retrieval, fuentes consultadas ni citas verificadas. La revisión humana
+- Retrieval independiente disponible localmente; generación aún sin fuentes
+  consultadas ni citas verificadas. La revisión humana
   aplica una rúbrica limitada; no hay validación factual automática.
 - Timeout de transporte sin deadline total; un retry puede duplicar consumo.
   [Política y motivos](decisions/D011-gemini.md).
@@ -56,8 +60,8 @@ Actualizado: 2026-10-06. Distingue código versionado de trabajo local pendiente
 
 ## Siguiente trabajo
 
-El siguiente paso técnico, bajo un nuevo encargo, es integrar embeddings y almacenamiento en
-#39 según D024, concretando límites del encoder y compatibilidad de representaciones.
+El siguiente paso técnico, bajo un nuevo encargo, es medir retrieval y establecer
+el baseline de #40.
 Cuando exista cuota y se solicite, obtener/promover/revisar el baseline real.
 Los comandos y requisitos de pruebas viven en el [README](../README.md);
 la secuencia futura, en el roadmap.
