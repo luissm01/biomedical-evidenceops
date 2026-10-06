@@ -1,9 +1,19 @@
 # Estado actual
 
-Actualizado: 2026-10-01. Distingue código versionado de trabajo local pendiente.
+Actualizado: 2026-10-06. Distingue código versionado de trabajo local pendiente.
 
 ## Presente
 
+- **M7 — Retrieval & Embeddings**: transformación de #38 implementada:
+  una unidad por publicación (`whole-publication-v1`),
+  título + abstract, identidad determinista, fingerprint del texto y procedencia.
+  Sin contenido recuperable devuelve `None`; no divide ni trunca el texto.
+  [Contrato y transformación](../src/evidenceops/chunking.py).
+  Diseño posterior: MedCPT local con encoders de consultas/artículos,
+  dot product, PostgreSQL + pgvector y filtro inicial por año de publicación.
+  Decisiones acordadas en [D024](decisions/D024-retrieval-baseline-and-embeddings.md).
+  Todavía no hay
+  embeddings, persistencia de unidades ni búsqueda vectorial.
 - **M6 — Biomedical Data Ingestion** implementado: PubMed/NCBI E-utilities,
   parsing y contrato normalizado, persistencia con upsert atómico y CLI
   `evidenceops ingest` sobre un servicio reutilizable. El pipeline coordina lotes,
@@ -46,8 +56,8 @@ Actualizado: 2026-10-01. Distingue código versionado de trabajo local pendiente
 
 ## Siguiente trabajo
 
-M7 — Retrieval & Embeddings es el siguiente milestone del roadmap;
-su alcance concreto requiere un nuevo encargo. No se ha iniciado.
+El siguiente paso técnico, bajo un nuevo encargo, es integrar embeddings y almacenamiento en
+#39 según D024, concretando límites del encoder y compatibilidad de representaciones.
 Cuando exista cuota y se solicite, obtener/promover/revisar el baseline real.
 Los comandos y requisitos de pruebas viven en el [README](../README.md);
 la secuencia futura, en el roadmap.
