@@ -135,3 +135,10 @@ GraphQL ni integración LLM.
 [retrieval_demo.py](../src/evidenceops/retrieval_demo.py) compone recursos para
 una prueba manual sobre publicaciones ya ingeridas. Contratos, límites y comandos
 en el [README](../README.md#embeddings-y-retrieval-local-m7--39); motivos en D024.
+
+La evaluación de retrieval en [retrieval_evaluation.py](../src/evidenceops/retrieval_evaluation.py)
+valida snapshots congelados y usa el indexador/buscador existente en un esquema
+PostgreSQL aislado. Separa corpus, juicios binarios previos y resultados por query;
+el top-5 operacional y el ranking completo alimentan métricas deterministas.
+Solo el comando explícito `--live` ejecuta MedCPT; los tests usan dobles.
+[Procedimiento y límites](../evaluation/retrieval/README.md).

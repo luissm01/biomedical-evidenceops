@@ -1,0 +1,260 @@
+{
+  "version": "retrieval-queries-m7-v1",
+  "corpus_version": "pubmed-m7-v1",
+  "unit": "publication-pmid",
+  "relevance": "binary",
+  "judgments": {
+    "author": "Codex-assisted; developer review pending",
+    "basis": "Only frozen title and abstract. No MedCPT ranking, score or embedding consulted. Authored dataset annotations; no judge model or automated semantic grading pipeline.",
+    "coverage": "all-query-publication-pairs",
+    "policy": "All 500 pairs assessed against query criteria. Listed relevant pairs are label 1; every other corpus publication is label 0 for this operational dataset. Ambiguous cases are explicitly recorded and excluded from positives. Labels do not claim universal biomedical irrelevance.",
+    "review_status": "pending-developer-review",
+    "created_at_utc": "2026-10-06T14:33:13.901688+00:00"
+  },
+  "queries": [
+    {
+      "id": "q01",
+      "query": "association between childhood obesity and asthma risk",
+      "criterion": "Explicitly addresses childhood obesity and asthma onset/risk; adult-only associations or severity without childhood risk are insufficient.",
+      "relevant": [
+        {
+          "pmid": "29627041",
+          "reason": "El abstract identifica la obesidad como factor de riesgo de asma en niños y adultos y revisa su epidemiología por edad."
+        },
+        {
+          "pmid": "35988550",
+          "reason": "Compara niños con obesidad y peso saludable y afirma mayor riesgo de asma en los primeros."
+        }
+      ],
+      "ambiguous": [
+        {
+          "pmid": "34353454",
+          "reason": "La revisión trata asma en mujeres y obesidad; enumera infancia entre etapas hormonales, pero no establece el vínculo obesidad infantil-riesgo de asma."
+        }
+      ]
+    },
+    {
+      "id": "q02",
+      "query": "genetic factors associated with severe asthma",
+      "criterion": "Identifies genetic variants/loci associated with severe or moderate-to-severe asthma, including severe phenotypes; explicit severity-genetics reviews are eligible. Genetic susceptibility to asthma without severity is insufficient.",
+      "relevant": [
+        {
+          "pmid": "31090575",
+          "reason": "Revisa determinantes genéticos de gravedad e identifica loci GATA3, MUC5AC y KIAA1109 y variantes asociadas a desenlaces más graves."
+        },
+        {
+          "pmid": "30552067",
+          "reason": "GWAS de asma moderada-grave con señales de asociación y variantes que regulan mucinas; no se limita a susceptibilidad a asma leve."
+        },
+        {
+          "pmid": "28371335",
+          "reason": "Estudia SNPs y asociaciones con asma grave con sensibilización fúngica, comparando asma atópica y controles."
+        }
+      ],
+      "ambiguous": [
+        {
+          "pmid": "35988550",
+          "reason": "Menciona genética/genómica y mayor gravedad en el fenotipo obeso infantil, pero no identifica una asociación genética con gravedad."
+        },
+        {
+          "pmid": "29627041",
+          "reason": "Incluye genética del asma asociada a obesidad y exacerbaciones graves, sin establecer una relación genética-gravedad en el abstract."
+        }
+      ]
+    },
+    {
+      "id": "q03",
+      "query": "effectiveness of metformin for type 2 diabetes",
+      "criterion": "Clinical efficacy/effectiveness of metformin in type 2 diabetes, alone or in a combination with interpretable metformin comparisons, or a review explicitly summarizing that efficacy; prevention-only or type 1 insulin therapy is insufficient.",
+      "relevant": [
+        {
+          "pmid": "27493136",
+          "reason": "Ensayo con brazos de metformina sola y combinaciones con empagliflozina; comunica cambios de HbA1c en diabetes tipo 2."
+        },
+        {
+          "pmid": "38763510",
+          "reason": "Ensayo con metformina, atorvastatina y combinación que informa cambios de HbA1c y efecto glucémico de metformina en diabetes tipo 2."
+        },
+        {
+          "pmid": "22000494",
+          "reason": "La revisión resume eficacia de metformina para tratamiento de diabetes tipo 2, además de prevención y otros mecanismos."
+        }
+      ],
+      "ambiguous": []
+    },
+    {
+      "id": "q04",
+      "query": "relationship between obesity and insulin resistance",
+      "criterion": "Explains or reports an explicit relationship/mechanism linking obesity to insulin resistance; obesity with diabetes or fertility alone is insufficient.",
+      "relevant": [
+        {
+          "pmid": "28467922",
+          "reason": "Explica resistencia a insulina e inflexibilidad metabólica en obesidad y diabetes tipo 2, con mecanismos de metabolismo energético."
+        },
+        {
+          "pmid": "37425065",
+          "reason": "Relaciona expansión del tejido adiposo y secreción de adipocinas/citoquinas con inducción de resistencia a insulina."
+        },
+        {
+          "pmid": "34767960",
+          "reason": "Revisa directamente obesidad metabólicamente no saludable, resistencia a insulina y mecanismos endocrinos, inflamatorios y de estrés."
+        }
+      ],
+      "ambiguous": [
+        {
+          "pmid": "36774932",
+          "reason": "La pérdida de peso mejora diabetes y otras complicaciones, pero el abstract no explicita resistencia a insulina ni su relación mecanística con obesidad."
+        }
+      ]
+    },
+    {
+      "id": "q05",
+      "query": "association between hypertension and cardiovascular disease risk",
+      "criterion": "Explicitly addresses hypertension and cardiovascular risk or hypertension-associated cardiovascular outcomes, including atrial fibrillation, or summarizes blood-pressure management in relation to cardiovascular prevention. A different primary risk factor with incidental hypertension is insufficient.",
+      "relevant": [
+        {
+          "pmid": "29669543",
+          "reason": "Revisa la coexistencia de hipertensión y enfermedad cardiovascular en diabetes y el mayor impacto de hipertensión en esta población."
+        },
+        {
+          "pmid": "33793326",
+          "reason": "Revisa valoración de riesgo cardiovascular y umbrales/objetivos de presión arterial en hipertensión para prevenir enfermedad cardiovascular y mortalidad."
+        },
+        {
+          "pmid": "37161520",
+          "reason": "Relaciona control de hipertensión con prevención de eventos cardiovasculares y comunica reducción del riesgo cardiovascular vinculada a hábitos saludables."
+        },
+        {
+          "pmid": "36519436",
+          "reason": "Informa mayor probabilidad de fibrilación auricular en hipertensos y trata reducción de riesgo de fibrilación y complicaciones cardiovasculares con control de presión."
+        }
+      ],
+      "ambiguous": [
+        {
+          "pmid": "35653320",
+          "reason": "Afirma en la introducción que hipertensión es factor de riesgo cardiovascular y menciona beneficios cardiovasculares al final; el objetivo y desarrollo del abstract son renales, sin detallar la asociación cardiovascular."
+        },
+        {
+          "pmid": "35896123",
+          "reason": "Propone estudios futuros que vinculen hipertensión infantil a riesgo cardiovascular adulto; el abstract no ofrece evidencia de ese vínculo."
+        }
+      ]
+    },
+    {
+      "id": "q06",
+      "query": "effect of lifestyle interventions on blood pressure",
+      "criterion": "Describes effects of lifestyle interventions or behaviors on blood pressure/hypertension control, with an explicit direction or magnitude of effect. Merely listing lifestyle management without an effect is insufficient.",
+      "relevant": [
+        {
+          "pmid": "37161520",
+          "reason": "Describe intervenciones sobre dieta, sal, ejercicio y peso y comunica reducción de presión sistólica de 3,5 mmHg asociada a hábitos saludables."
+        }
+      ],
+      "ambiguous": [
+        {
+          "pmid": "33793326",
+          "reason": "Incluye manejo del estilo de vida entre temas de la revisión, pero el abstract no especifica su efecto sobre presión arterial."
+        },
+        {
+          "pmid": "35896123",
+          "reason": "Recomienda estrategias centradas en estilo de vida en población pediátrica, sin resultados del efecto en presión arterial."
+        },
+        {
+          "pmid": "36774932",
+          "reason": "Describe mejoría de hipertensión tras pérdida de peso, pero mezcla estilo de vida, fármacos y cirugía sin aislar la intervención de estilo de vida."
+        }
+      ]
+    },
+    {
+      "id": "q07",
+      "query": "effectiveness of immunotherapy in non-small-cell lung cancer",
+      "criterion": "Clinical outcomes of immune checkpoint immunotherapy, alone or with chemotherapy, in NSCLC. EGFR-targeted treatment without a stated immune-checkpoint intervention does not qualify; the presence of an antibody alone is insufficient.",
+      "relevant": [
+        {
+          "pmid": "38512301",
+          "reason": "Metaanálisis que compara quimioinmunoterapia neoadyuvante y quimioterapia en NSCLC con supervivencia, respuesta patológica y eventos adversos."
+        },
+        {
+          "pmid": "29863955",
+          "reason": "Ensayo de atezolizumab añadido a bevacizumab y quimioterapia en NSCLC con supervivencia global y libre de progresión."
+        },
+        {
+          "pmid": "31018251",
+          "reason": "Compara inhibidores PD-1/PD-L1, quimioterapia y combinación en NSCLC con resultados de supervivencia y seguridad."
+        }
+      ],
+      "ambiguous": [
+        {
+          "pmid": "38924756",
+          "reason": "Amivantamab-lazertinib mejora supervivencia libre de progresión en NSCLC con EGFR mutado, pero el abstract presenta tratamiento dirigido a EGFR y no inmunoterapia checkpoint; excluido según criterio operacional."
+        },
+        {
+          "pmid": "37879444",
+          "reason": "Ensayo de amivantamab con quimioterapia y/o lazertinib en NSCLC EGFR mutado; anticuerpo y eficacia no bastan para clasificarlo como inmunoterapia checkpoint."
+        }
+      ]
+    },
+    {
+      "id": "q08",
+      "query": "biomarkers associated with breast cancer prognosis",
+      "criterion": "Identifies biomarkers and their prognostic relationship, or reviews explicitly prognostic breast-cancer biomarkers. Treatment pharmacokinetics, diagnostic-only markers or bibliometric trends without a prognostic relationship are insufficient.",
+      "relevant": [
+        {
+          "pmid": "35115765",
+          "reason": "Identifica el receptor de progesterona como biomarcador pronóstico y asocia expresión alta con tumores de mejor pronóstico basal."
+        },
+        {
+          "pmid": "33198517",
+          "reason": "Revisa biomarcadores pronósticos establecidos y en desarrollo en cáncer de mama triple negativo y enumera candidatos concretos."
+        }
+      ],
+      "ambiguous": [
+        {
+          "pmid": "38857504",
+          "reason": "Analiza tendencias y redes de investigación de biomarcadores de TNBC, pero no establece qué marcadores se asocian con pronóstico ni sus resultados clínicos."
+        }
+      ]
+    },
+    {
+      "id": "q09",
+      "query": "antibiotic treatment outcomes in community-acquired pneumonia",
+      "criterion": "Antibiotic treatment outcomes in community-acquired pneumonia, with children eligible because query is age-unspecified. Pathogen-specific reviews qualify if they explicitly link antibiotic treatment to CAP outcomes; tuberculosis alone does not.",
+      "relevant": [
+        {
+          "pmid": "35040920",
+          "reason": "SCOUT-CAP compara 5 frente a 10 días de antibióticos en neumonía comunitaria pediátrica con respuesta clínica, efectos adversos y resistencia."
+        },
+        {
+          "pmid": "33683325",
+          "reason": "SAFER compara 5 frente a 10 días de amoxicilina en neumonía comunitaria pediátrica con tasas de curación clínica."
+        },
+        {
+          "pmid": "35505000",
+          "reason": "Revisión de neumonía por Legionella que vincula terapia antibiótica inadecuada o tardía con peor pronóstico y aborda tratamiento empírico de neumonía comunitaria grave; evidencia principalmente observacional."
+        }
+      ],
+      "ambiguous": []
+    },
+    {
+      "id": "q10",
+      "query": "effectiveness of influenza vaccination in older adults",
+      "criterion": "Explicitly addresses influenza-vaccine effectiveness/protection in elderly/older adults; immunogenicity alone, another virus or pregnancy-only effectiveness is insufficient.",
+      "relevant": [
+        {
+          "pmid": "33650528",
+          "reason": "Revisa baja efectividad de vacunas de influenza en personas mayores por inmunosenescencia y estrategias de dosis alta o adyuvantes."
+        },
+        {
+          "pmid": "27813430",
+          "reason": "Resume estudios de vacuna de influenza de dosis alta en mayores de 65 años con protección frente a influenza y hospitalizaciones frente a dosis estándar."
+        }
+      ],
+      "ambiguous": [
+        {
+          "pmid": "27494630",
+          "reason": "El foco es vacunación materna y protección del recién nacido; compara brevemente eficacia con mayores, sin evaluar efectividad en esa población."
+        }
+      ]
+    }
+  ]
+}

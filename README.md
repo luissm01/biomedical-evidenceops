@@ -312,5 +312,7 @@ configuración persistida. Referencias oficiales:
 [Article Encoder](https://huggingface.co/ncbi/MedCPT-Article-Encoder) y
 [Query Encoder](https://huggingface.co/ncbi/MedCPT-Query-Encoder).
 Ranking exacto de pgvector, sin índice aproximado ni umbral de score. Un score
-mayor ordena antes; no representa probabilidad ni calidad biomédica. La calidad
-retrieval se medirá en #40.
+mayor ordena antes; no representa probabilidad ni calidad biomédica.
+La evaluación end-to-end de #40 y su baseline real se describen en
+[evaluation/retrieval](evaluation/retrieval/README.md), con juicios asistidos
+y límites explícitos del corpus.

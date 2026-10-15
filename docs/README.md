@@ -17,6 +17,7 @@ destinos en cascada.
 | Trabajo histórico útil | [Planes completados](plans/completed/README.md) | Investigación histórica |
 | Cómo enseñar / qué se ha trabajado | [Aprendizaje](learning/README.md) | Solo tareas pedagógicas |
 | Dataset, runs y revisión | [Evaluation](../evaluation/README.md) | Evaluación del generador |
+| Corpus, métricas y baseline de retrieval | [Retrieval evaluation](../evaluation/retrieval/README.md) | Evaluar retrieval de M7 |
 | Eventos y diagnóstico | [Observabilidad](subsystems/observability.md) | Cambiar/usar logs |
 | Workflow de evaluación asistida | [Skill evaluation](../.codex/skills/evidenceops-evaluation/SKILL.md) | Ejecutar, revisar o comparar evaluaciones |
 
