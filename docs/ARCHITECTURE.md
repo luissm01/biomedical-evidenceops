@@ -142,3 +142,12 @@ PostgreSQL aislado. Separa corpus, juicios binarios previos y resultados por que
 el top-5 operacional y el ranking completo alimentan métricas deterministas.
 Solo el comando explícito `--live` ejecuta MedCPT; los tests usan dobles.
 [Procedimiento y límites](../evaluation/retrieval/README.md).
+
+## Diseño RAG v1 de M8 (sin implementar)
+
+[D026](decisions/D026-rag-v1-contract-context-and-citations.md) define el contrato
+`query → retrieval M7 → contexto → Generator → answer + limitations + sources`.
+El diseño fija top-5, fuentes completas dentro de 20.000 caracteres de evidencia,
+citas a fuentes incluidas y respuestas efímeras. Las adaptaciones de instrucciones
+y cobertura de citas están acordadas en #44, pendientes de implementación.
+El flujo actual continúa independiente; no existe todavía servicio RAG ni integración HTTP.
