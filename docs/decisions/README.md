@@ -29,6 +29,7 @@ en Git/issues. El estado de entrega vive en GitHub y el trabajo local en los pla
 | [D022](D022-biomedical-publication-persistence.md) | Persistencia atómica de publicaciones biomédicas (#30) | Aceptada |
 | [D023](D023-biomedical-ingestion-pipeline.md) | Pipeline local, fallos parciales y semántica del resumen (#31) | Aceptada |
 | [D024](D024-retrieval-baseline-and-embeddings.md) | Unidad de retrieval, MedCPT y almacenamiento vectorial (#37) | Aceptada; representación implementada |
+| [D025](D025-retrieval-evaluation.md) | Corpus fijo y evaluación binaria de retrieval (#40) | Aceptada |
 
 Nueva decisión: siguiente ID, problema, alternativas, decisión, consecuencias
 y estado. Cambios de dirección enlazan a la decisión sustituida; no reescribas

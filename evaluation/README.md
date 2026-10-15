@@ -1,5 +1,8 @@
 # Evaluación offline de Generator
 
+La evaluación de retrieval M7 tiene su propio [dataset y runbook](retrieval/README.md),
+independientes de este generador.
+
 Fuente del procedimiento de dataset, ejecución, promoción y revisión. El dataset
 [cases.json](cases.json) contiene la rúbrica; no es una respuesta ideal ni un
 benchmark completo. No incluye fuentes de referencia en su versión inicial.
