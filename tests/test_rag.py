@@ -15,6 +15,7 @@ from evidenceops.rag import (
     validate_citations,
 )
 from evidenceops.retrieval import RetrievalResult
+from evidenceops.rag_errors import RagRetrievalError
 
 
 def result(pmid="123", *, title="Título", abstract="Abstract íntegro.", year=2021):
@@ -200,7 +201,9 @@ def test_technical_retrieval_failure_is_not_abstention():
     retrieve.side_effect = error
     with pytest.raises(RuntimeError) as caught:
         rag.generate("Pregunta")
-    assert caught.value is error
+    assert isinstance(caught.value, RagRetrievalError)
+    assert caught.value.cause == "retrieval_unavailable"
+    assert caught.value.__cause__ is error
     generator.generate.assert_not_called()
 
 
@@ -212,3 +215,85 @@ def test_generation_failure_propagates_without_retry():
         rag.generate("Pregunta")
     assert caught.value is error
     generator.generate.assert_called_once()
+
+
+@pytest.mark.parametrize("answer,limitations,expected", [
+    ("Texto [S99].", [], {"validation_reason": "unknown_citation", "validation_field": "answer",
+                         "block_index": 0, "character_offset": 6}),
+    ("Texto [S01].", [], {"validation_reason": "malformed_citation", "validation_field": "answer",
+                         "block_index": 0, "character_offset": 6}),
+    ("Con cita [S1].\n\n  Sin cita.", [], {
+        "validation_reason": "block_missing_citation", "validation_field": "answer",
+        "block_index": 1, "character_offset": 18,
+    }),
+    ("- Con cita [S1].\n- Sin cita.", [], {
+        "validation_reason": "block_missing_citation", "validation_field": "answer",
+        "block_index": 1, "character_offset": 17,
+    }),
+    ("Texto [S1] y afirmación posterior.", [], {
+        "validation_reason": "block_not_cited_at_end", "validation_field": "answer",
+        "block_index": 0, "character_offset": 0,
+    }),
+    ("Texto [S1].", ["Primera [S1].", "Sí [S1].\n\nNo [S8]."], {
+        "validation_reason": "unknown_citation", "validation_field": "limitations",
+        "limitation_index": 1, "block_index": 1, "character_offset": 13,
+    }),
+    (ABSTENTION_ANSWER, ["Limitación [S1]."], {
+        "validation_reason": "invalid_abstention", "validation_field": "limitations",
+        "limitation_index": 0,
+    }),
+])
+def test_validation_diagnostic_reason_and_exact_location(answer, limitations, expected):
+    from evidenceops.rag_errors import InvalidCitationsError
+
+    with pytest.raises(InvalidCitationsError) as caught:
+        validate_citations(GeneratedContent(answer=answer, limitations=limitations),
+                           build_context([result()]).sources)
+    assert caught.value.cause is GenerationErrorCause.INVALID_OUTPUT
+    assert caught.value.diagnostic() == expected
+    assert answer not in str(caught.value)
+
+
+@pytest.mark.parametrize("answer", [
+    "Texto [S0].", "Texto [S01].", "Texto [S1,S2].", "Texto [S1, S2].",
+    "Texto [s1].", "Texto [S1", "Texto S1].", "Texto [[S1]].",
+])
+def test_malformed_citation_is_distinct_from_unknown_source(answer):
+    from evidenceops.rag_errors import InvalidCitationsError
+
+    with pytest.raises(InvalidCitationsError) as caught:
+        validate_citations(GeneratedContent(answer=answer, limitations=[]),
+                           build_context([result()]).sources)
+    assert caught.value.reason == "malformed_citation"
+
+
+@pytest.mark.parametrize("answer,reason", [
+    # Characterize current restrictive policy, not proposed acceptance changes.
+    ("**Texto [S1].**", "block_not_cited_at_end"),
+    ('“Texto [S1].”', "block_not_cited_at_end"),
+    ("Texto [S1]。", "block_not_cited_at_end"),
+    ("## Resumen\n\nTexto [S1].", "block_missing_citation"),
+    ("Intervalo [0.1, 0.2] [S1].", "malformed_citation"),
+    ("No hay evidencia suficiente.", "block_missing_citation"),
+])
+def test_current_restrictions_are_preserved_pending_policy_decision(answer, reason):
+    from evidenceops.rag_errors import InvalidCitationsError
+
+    with pytest.raises(InvalidCitationsError) as caught:
+        validate_citations(GeneratedContent(answer=answer, limitations=[]),
+                           build_context([result()]).sources)
+    assert caught.value.reason == reason
+
+
+def test_first_failure_precedence_and_unicode_offsets_are_stable():
+    from evidenceops.rag_errors import InvalidCitationsError
+
+    text = "Sin cita.\n\n😀 [malformada] [S99]."
+    with pytest.raises(InvalidCitationsError) as caught:
+        validate_citations(GeneratedContent(answer=text, limitations=[]),
+                           build_context([result()]).sources)
+    diagnostic = caught.value.diagnostic()
+    # Preserve old precedence: unknown reference before malformed brackets/coverage.
+    assert diagnostic["validation_reason"] == "unknown_citation"
+    assert diagnostic["block_index"] == 1
+    assert diagnostic["character_offset"] == text.index("[S99]")

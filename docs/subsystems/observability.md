@@ -183,3 +183,186 @@ ninguno realiza inferencias reales.
   total. DeepSeek usa JSON mode y Pydantic valida el esquema; Gemini envía
   además JSON Schema al proveedor.
 - No hay cálculo de coste monetario ni plataforma de observabilidad desplegada.
+
+## RAG end-to-end (M8 / #46)
+
+`POST /rag` reutiliza la correlación HTTP y la exportación de M5. El servicio
+emite `rag.started` y `rag.finished` para cada `stage`:
+`operation`, `retrieval`, `context`, `generation`. Cada final añade `duration_ms`,
+`outcome=success|abstention|error` y `cause` segura (null cuando no hay fallo).
+Los eventos incluyen `request_id`, `trace_id` y `span_id`; no contienen query,
+filtro, documentos, PMIDs, UUID de publicación, fuentes, respuesta ni excepciones
+originales. Las duraciones usan `perf_counter`, sin depender del reloj de pared.
+
+La operación cubre todo el servicio después de validar la entrada: retrieval
+(incluida codificación de query y posible carga inicial de MedCPT), construcción
+de contexto/mensaje y generación con validación determinista de citas. Excluye
+validación/serialización y transporte HTTP, que cubre el span del servidor.
+La etapa de generación incluye el adapter y validación posterior de citas.
+La abstención local registra operación `abstention`, retrieval/context `success`
+y ninguna generación. La abstención del modelo registra operación y generación
+`abstention`. Ambas son resultados normales con estado de span OK.
+
+| Métrica | Tipo | Labels |
+| --- | --- | --- |
+| `evidenceops_rag_operations_total` | Counter | `stage`, `outcome` |
+| `evidenceops_rag_duration_seconds` | Histogram | `stage`, `outcome` |
+| `evidenceops_rag_errors_total` | Counter | `stage`, `cause` |
+
+`stage` y `outcome` tienen únicamente los valores anteriores. `cause` procede de
+`GenerationErrorCause`, o es `database_unavailable`, `retrieval_incompatible`,
+`retrieval_unavailable`, `invalid_citations`, `unexpected_application_error`.
+No se usan textos ni identificadores como labels. El registry es el mismo de
+cada aplicación M5 y `/metrics` expone ambas familias. Para contar operaciones o
+calcular su latencia, seleccionar `stage="operation"`; los otros valores observan
+etapas y no deben sumarse a la operación. Los histogramas usan los buckets de M5.
+Un fallo cuenta en la etapa fallida y en la operación que lo contiene.
+
+No se incrementa `evidenceops_generations_total` con RAG: ese contador sigue
+midiendo el endpoint M3. Los tokens observados se añaden una sola vez desde
+Gemini/DeepSeek a los contadores existentes, incluidos los de respuestas que
+posteriormente fallen validación de citas. Sin generación no hay consumo LLM.
+
+```text
+POST /rag (SERVER)
+└── rag
+    ├── rag.retrieval
+    ├── rag.context
+    └── rag.generation
+        └── llm.gemini (o llm.deepseek)
+```
+
+Los spans de etapas son secuenciales. Se marcan ERROR la etapa que falla, `rag`
+y HTTP; los spans anteriores completados conservan OK. Un fallo de citas deja
+el span del adapter OK si completó correctamente su salida estructurada, y
+`rag.generation` ERROR con `invalid_citations`. `GenerationError` conserva su
+causa `INVALID_OUTPUT` como exige D026. Los eventos de excepción usan la misma
+excepción sintética segura de M5. El span HTTP clasifica errores como `http_error`;
+la causa precisa está en el servicio/etapa. Un 422 solo genera el span HTTP.
+
+El [README](../../README.md#rag-desde-la-api-m8--46) contiene los requisitos,
+curl y procedimiento de demostración con el pipeline real. Las pruebas nuevas
+validan logs JSON, métricas, jerarquía, errores y privacidad sin modelos ni red:
+
+```bash
+uv run --locked pytest tests/test_rag.py tests/test_rag_api.py tests/test_rag_integration.py -q
+```
+
+El último archivo requiere PostgreSQL con pgvector de pruebas. Usa búsqueda M7
+real y encoder/LLM deterministas. No mide calidad IA ni adelanta la evaluación #47.
+
+### Diagnosticar `502 invalid_citations` sin registrar contenido
+
+Un span `llm.deepseek` OK confirma transporte y salida estructurada válidos para
+el adapter; las reglas de citas se ejecutan después, dentro de `rag.generation`.
+Por tanto, un adapter OK y RAG ERROR son compatibles. Los logs antiguos con solo
+`cause=invalid_citations` no permiten reconstruir qué regla falló ni la salida
+rechazada. Los logs del incidente aportado por el desarrollador confirman esa
+secuencia, pero no identifican una regla concreta. No se repite automáticamente
+la petición para investigarlo.
+
+Los eventos `rag.finished` fallidos de generación y operación incorporan ahora
+el mismo diagnóstico seguro; los spans `rag.generation` y `rag` lo incorporan
+con el prefijo `evidenceops.`. No cambia el cuerpo ni código HTTP del error.
+
+| `validation_reason` | Regla que falló |
+| --- | --- |
+| `unknown_citation` | Etiqueta con formato `[S1]` que no pertenece a las fuentes incluidas |
+| `malformed_citation` | Quedan corchetes fuera de etiquetas válidas, incluidos `[S0]`, `[S01]`, `[S1,S2]` o corchetes de otro uso |
+| `block_missing_citation` | Párrafo/elemento no vacío sin ninguna cita válida |
+| `block_not_cited_at_end` | Bloque con cita válida, pero sin el sufijo de cita/puntuación admitido |
+| `invalid_abstention` | Answer exactamente igual a la abstención fija con limitations no vacío |
+
+`validation_field` es `answer` o `limitations`. `limitation_index`, si procede,
+identifica el elemento de limitations. `block_index` identifica el bloque del
+campo o elemento; `character_offset` es su posición dentro de ese texto, en
+caracteres Unicode, no bytes. Todos los índices empiezan en cero. Las posiciones
+se refieren al `GeneratedContent` ya validado por Pydantic (espacios exteriores
+eliminados, JSON decodificado), no a offsets del JSON de transporte.
+
+Para una cita desconocida o corchete mal formado, el offset apunta al inicio de
+la cita o al primer corchete que sobra. Para cobertura apunta al primer carácter
+no blanco del bloque que falla. `invalid_abstention` señala `limitations[0]` sin
+inventar bloque/offset: falla la condición de lista vacía, no su prosa.
+
+Se informa solo del primer fallo según la precedencia conservada: abstención
+exacta; después, en answer y cada limitations por orden, referencias desconocidas,
+corchetes mal formados y cobertura. Puede haber otros fallos posteriores. Una
+abstención redactada libremente se valida como cualquier otro texto: sin cita
+produce `block_missing_citation`. No se intenta inferir semánticamente si el
+modelo pretendía abstenerse.
+
+Ejemplo de fragmento de un evento, sin contenido generado:
+
+```json
+{"event":"rag.finished","stage":"generation","cause":"invalid_citations","validation_reason":"block_missing_citation","validation_field":"limitations","limitation_index":0,"block_index":0,"character_offset":0}
+```
+
+No se registran fragmentos, etiquetas desconocidas, prompts, queries, fuentes,
+abstracts ni respuestas, tampoco a nivel DEBUG. No se ha añadido un modo de
+volcado de contenido. Los diagnósticos no son labels Prometheus; las métricas
+conservan su esquema y causa `invalid_citations`.
+
+Para reproducir las cinco categorías con DeepSeek simulado, sin red, claves ni
+base de datos:
+
+```bash
+uv run --locked pytest tests/test_rag_api.py -k deepseek_success_then_citation_failure -q
+```
+
+Para diagnosticar una nueva llamada real, reiniciar la API con el código actual
+(y PostgreSQL/corpus indexado/proveedor configurado como en el README):
+
+```bash
+EVIDENCEOPS_TRACE_CONSOLE=true uv run --locked --extra medcpt uvicorn evidenceops.main:app --no-access-log \
+  > /tmp/evidenceops-rag-events.jsonl 2> /tmp/evidenceops-rag-traces.jsonl
+```
+
+En otra terminal, realizar explícitamente una sola petición; este ejemplo descarta
+el cuerpo para dejar únicamente status/cabeceras en la terminal y puede consumir
+cuota real:
+
+```bash
+curl -sS -D - -o /dev/null -X POST http://127.0.0.1:8000/rag \
+  -H 'Content-Type: application/json' \
+  -d '{"query":"association between childhood obesity and asthma risk","published_from":2020}'
+```
+
+Copiar el nuevo `X-Request-ID` y filtrar únicamente esa petición:
+
+```bash
+rg -F 'ID_COPIADO' /tmp/evidenceops-rag-events.jsonl
+```
+
+Si vuelve a fallar, leer `validation_reason` y localización en el evento de
+`stage=generation`; `stage=operation` repite el mismo diagnóstico. Con el
+`trace_id` se localizan los spans y se comprueba el adapter OK/generación ERROR.
+La salida del modelo puede variar entre llamadas: no se promete reproducir el
+fallo histórico. Si ya se dispone localmente del objeto de salida rechazado,
+puede validarse offline con `validate_citations` y las fuentes exactas incluidas,
+sin repetir la inferencia; `InvalidCitationsError.diagnostic()` devuelve solo
+metadata segura.
+
+#### Restricciones actuales que requieren decisión antes de flexibilizar
+
+Los tests caracterizan estos casos sin cambiar las reglas de D026 ni las
+instrucciones al modelo:
+
+- `**Texto [S1].**`, una comilla de cierre tras la cita o puntuación como `。`
+  fallan `block_not_cited_at_end`. El sufijo implementado admite solo
+  `. ! ? ; : …`; la referencia de D026 a puntuación final es más general.
+  Una futura normalización de envoltorios Markdown o ampliación de puntuación
+  debe acordarse antes de modificar la aceptación.
+- Un encabezado separado por línea en blanco falla `block_missing_citation`,
+  aunque sea solo organizativo. El validador no distingue encabezados de
+  párrafos con afirmaciones; eximirlos requiere acordar ese criterio.
+- Un intervalo entre corchetes, como `Intervalo [0.1, 0.2] [S1].`, falla
+  `malformed_citation`. Es la restricción explícita de las instrucciones actuales
+  de no usar otros corchetes; distinguirlos de citas cambiaría la política.
+- Una limitación operativa escrita por el modelo sin cita también se rechaza;
+  D026 reserva esas limitaciones sin citas a la aplicación.
+
+Un rechazo estructural no prueba falta de apoyo científico, igual que una cita
+aceptada no demuestra apoyo semántico. La segmentación de bloques sigue siendo
+la existente: párrafos separados por línea en blanco y listas con `-`, `+`, `*`
+o numeración `1.`/`1)`. Un salto de línea simple puede ser continuación de párrafo.

@@ -343,7 +343,8 @@ La aplicación valida citas existentes y cobertura al final de cada párrafo o
 elemento de lista de `answer` y `limitations`. Solo permite sin citas la abstención
 fija acordada. Sin resultados o si ninguna fuente cabe, no llama al LLM. Errores
 de citas producen `GenerationError` con causa `INVALID_OUTPUT`, sin retries ni
-sustitución por abstención; fallos técnicos de retrieval/generación se propagan.
+sustitución por abstención. Los fallos de retrieval se clasifican con causas seguras;
+los de generación conservan la frontera existente.
 No valida apoyo semántico. El presupuesto en caracteres no garantiza caber en la
 ventana de tokens del proveedor. Detalles en [D026](docs/decisions/D026-rag-v1-contract-context-and-citations.md).
 
@@ -353,3 +354,99 @@ modelos reales (los dos casos HTTP/DB de Gemini se excluyen en este comando):
 ```bash
 uv run --locked pytest tests/test_rag.py tests/test_generation_contract.py tests/test_gemini_adapter.py tests/test_deepseek_adapter.py -k 'not http_database_and_real_adapter_flow'
 ```
+
+## RAG desde la API (M8 / #46)
+
+`POST /rag` ejecuta el servicio anterior sin registrar una pregunta ni persistir
+la respuesta. Requiere PostgreSQL con pgvector, publicaciones previamente
+[ingeridas e indexadas](#embeddings-y-retrieval-local-m7--39), el extra `medcpt`
+y la clave del proveedor elegido en `.env` (`EVIDENCEOPS_LLM_PROVIDER=deepseek`
+o `gemini`, junto a su correspondiente API key). No indexa automáticamente.
+
+Entrada JSON: `query` obligatoria, texto de 1–2000 caracteres tras eliminar
+espacios exteriores; `published_from` opcional/null, entero positivo estricto,
+filtro inclusivo. No admite campos adicionales ni selección de top-k.
+
+```bash
+uv run --locked --extra medcpt uvicorn evidenceops.main:app --no-access-log
+```
+
+En otra terminal, esta llamada ejecuta MedCPT y el proveedor real si hay fuentes
+utilizables; puede consumir cuota:
+
+```bash
+curl -sS -i -X POST http://127.0.0.1:8000/rag \
+  -H 'Content-Type: application/json' \
+  -d '{"query":"association between childhood obesity and asthma risk","published_from":2020}'
+```
+
+Respuesta 200: `{"answer":"… [S1].","limitations":[],"sources":[…]}`.
+Cada fuente es `{"citation_id":"S1","unit":{…},"score":0.75}`: `unit`
+contiene identidad, UUID de publicación, estrategia, índice, fingerprint,
+source/source_id, título, abstract, texto íntegro, autores, revista, DOI, año y URL
+según el [contrato de unidad](src/evidenceops/chunking.py). `score` es producto
+interno, no confianza. Los valores anteriores son ilustrativos; la API devuelve
+metadata real. OpenAPI con todos los campos está disponible en `/docs`.
+No añade `status`, `confidence` ni `external_sources_consulted`.
+
+La abstención devuelve 200 con la frase fija de D026 y una limitación operativa.
+Si no hay fuentes o ninguna cabe, `sources=[]` y no se invoca el LLM. Si el modelo
+se abstiene, se conservan las fuentes que recibió.
+
+| Caso | HTTP | `detail.code` |
+| --- | --- | --- |
+| Entrada inválida | 422 | Validación estándar FastAPI |
+| Fallo de BD durante retrieval | 503 | `database_unavailable` |
+| Corpus/configuración incompatible | 503 | `retrieval_incompatible` |
+| Encoder/retrieval no disponible | 503 | `retrieval_unavailable` |
+| Timeout LLM | 504 | `generation_timeout` |
+| Cuota/rate limit LLM | 429 | `generation_rate_limited` |
+| Autenticación o indisponibilidad LLM | 503 | `generation_unavailable` |
+| JSON/esquema de salida LLM inválido | 502 | `invalid_generation` |
+| Citas/cobertura/abstención inválidas | 502 | `invalid_citations` |
+| Otro fallo clasificado del proveedor | 502 | `generation_failed` |
+| Error inesperado | 500 | Respuesta estándar del servidor |
+
+Los errores controlados usan `{"detail":{"code":"…","message":"…"}}` con
+mensajes seguros, sin texto original de excepciones. Todas las respuestas llevan
+`X-Request-ID`. Sin retries RAG ni reparación de citas.
+
+Para la demostración end-to-end con logs, métricas y trazas, sustituir el arranque
+anterior por:
+
+```bash
+EVIDENCEOPS_TRACE_CONSOLE=true uv run --locked --extra medcpt uvicorn evidenceops.main:app --no-access-log \
+  > /tmp/evidenceops-rag-events.jsonl 2> /tmp/evidenceops-rag-traces.jsonl
+```
+
+Ejecutar el mismo curl, copiar su `X-Request-ID` y buscarlo en los eventos.
+Comprobar la relación HTTP → RAG → etapas → proveedor por `trace_id`/`parent_id`
+y consultar los agregados:
+
+```bash
+rg 'rag|llm.generation.started' /tmp/evidenceops-rag-events.jsonl
+rg 'rag|llm.deepseek|llm.gemini|evidenceops.outcome' /tmp/evidenceops-rag-traces.jsonl
+curl -sS http://127.0.0.1:8000/metrics | rg 'evidenceops_rag_|evidenceops_llm_'
+```
+
+Se esperan retrieval, contexto y generación cuando hay evidencia utilizable;
+sin ella no hay etapa ni span de generación ni proveedor. Una salida inválida se
+rechaza con 502 aunque el adapter haya completado correctamente su llamada.
+No demuestra groundedness ni calidad semántica: corresponden a #47.
+El primer acceso puede cargar/descargar los pesos de MedCPT y tardar más.
+Métricas y causas en [observabilidad](docs/subsystems/observability.md#rag-end-to-end-m8--46);
+decisiones en [D027](docs/decisions/D027-rag-http-errors-and-observability.md).
+
+Pruebas nuevas sin modelos ni red externa (la segunda requiere PostgreSQL de pruebas):
+
+```bash
+uv run --locked pytest tests/test_rag_api.py tests/test_rag.py -q
+uv run --locked pytest tests/test_rag_integration.py -q
+```
+
+
+Si DeepSeek termina correctamente pero la API devuelve `502 invalid_citations`,
+consultar el [diagnóstico seguro por motivo y localización](docs/subsystems/observability.md#diagnosticar-502-invalid_citations-sin-registrar-contenido).
+Los eventos nuevos distinguen referencias desconocidas, corchetes/formato,
+cobertura y abstención inválida sin registrar contenido. El contrato HTTP no
+incluye esos detalles de desarrollo.

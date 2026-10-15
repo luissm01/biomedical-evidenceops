@@ -1,12 +1,21 @@
 """Ephemeral RAG orchestration and deterministic context/citation policy (D026)."""
 
-from collections.abc import Callable
+from collections.abc import Callable, Iterator
 from dataclasses import dataclass
 import json
 import re
+from typing import NoReturn
 
+from sqlalchemy.exc import SQLAlchemyError
+
+from evidenceops.embeddings import EmbeddingCompatibilityError
+from evidenceops.metrics import GenerationMetrics
+from evidenceops.rag_errors import (
+    CitationFailureReason, CitationField, InvalidCitationsError, RagRetrievalError,
+)
+from evidenceops.rag_observability import observe_rag
 from evidenceops.chunking import RetrievableUnit
-from evidenceops.generation import GeneratedContent, GenerationError, GenerationErrorCause, Generator
+from evidenceops.generation import GeneratedContent, Generator
 from evidenceops.retrieval import RetrievalResult
 
 EVIDENCE_CHARACTER_LIMIT = 20_000
@@ -99,56 +108,111 @@ _CITED_END = re.compile(r"(?:\[S[1-9][0-9]*\])+[.!?;:…]*$")
 _BLOCK_BREAK = re.compile(r"\n\s*\n|\n(?=\s*(?:[-+*]|[0-9]+[.)])\s+)")
 
 
-def _invalid_output() -> None:
-    # Do not include generated content, query or evidence in error messages.
-    raise GenerationError(
-        GenerationErrorCause.INVALID_OUTPUT,
-        "RAG output contains invalid citations or uncited content",
+def _blocks(text: str) -> Iterator[tuple[int, str]]:
+    """Same boundaries as _BLOCK_BREAK.split, retaining offsets in the field."""
+    start = 0
+    for boundary in _BLOCK_BREAK.finditer(text):
+        yield start, text[start:boundary.start()]
+        start = boundary.end()
+    yield start, text[start:]
+
+
+def _citation_failure(
+    reason: CitationFailureReason, field: CitationField, text: str,
+    offset: int, limitation_index: int | None,
+) -> NoReturn:
+    block_index = next(
+        index for index, (start, block) in enumerate(_blocks(text))
+        if start <= offset < start + len(block)
+    )
+    raise InvalidCitationsError(
+        reason, field, limitation_index=limitation_index,
+        block_index=block_index, character_offset=offset,
     )
 
 
 def validate_citations(content: GeneratedContent, sources: tuple[RagSource, ...]) -> None:
-    """Validate membership and block coverage, not semantic entailment."""
+    """Preserve D026 acceptance; report the first failure with content-free location.
+
+    Precedence: exact abstention, unknown citation, leftover brackets, coverage.
+    Locations refer to the validated GeneratedContent, not raw provider JSON.
+    """
     if content.answer == ABSTENTION_ANSWER:
         if content.limitations:
-            _invalid_output()
+            raise InvalidCitationsError("invalid_abstention", "limitations", limitation_index=0)
         return
     allowed = {f"[{source.citation_id}]" for source in sources}
-    for text in (content.answer, *content.limitations):
-        citations = _CITATION.findall(text)
-        remainder = _CITATION.sub("", text)
-        if (any(citation not in allowed for citation in citations)
-                or "[" in remainder or "]" in remainder):
-            _invalid_output()
-        for block in _BLOCK_BREAK.split(text):
-            if block.strip() and not _CITED_END.search(block.strip()):
-                _invalid_output()
+    fields = [("answer", None, content.answer)] + [
+        ("limitations", index, text) for index, text in enumerate(content.limitations)
+    ]
+    for field, limitation_index, text in fields:
+        matches = list(_CITATION.finditer(text))
+        for match in matches:
+            if match.group() not in allowed:
+                _citation_failure("unknown_citation", field, text, match.start(), limitation_index)
+        # Inspect the original positions, not a shortened string after substitution.
+        valid_brackets = {position for match in matches for position in (match.start(), match.end() - 1)}
+        for offset, character in enumerate(text):
+            if character in "[]" and offset not in valid_brackets:
+                _citation_failure("malformed_citation", field, text, offset, limitation_index)
+        for block_index, (start, block) in enumerate(_blocks(text)):
+            stripped = block.strip()
+            if stripped and not _CITED_END.search(stripped):
+                reason = "block_not_cited_at_end" if _CITATION.search(block) else "block_missing_citation"
+                raise InvalidCitationsError(
+                    reason, field, limitation_index=limitation_index, block_index=block_index,
+                    character_offset=start + len(block) - len(block.lstrip()),
+                )
 
 
 class RagService:
     """Own no resources: caller composes search and the existing provider factory."""
 
-    def __init__(self, retrieve: Retriever, generator: Generator) -> None:
+    def __init__(
+        self, retrieve: Retriever, generator: Generator,
+        metrics: GenerationMetrics | None = None,
+    ) -> None:
         self._retrieve = retrieve
         self._generator = generator
+        self._metrics = metrics
 
     def generate(self, query: str, *, published_from: int | None = None) -> RagResponse:
         if not isinstance(query, str) or not query.strip():
             raise ValueError("Query must contain text")
         if published_from is not None and (type(published_from) is not int or published_from <= 0):
             raise ValueError("published_from must be a positive year")
-        results = self._retrieve(query=query.strip(), top_k=5, published_from=published_from)
-        context = build_context(results)
+        with observe_rag("operation", self._metrics) as operation:
+            response = self._generate(query.strip(), published_from=published_from)
+            if response.answer == ABSTENTION_ANSWER:
+                operation.outcome = "abstention"
+            return response
+
+    def _generate(self, query: str, *, published_from: int | None) -> RagResponse:
+        with observe_rag("retrieval", self._metrics):
+            try:
+                results = self._retrieve(query=query, top_k=5, published_from=published_from)
+            except SQLAlchemyError as exc:
+                raise RagRetrievalError("database_unavailable") from exc
+            except EmbeddingCompatibilityError as exc:
+                raise RagRetrievalError("retrieval_incompatible") from exc
+            except (OSError, RuntimeError, ValueError) as exc:
+                raise RagRetrievalError("retrieval_unavailable") from exc
+        with observe_rag("context", self._metrics):
+            context = build_context(results)
+            message = context.message(query)
         if not context.sources:
             limitation = (
                 "La búsqueda no devolvió fuentes." if not results else
                 "Ninguna fuente completa cupo en el presupuesto de evidencia."
             )
             return RagResponse(ABSTENTION_ANSWER, [limitation], ())
-        content = self._generator.generate(
-            context.message(query.strip()), system_instruction=RAG_SYSTEM_INSTRUCTION,
-        )
-        validate_citations(content, context.sources)
+        with observe_rag("generation", self._metrics) as generation:
+            content = self._generator.generate(
+                message, system_instruction=RAG_SYSTEM_INSTRUCTION,
+            )
+            validate_citations(content, context.sources)
+            if content.answer == ABSTENTION_ANSWER:
+                generation.outcome = "abstention"
         limitations = (
             ["Las fuentes proporcionadas no permiten responder a la pregunta."]
             if content.answer == ABSTENTION_ANSWER else list(content.limitations)

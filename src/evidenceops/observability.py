@@ -30,7 +30,9 @@ class JsonFormatter(logging.Formatter):
             event["trace_id"] = format(context.trace_id, "032x")
             event["span_id"] = format(context.span_id, "016x")
         # Only explicitly selected operational metadata; never exception text/stack.
-        for field in ("duration_ms", "outcome", "cause", "provider", "model",
+        for field in ("stage", "duration_ms", "outcome", "cause", "provider", "model",
+                      "validation_reason", "validation_field", "limitation_index",
+                      "block_index", "character_offset",
                       "source", "run_id", "requested", "unique", "batches",
                       "updated", "omitted", "failed", "unidentified_invalid"):
             if hasattr(record, field):
@@ -69,6 +71,9 @@ class RequestContextMiddleware:
             and parts[1] == "questions"
             and parts[3] == "generate"
         )
+        route = "/questions/{question_id}/generate" if is_generation else None
+        if scope.get("method") == "POST" and scope.get("path") == "/rag":
+            route = "/rag"
         status_code = None
 
         async def send_with_id(message: Message) -> None:
@@ -81,11 +86,11 @@ class RequestContextMiddleware:
             await send(message)
 
         try:
-            if is_generation:
+            if route is not None:
                 with tracer.start_as_current_span(
-                    "POST /questions/{question_id}/generate",
+                    f"POST {route}",
                     kind=SpanKind.SERVER,
-                    attributes={"http.request.method": "POST", "http.route": "/questions/{question_id}/generate"},
+                    attributes={"http.request.method": "POST", "http.route": route},
                     record_exception=False,
                     set_status_on_exception=False,
                 ) as span:
