@@ -6,9 +6,12 @@ Actualizado: 2026-10-15. Distingue código versionado de trabajo local pendiente
 
 - **M8 — RAG v1**, #44: diseño acordado del contrato, construcción
   de contexto y política de citas en [D026](decisions/D026-rag-v1-contract-context-and-citations.md).
-  Decisiones acordadas, incluidas instrucciones por llamada y validación
-  determinista de citas/abstención; entrega documental autorizada.
-  Sin implementación RAG ni cambios HTTP; #45 todavía no iniciada.
+  #45 implementada y aceptada por el desarrollador: servicio
+  RAG independiente, contexto top-5 con presupuesto, instrucciones por llamada,
+  fuentes desde la aplicación y validación determinista de citas/abstención.
+  Tests con dobles y transporte simulado; demo manual local disponible en
+  `demo_rag_local.py`, sin inferencias reales ejecutadas por el agente.
+  Sin cambios HTTP ni nueva observabilidad end-to-end.
 
 - **M7 — Retrieval & Embeddings** completado: transformación de #38 implementada:
   una unidad por publicación (`whole-publication-v1`),
@@ -56,8 +59,8 @@ Actualizado: 2026-10-15. Distingue código versionado de trabajo local pendiente
   la cuota impidió completar el run. Obtenerlo es una operación futura, no desarrollo pendiente
   de M4 ni prueba de calidad del modelo. No cambiar proveedor, pagar cuota o
   añadir retries artificiales para conseguirlo.
-- Retrieval independiente disponible localmente; generación aún sin fuentes
-  consultadas ni citas verificadas. La revisión humana
+- Servicio RAG local disponible con fuentes y citas verificadas estructuralmente;
+  la generación HTTP existente sigue sin retrieval. La revisión humana
   aplica una rúbrica limitada; no hay validación factual automática.
 - Timeout de transporte sin deadline total; un retry puede duplicar consumo.
   [Política y motivos](decisions/D011-gemini.md).
@@ -72,8 +75,8 @@ Actualizado: 2026-10-15. Distingue código versionado de trabajo local pendiente
 
 ## Siguiente trabajo
 
-El diseño de #44 está acordado. El siguiente trabajo es implementar #45, bajo
-un nuevo encargo. La corrida real de retrieval no resuelve el baseline de
+La integración HTTP/observabilidad (#46) y evaluación RAG (#47) requieren sus
+respectivos encargos. La corrida real de retrieval no resuelve el baseline de
 generación M4 pendiente.
 Cuando exista cuota y se solicite, obtener/promover/revisar el baseline real.
 Los comandos y requisitos de pruebas viven en el [README](../README.md);

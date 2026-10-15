@@ -47,13 +47,17 @@ class DeepSeekGenerator:
             raise GenerationError(GenerationErrorCause.UNKNOWN, "Could not close the DeepSeek client") from exc
 
     @traced_provider("deepseek")
-    def generate(self, question_text: str) -> GeneratedContent:
+    def generate(
+        self, question_text: str, *, system_instruction: str | None = None,
+    ) -> GeneratedContent:
         logger.info("llm.generation.started", extra={"provider": "deepseek", "model": self._model})
         try:
             response = self._client.post(_ENDPOINT, json={
                 "model": self._model,
                 "messages": [
-                    {"role": "system", "content": SYSTEM_INSTRUCTION +
+                    {"role": "system", "content": (
+                        SYSTEM_INSTRUCTION if system_instruction is None else system_instruction
+                     ) +
                      '\nDevuelve solo JSON con esta estructura: '
                      '{"answer": "respuesta prudente", "limitations": ["limitación relevante"]}.'},
                     {"role": "user", "content": question_text},

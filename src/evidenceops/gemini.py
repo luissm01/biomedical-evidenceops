@@ -153,12 +153,16 @@ class GeminiGenerator:
             ) from exc
 
     @traced_provider("gemini")
-    def generate(self, question_text: str) -> GeneratedContent:
+    def generate(
+        self, question_text: str, *, system_instruction: str | None = None,
+    ) -> GeneratedContent:
         logger.info("llm.generation.started", extra={"provider": "gemini", "model": self._model})
         try:
             interaction = self._client.interactions.create(
                 model=self._model,
-                system_instruction=SYSTEM_INSTRUCTION,
+                system_instruction=(
+                    SYSTEM_INSTRUCTION if system_instruction is None else system_instruction
+                ),
                 input=question_text,
                 store=False,
                 generation_config={
