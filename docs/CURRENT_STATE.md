@@ -4,6 +4,12 @@ Actualizado: 2026-10-15. Distingue código versionado de trabajo local pendiente
 
 ## Presente
 
+- **M8 — RAG v1**, #44: diseño acordado del contrato, construcción
+  de contexto y política de citas en [D026](decisions/D026-rag-v1-contract-context-and-citations.md).
+  Decisiones acordadas, incluidas instrucciones por llamada y validación
+  determinista de citas/abstención; entrega documental autorizada.
+  Sin implementación RAG ni cambios HTTP; #45 todavía no iniciada.
+
 - **M7 — Retrieval & Embeddings** completado: transformación de #38 implementada:
   una unidad por publicación (`whole-publication-v1`),
   título + abstract, identidad determinista, fingerprint del texto y procedencia.
@@ -66,9 +72,9 @@ Actualizado: 2026-10-15. Distingue código versionado de trabajo local pendiente
 
 ## Siguiente trabajo
 
-M7 queda completado con el cierre de #40 aceptado por el desarrollador.
-El siguiente milestone es M8, bajo un nuevo encargo. La corrida real de
-retrieval no resuelve el baseline de generación M4 pendiente.
+El diseño de #44 está acordado. El siguiente trabajo es implementar #45, bajo
+un nuevo encargo. La corrida real de retrieval no resuelve el baseline de
+generación M4 pendiente.
 Cuando exista cuota y se solicite, obtener/promover/revisar el baseline real.
 Los comandos y requisitos de pruebas viven en el [README](../README.md);
 la secuencia futura, en el roadmap.
