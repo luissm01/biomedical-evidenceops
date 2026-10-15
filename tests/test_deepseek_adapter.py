@@ -151,3 +151,16 @@ def test_http_contract_with_deepseek_adapter(transport):
     assert response.json() == {
         "answer": "Respuesta", "limitations": [], "external_sources_consulted": False,
     }
+
+
+def test_per_call_instructions_do_not_change_default_or_json_format(transport):
+    from evidenceops.generation_prompt import SYSTEM_INSTRUCTION
+
+    with closing(DeepSeekGenerator("private-key")) as generator:
+        for instruction in ("RAG instructions", None):
+            generator.generate('{"query":"Pregunta","evidence":[]}', system_instruction=instruction)
+            body = json.loads(transport[0].call_args.args[0].content)
+            expected = SYSTEM_INSTRUCTION if instruction is None else instruction
+            assert body["messages"][0]["content"].startswith(expected + '\nDevuelve solo JSON')
+            assert body["response_format"] == {"type": "json_object"}
+            assert body["max_tokens"] == 2048

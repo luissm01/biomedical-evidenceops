@@ -240,3 +240,14 @@ def test_model_event_uses_safe_metadata(transport, caplog):
     serialized = json.dumps(events)
     for secret in ("test-only-key", "private-question", "Respuesta prudente", "limitations"):
         assert secret not in serialized
+
+
+def test_per_call_instructions_do_not_change_default_or_schema(transport):
+    handler, _ = transport
+    with closing(GeminiGenerator(api_key="test-only-key")) as generator:
+        for instruction in ("RAG instructions", None):
+            generator.generate('{"query":"Pregunta","evidence":[]}', system_instruction=instruction)
+            body = json.loads(handler.call_args.args[0].content)
+            assert body["system_instruction"] == (SYSTEM_INSTRUCTION if instruction is None else instruction)
+            assert body["response_format"]["schema"] == GeneratedContent.model_json_schema()
+            assert body["store"] is False

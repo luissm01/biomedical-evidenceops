@@ -31,7 +31,9 @@ class FakeGenerator:
     def __init__(self) -> None:
         self.calls: list[str] = []
 
-    def generate(self, question_text: str) -> GeneratedContent:
+    def generate(
+        self, question_text: str, *, system_instruction: str | None = None,
+    ) -> GeneratedContent:
         self.calls.append(question_text)
 
         return GeneratedContent(

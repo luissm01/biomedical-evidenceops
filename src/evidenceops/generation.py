@@ -41,5 +41,7 @@ class GenerationError(RuntimeError):
 
 
 class Generator(Protocol):
-    def generate(self, question_text: str) -> GeneratedContent:
+    def generate(
+        self, question_text: str, *, system_instruction: str | None = None,
+    ) -> GeneratedContent:
         ...

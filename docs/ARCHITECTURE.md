@@ -74,7 +74,7 @@ sin leer antes de escribir. Flujo:
 `CLI → ESearch opcional → PMIDs únicos → EFetch por lote → parser → BiomedicalDocument → upsert → commit → resumen`
 
 No se retiene conexión DB durante adquisición. No hay endpoint de ingestión;
-los documentos persistidos no se conectan aún con generación. Motivos y alcance en
+el servicio RAG puede recuperar sus representaciones indexadas para generación. Motivos y alcance en
 [D021](decisions/D021-biomedical-ingestion-source-and-contract.md) y
 [D022](decisions/D022-biomedical-publication-persistence.md) y
 [D023](decisions/D023-biomedical-ingestion-pipeline.md).
@@ -129,8 +129,7 @@ o reindexación; un cambio incompatible requiere autorización explícita median
 La búsqueda exacta de pgvector usa `<#>` (producto interno negativo), orden
 ascendente y score con signo invertido; desempate por identidad de unidad.
 Rechaza configuraciones incompatibles y excluye snapshots obsoletos antes del
-LIMIT. Une metadata vigente y devuelve unidad trazable más score. Sin HTTP,
-GraphQL ni integración LLM.
+LIMIT. Une metadata vigente y devuelve unidad trazable más score. Sin HTTP ni GraphQL; el servicio RAG reutiliza esta búsqueda sin modificarla.
 
 [retrieval_demo.py](../src/evidenceops/retrieval_demo.py) compone recursos para
 una prueba manual sobre publicaciones ya ingeridas. Contratos, límites y comandos
@@ -143,11 +142,31 @@ el top-5 operacional y el ranking completo alimentan métricas deterministas.
 Solo el comando explícito `--live` ejecuta MedCPT; los tests usan dobles.
 [Procedimiento y límites](../evaluation/retrieval/README.md).
 
-## Diseño RAG v1 de M8 (sin implementar)
+## Servicio RAG v1 de M8
 
-[D026](decisions/D026-rag-v1-contract-context-and-citations.md) define el contrato
-`query → retrieval M7 → contexto → Generator → answer + limitations + sources`.
-El diseño fija top-5, fuentes completas dentro de 20.000 caracteres de evidencia,
-citas a fuentes incluidas y respuestas efímeras. Las adaptaciones de instrucciones
-y cobertura de citas están acordadas en #44, pendientes de implementación.
-El flujo actual continúa independiente; no existe todavía servicio RAG ni integración HTTP.
+[rag.py](../src/evidenceops/rag.py) implementa el contrato de
+[D026](decisions/D026-rag-v1-contract-context-and-citations.md):
+`query → retrieval M7 → contexto → Generator → validación → answer + limitations + sources`.
+`RagService` recibe un callable de búsqueda (M7 con sesiones y encoder ligados)
+y el `Generator` existente. Solicita top-5 con año inicial opcional. No posee
+recursos, accede a HTTP ni persiste respuestas.
+
+`build_context` conserva recuperados, incluidos y omitidos en orden; asigna S1…Sn
+al incluir unidades completas. El presupuesto de 20.000 caracteres cuenta la
+lista de evidencia serializada como JSON compacto con Unicode literal, incluida
+metadata y escapes. Omite una unidad que no cabe y continúa con las siguientes.
+El mensaje contiene query y evidence como datos; las instrucciones RAG separadas
+se pasan mediante `generate(..., system_instruction=...)`. Con `None`, Gemini y
+DeepSeek conservan las instrucciones originales, formato, límites y timeout.
+
+La aplicación construye `sources` con unidad íntegra y score de cada fuente
+incluida, también las no citadas. Valida pertenencia y formato de las citas en
+answer y limitations, y exige citas al final de cada párrafo o elemento de lista.
+Fallos producen `GenerationError(INVALID_OUTPUT)` sin reparación ni retry RAG.
+La única abstención del modelo sin citas es la frase fija con limitations vacío;
+la aplicación añade la limitación operacional. Sin resultados o si no cabe ninguna
+fuente, se abstiene sin invocar al generador. Los fallos técnicos se propagan.
+
+La validación es estructural: no demuestra apoyo semántico ni groundedness.
+HTTP/observabilidad RAG (#46) y evaluación RAG (#47) siguen pendientes.
+Composición y pruebas deterministas en el [README](../README.md#rag-v1-m8--45).

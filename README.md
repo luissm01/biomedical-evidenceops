@@ -316,3 +316,40 @@ mayor ordena antes; no representa probabilidad ni calidad biomédica.
 La evaluación end-to-end de #40 y su baseline real se describen en
 [evaluation/retrieval](evaluation/retrieval/README.md), con juicios asistidos
 y límites explícitos del corpus.
+
+## RAG v1 (M8 — #45)
+
+Servicio local independiente de HTTP, sin persistencia de respuestas. Reutiliza
+la búsqueda M7 y el generador configurado; el llamador posee y cierra sus recursos:
+
+```python
+from functools import partial
+from evidenceops.rag import RagService
+from evidenceops.retrieval import search
+
+# sessions, encoder y generator ya compuestos con la configuración existente.
+rag = RagService(partial(search, sessions, encoder), generator)
+response = rag.generate("¿Qué evidencia hay sobre X?", published_from=2020)
+# response.answer, response.limitations, response.sources
+```
+
+`published_from` es opcional; top-5 es fijo. El contexto incluye fuentes completas
+hasta 20.000 caracteres del JSON compacto de evidencia; omite las que no caben y
+continúa sin truncar ni buscar candidatos adicionales. `sources` conserva la
+unidad completa y score de todas las fuentes incluidas, citadas o no; las citas
+inline usan sus etiquetas locales `[S1]`, `[S2]`, etc. El score no mide confianza.
+
+La aplicación valida citas existentes y cobertura al final de cada párrafo o
+elemento de lista de `answer` y `limitations`. Solo permite sin citas la abstención
+fija acordada. Sin resultados o si ninguna fuente cabe, no llama al LLM. Errores
+de citas producen `GenerationError` con causa `INVALID_OUTPUT`, sin retries ni
+sustitución por abstención; fallos técnicos de retrieval/generación se propagan.
+No valida apoyo semántico. El presupuesto en caracteres no garantiza caber en la
+ventana de tokens del proveedor. Detalles en [D026](docs/decisions/D026-rag-v1-contract-context-and-citations.md).
+
+Pruebas del servicio y de compatibilidad de instrucciones por llamada, sin DB ni
+modelos reales (los dos casos HTTP/DB de Gemini se excluyen en este comando):
+
+```bash
+uv run --locked pytest tests/test_rag.py tests/test_generation_contract.py tests/test_gemini_adapter.py tests/test_deepseek_adapter.py -k 'not http_database_and_real_adapter_flow'
+```
