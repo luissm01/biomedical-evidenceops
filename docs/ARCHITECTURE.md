@@ -168,5 +168,15 @@ la aplicación añade la limitación operacional. Sin resultados o si no cabe ni
 fuente, se abstiene sin invocar al generador. Los fallos técnicos se propagan.
 
 La validación es estructural: no demuestra apoyo semántico ni groundedness.
-HTTP/observabilidad RAG (#46) y evaluación RAG (#47) siguen pendientes.
+La API compone el servicio en lifespan con `partial(search, sessions, encoder)`
+y el generador compartido de la factoría. `POST /rag` recibe query/año sin
+persistencia previa y serializa las fuentes completas. `LocalMedCPT` conserva
+carga diferida; se puede inyectar un encoder para integración determinista.
+Los errores de retrieval se traducen a causas seguras; un subtipo de
+`GenerationError(INVALID_OUTPUT)` distingue citas inválidas de errores de esquema
+del proveedor. La ruta reutiliza las traducciones HTTP de generación existentes.
+[D027](decisions/D027-rag-http-errors-and-observability.md) documenta composición,
+errores y límites. El servicio observa operación, retrieval, contexto y generación
+con logs, métricas y spans M5, sin registrar contenido. La evaluación RAG (#47)
+sigue pendiente.
 Composición y pruebas deterministas en el [README](../README.md#rag-v1-m8--45).

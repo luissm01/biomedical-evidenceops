@@ -21,6 +21,19 @@ class GenerationMetrics:
             ["outcome"], buckets=(0.1, 0.25, 0.5, 1, 2, 5, 10, 20, 30, 60, 120, float("inf")),
             registry=self.registry,
         )
+        self.rag_operations = Counter(
+            "evidenceops_rag_operations_total", "Completed RAG operations and stages",
+            ["stage", "outcome"], registry=self.registry,
+        )
+        self.rag_duration = Histogram(
+            "evidenceops_rag_duration_seconds", "RAG operation and stage duration",
+            ["stage", "outcome"], buckets=(0.1, 0.25, 0.5, 1, 2, 5, 10, 20, 30, 60, 120, float("inf")),
+            registry=self.registry,
+        )
+        self.rag_errors = Counter(
+            "evidenceops_rag_errors_total", "RAG operation and stage errors",
+            ["stage", "cause"], registry=self.registry,
+        )
         self.input_tokens = Counter(
             "evidenceops_llm_input_tokens_total", "Provider-reported input tokens",
             ["provider", "model"], registry=self.registry,
@@ -33,6 +46,14 @@ class GenerationMetrics:
             "evidenceops_llm_total_tokens_total", "Provider-reported total tokens",
             ["provider", "model"], registry=self.registry,
         )
+
+    def record_rag(
+        self, stage: str, outcome: str, duration: float, cause: str | None,
+    ) -> None:
+        self.rag_operations.labels(stage=stage, outcome=outcome).inc()
+        self.rag_duration.labels(stage=stage, outcome=outcome).observe(duration)
+        if cause is not None:
+            self.rag_errors.labels(stage=stage, cause=cause).inc()
 
     def record_generation(
         self, outcome: str, duration_seconds: float,

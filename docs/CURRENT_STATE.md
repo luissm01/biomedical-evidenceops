@@ -11,7 +11,18 @@ Actualizado: 2026-10-15. Distingue código versionado de trabajo local pendiente
   fuentes desde la aplicación y validación determinista de citas/abstención.
   Tests con dobles y transporte simulado; demo manual local disponible en
   `demo_rag_local.py`, sin inferencias reales ejecutadas por el agente.
-  Sin cambios HTTP ni nueva observabilidad end-to-end.
+  #46 implementada y aceptada por el desarrollador: `POST /rag`
+  con query/año y respuesta estructurada, traducción segura de errores y
+  observabilidad de operación/retrieval/contexto/generación con M5.
+  Tests deterministas HTTP y PostgreSQL/pgvector; demo API preparada en el
+  [README](../README.md#rag-desde-la-api-m8--46), sin inferencias reales del agente.
+  Diagnóstico seguro de citas: motivo, campo y localización en logs/spans,
+  sin volcar contenido ni modificar reglas de D026. Los logs antiguos del fallo
+  reportado solo permiten ubicarlo tras DeepSeek, no reconstruir el motivo.
+  La prueba HTTP real aportada por el desarrollador termina en rechazo de citas
+  tras completar retrieval/contexto/DeepSeek; no acredita una respuesta válida
+  ni calidad semántica. Cierre de #46 aceptado con este límite.
+  Decisiones de integración en [D027](decisions/D027-rag-http-errors-and-observability.md).
 
 - **M7 — Retrieval & Embeddings** completado: transformación de #38 implementada:
   una unidad por publicación (`whole-publication-v1`),
@@ -60,8 +71,8 @@ Actualizado: 2026-10-15. Distingue código versionado de trabajo local pendiente
   de M4 ni prueba de calidad del modelo. No cambiar proveedor, pagar cuota o
   añadir retries artificiales para conseguirlo.
 - Servicio RAG local disponible con fuentes y citas verificadas estructuralmente;
-  la generación HTTP existente sigue sin retrieval. La revisión humana
-  aplica una rúbrica limitada; no hay validación factual automática.
+  el endpoint RAG reutiliza retrieval y la generación HTTP previa conserva su
+  contrato. La revisión humana aplica una rúbrica limitada; no hay validación factual automática.
 - Timeout de transporte sin deadline total; un retry puede duplicar consumo.
   [Política y motivos](decisions/D011-gemini.md).
 - Una caída de PostgreSQL tras startup aún produce errores no controlados en
@@ -75,9 +86,8 @@ Actualizado: 2026-10-15. Distingue código versionado de trabajo local pendiente
 
 ## Siguiente trabajo
 
-La integración HTTP/observabilidad (#46) y evaluación RAG (#47) requieren sus
-respectivos encargos. La corrida real de retrieval no resuelve el baseline de
-generación M4 pendiente.
+La evaluación RAG (#47) requiere su propio encargo. La corrida real de retrieval no resuelve
+el baseline de generación M4 pendiente.
 Cuando exista cuota y se solicite, obtener/promover/revisar el baseline real.
 Los comandos y requisitos de pruebas viven en el [README](../README.md);
 la secuencia futura, en el roadmap.

@@ -1,4 +1,5 @@
 import logging
+from functools import partial
 from time import perf_counter
 
 from collections.abc import AsyncIterator
@@ -19,11 +20,17 @@ from evidenceops.generation import (
     GenerationErrorCause,
     Generator,
 )
+from evidenceops.embeddings import LocalMedCPT, MedCPTEncoder
+from evidenceops.rag import RagService
+from evidenceops.rag_errors import InvalidCitationsError, RagRetrievalError
+from evidenceops.retrieval import search
 from evidenceops.models import Question
 from evidenceops.metrics import GenerationMetrics
 from evidenceops.observability import CorrelatedFastAPI, configure_logging
 from evidenceops.schemas import (
     GenerationResponse,
+    RagRequest,
+    RagHTTPResponse,
     HealthCheckResponse,
     QuestionCreate,
     QuestionResponse,
@@ -89,6 +96,31 @@ def get_generator(request: Request) -> Generator:
 
 def get_metrics(request: Request) -> GenerationMetrics:
     return cast(GenerationMetrics, request.app.state.metrics)
+
+
+def get_rag_service(request: Request) -> RagService:
+    return cast(RagService, request.app.state.rag_service)
+
+
+@router.post("/rag", response_model=RagHTTPResponse)
+def generate_rag(
+    body: RagRequest, service: RagService = Depends(get_rag_service),
+) -> RagHTTPResponse:
+    try:
+        result = service.generate(body.query, published_from=body.published_from)
+    except RagRetrievalError as exc:
+        raise HTTPException(status_code=503, detail={
+            "code": exc.cause, "message": "Evidence retrieval is unavailable",
+        }) from exc
+    except InvalidCitationsError as exc:
+        raise HTTPException(status_code=502, detail={
+            "code": "invalid_citations", "message": "Generation returned invalid citations",
+        }) from exc
+    except GenerationError as exc:
+        raise _generation_http_exception(exc) from exc
+    return RagHTTPResponse(
+        answer=result.answer, limitations=result.limitations, sources=list(result.sources),
+    )
 
 
 def get_question_text(question_id: UUID, request: Request) -> str:
@@ -194,7 +226,8 @@ def generate_answer(
 
 
 def create_app(
-    settings: Settings | None = None, generator: Generator | None = None
+    settings: Settings | None = None, generator: Generator | None = None,
+    encoder: MedCPTEncoder | None = None,
 ) -> FastAPI:
     @asynccontextmanager
     async def lifespan(app: FastAPI) -> AsyncIterator[None]:
@@ -215,6 +248,10 @@ def create_app(
                 owned_generator = create_generator(configured_settings, app.state.metrics)
                 configured_generator = owned_generator
             app.state.generator = configured_generator
+            app.state.rag_service = RagService(
+                partial(search, session_factory, encoder if encoder is not None else LocalMedCPT()),
+                configured_generator, app.state.metrics,
+            )
             yield
         finally:
             try:

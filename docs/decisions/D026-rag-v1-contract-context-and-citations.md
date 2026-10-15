@@ -5,7 +5,9 @@
 Aceptada por las decisiones del encargo de #44 y la confirmación explícita del
 desarrollador sobre instrucciones por llamada, cobertura determinista de citas
 y abstención fija. Entrega documental y cierre de #44 autorizados por el
-desarrollador. Sin implementación.
+desarrollador. El diseño se implementó en #45; la integración HTTP local de #46
+se documenta en [D027](D027-rag-http-errors-and-observability.md). El resto del
+texto conserva el alcance y los criterios del encargo de diseño original.
 
 ## Problema
 
