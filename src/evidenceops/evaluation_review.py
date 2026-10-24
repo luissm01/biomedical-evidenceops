@@ -11,7 +11,9 @@ from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from evidenceops.evaluation import Case, Dataset, Run, Text, validate_baseline
 
-type Dimension = Literal["relevance", "factual_correctness", "prudence_and_limitations"]
+type Dimension = Literal["relevance", "factual_correctness", "prudence_and_limitations",
+                         "groundedness", "citation_semantics", "unsupported_claims",
+                         "abstention", "limitations"]
 
 
 class RubricCase(Case):
@@ -35,19 +37,19 @@ class Judgment(BaseModel):
     model_config = ConfigDict(extra="forbid")
     case_id: Text
     dimension: Dimension
-    verdict: Literal["pass", "fail"] | None = None
+    verdict: Literal["pass", "fail", "not_applicable"] | None = None
     notes: str = ""
 
     @model_validator(mode="after")
     def explain_failure(self) -> "Judgment":
-        if self.verdict == "fail" and not self.notes.strip():
-            raise ValueError("A fail requires explanatory notes")
+        if self.verdict in ("fail", "not_applicable") and not self.notes.strip():
+            raise ValueError("A fail or not_applicable requires explanatory notes")
         return self
 
 
 class Review(BaseModel):
     model_config = ConfigDict(extra="forbid")
-    review_version: Literal["1"] = "1"
+    review_version: Literal["1", "rag-1"] = "1"
     evaluator: Literal["human"] = "human"
     reviewer: str = ""
     run_id: UUID
@@ -67,6 +69,7 @@ def prepare_review(run: Run, dataset_path: Path) -> Review:
     validate_baseline(run, dataset_path)
     dataset = RubricDataset.model_validate_json(dataset_path.read_bytes())
     return Review(
+        review_version="rag-1" if getattr(run, "run_version", None) == "rag-1" else "1",
         run_id=run.run_id, run_sha256=run_digest(run),
         dataset_version=run.dataset_version, dataset_sha256=run.dataset_sha256,
         results=[Judgment(case_id=case.id, dimension=dimension)
@@ -76,18 +79,23 @@ def prepare_review(run: Run, dataset_path: Path) -> Review:
 
 def validate_review(review: Review, run: Run, dataset_path: Path) -> None:
     expected = prepare_review(run, dataset_path)
-    if (review.run_id, review.run_sha256, review.dataset_version, review.dataset_sha256) != (
-        expected.run_id, expected.run_sha256, expected.dataset_version, expected.dataset_sha256
+    if (review.review_version, review.run_id, review.run_sha256, review.dataset_version, review.dataset_sha256) != (
+        expected.review_version, expected.run_id, expected.run_sha256, expected.dataset_version, expected.dataset_sha256
     ):
         raise ValueError("Review does not match this run/dataset; prepare and review again")
+    validate_judgments = getattr(run, 'validate_human_judgments', None)
+    if validate_judgments is not None:
+        validate_judgments(review)
+    elif any(item.verdict == 'not_applicable' for item in review.results):
+        raise ValueError('M4 requires binary verdicts')
     keys = [(item.case_id, item.dimension) for item in review.results]
     expected_keys = {(item.case_id, item.dimension) for item in expected.results}
     if len(keys) != len(set(keys)) or set(keys) != expected_keys:
         raise ValueError("Review requires exactly the declared case_id + dimension pairs")
     if not review.reviewer.strip() or any(item.verdict is None for item in review.results):
         raise ValueError("Incomplete review: reviewer and every verdict are required")
-    if any(item.verdict == "fail" and not item.notes.strip() for item in review.results):
-        raise ValueError("A fail requires explanatory notes")
+    if any(item.verdict in ("fail", "not_applicable") and not item.notes.strip() for item in review.results):
+        raise ValueError("A fail or not_applicable requires explanatory notes")
 
 
 def ordered_results(review: Review) -> list[Judgment]:
@@ -97,18 +105,19 @@ def ordered_results(review: Review) -> list[Judgment]:
 def aggregate(review: Review, run: Run, dataset_path: Path) -> dict:
     validate_review(review, run, dataset_path)
     results = ordered_results(review)
+    verdicts = ("pass", "fail", "not_applicable") if hasattr(run, "run_version") else ("pass", "fail")
     by_dimension = {}
     for dimension in sorted({item.dimension for item in results}):
         by_dimension[dimension] = {
             verdict: sum(item.dimension == dimension and item.verdict == verdict for item in results)
-            for verdict in ("pass", "fail")
+            for verdict in verdicts
         }
     failed_cases = {item.case_id for item in results if item.verdict == "fail"}
     passed_cases = sorted({item.case_id for item in results} - failed_cases)
     return {
         "run_id": str(run.run_id), "reviewer": review.reviewer,
         "counts": {verdict: sum(item.verdict == verdict for item in results)
-                   for verdict in ("pass", "fail")},
+                   for verdict in verdicts},
         "by_dimension": by_dimension,
         "fully_passed_cases": passed_cases, "fully_passed_case_count": len(passed_cases),
         "failures": [item.model_dump() for item in results if item.verdict == "fail"],
@@ -128,10 +137,16 @@ def compare(
         ("pass", "pass"): "unchanged_pass", ("fail", "fail"): "unchanged_fail",
         ("fail", "pass"): "improvements", ("pass", "fail"): "regressions",
     }
-    groups = {name: [] for name in transitions.values()}
+    names = list(transitions.values())
+    if hasattr(baseline_run, 'run_version'):
+        names += ['applicability_changes', 'unchanged_not_applicable']
+    groups = {name: [] for name in names}
     for item in ordered_results(candidate):
         before = previous[item.case_id, item.dimension]
-        groups[transitions[before.verdict, item.verdict]].append({
+        transition = transitions.get((before.verdict, item.verdict),
+                                     "unchanged_not_applicable" if before.verdict == item.verdict
+                                     else "applicability_changes")
+        groups[transition].append({
             "case_id": item.case_id, "dimension": item.dimension,
             "baseline": before.verdict, "candidate": item.verdict,
             "baseline_notes": before.notes, "candidate_notes": item.notes,

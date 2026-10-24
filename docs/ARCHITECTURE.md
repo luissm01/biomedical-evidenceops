@@ -177,6 +177,15 @@ Los errores de retrieval se traducen a causas seguras; un subtipo de
 del proveedor. La ruta reutiliza las traducciones HTTP de generación existentes.
 [D027](decisions/D027-rag-http-errors-and-observability.md) documenta composición,
 errores y límites. El servicio observa operación, retrieval, contexto y generación
-con logs, métricas y spans M5, sin registrar contenido. La evaluación RAG (#47)
-sigue pendiente.
+con logs, métricas y spans M5, sin registrar contenido.
+
+La [evaluación RAG](../evaluation/rag/README.md) (#47) ejecuta el servicio en un
+esquema PostgreSQL aislado sobre el corpus congelado M7. Un observador opcional
+recibe el contexto real; un wrapper del generador conserva su output tipado para
+revisar rechazos de citas sin repetir llamadas. Las trazas públicas se guardan en
+artefactos locales, sin secretos ni cuerpos de error arbitrarios. Reutiliza la
+revisión humana M4 con dimensiones RAG y N/A justificado; exige runs completos,
+trazas verificadas y revisión completa para promocionar. Casos previos aprobados;
+corrida real completa y baseline v1 con revisión humana asistida aprobado y
+promocionado; [resultados y límites](../evaluation/rag/REPORT-v1.md). Decisión en [D028](decisions/D028-rag-evaluation.md).
 Composición y pruebas deterministas en el [README](../README.md#rag-v1-m8--45).

@@ -171,10 +171,12 @@ class RagService:
     def __init__(
         self, retrieve: Retriever, generator: Generator,
         metrics: GenerationMetrics | None = None,
+        context_observer: Callable[[RagContext], None] | None = None,
     ) -> None:
         self._retrieve = retrieve
         self._generator = generator
         self._metrics = metrics
+        self._context_observer = context_observer
 
     def generate(self, query: str, *, published_from: int | None = None) -> RagResponse:
         if not isinstance(query, str) or not query.strip():
@@ -200,6 +202,8 @@ class RagService:
         with observe_rag("context", self._metrics):
             context = build_context(results)
             message = context.message(query)
+            if self._context_observer is not None:
+                self._context_observer(context)
         if not context.sources:
             limitation = (
                 "La búsqueda no devolvió fuentes." if not results else

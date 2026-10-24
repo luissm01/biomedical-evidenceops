@@ -18,6 +18,7 @@ destinos en cascada.
 | Cómo enseñar / qué se ha trabajado | [Aprendizaje](learning/README.md) | Solo tareas pedagógicas |
 | Dataset, runs y revisión | [Evaluation](../evaluation/README.md) | Evaluación del generador |
 | Corpus, métricas y baseline de retrieval | [Retrieval evaluation](../evaluation/retrieval/README.md) | Evaluar retrieval de M7 |
+| Evaluar RAG end-to-end | [RAG evaluation](../evaluation/rag/README.md) | Casos, rúbrica, runs y baseline de M8 |
 | Eventos y diagnóstico | [Observabilidad](subsystems/observability.md) | Cambiar/usar logs |
 | Workflow de evaluación asistida | [Skill evaluation](../.codex/skills/evidenceops-evaluation/SKILL.md) | Ejecutar, revisar o comparar evaluaciones |
 

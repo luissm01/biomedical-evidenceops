@@ -69,6 +69,9 @@ class Run(BaseModel):
     timeout_seconds: float = Field(gt=0, allow_inf_nan=False)
     cases: list[Result]
 
+    def validate_artifacts(self, dataset_path: Path) -> None:
+        """Specialized pipelines may validate their additional evidence trace."""
+
 
 def load_dataset(path: Path) -> tuple[Dataset, str]:
     raw = path.read_bytes()
@@ -129,6 +132,7 @@ def validate_baseline(run: Run, dataset_path: Path) -> None:
     actual = [(case.case_id, case.question) for case in run.cases]
     if actual != expected or any(case.status != "success" for case in run.cases):
         raise ValueError("Baseline requires every dataset case to succeed")
+    run.validate_artifacts(dataset_path)
 
 
 def promote_baseline(source: Path, destination: Path, dataset_path: Path) -> None:

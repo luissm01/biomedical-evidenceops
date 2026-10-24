@@ -1,0 +1,19 @@
+{
+  "version": "rag-baseline-provenance-v1",
+  "run_id": "a8b78e1c-02c4-4e8d-964d-9823f6d8b741",
+  "baseline": "evaluation/rag/baseline-v1.json",
+  "raw_run_sha256": "19de1fd5fea10409e026538b492598191c540b369de5c0cf2ac7d409e6375329",
+  "canonical_run_sha256": "893b3c8c0c4254ae0025283d27a45f99765a4cba35d83e040364e637629674e8",
+  "review": "evaluation/rag/baseline-v1.review.json",
+  "review_sha256": "552cb71868ef2d76e352b229efa3b84a9739c8fa0899c74b6e3c3f936be38239",
+  "aggregate": "evaluation/rag/baseline-v1.aggregate.json",
+  "aggregate_sha256": "dbe2ca973350f0e64cbf74891d04715a8aec3b04f5fe8d2e29beda6610459ddb",
+  "snapshot": "evaluation/rag/baseline-v1.inputs-and-code.tar.gz",
+  "snapshot_sha256": "8edb11d889685494a6d41d8a8ae8777005d9d3f6027ec1a0b2d247d31f423bee",
+  "dataset_sha256": "17a965f3f47b63aaa9e591d2cabb4f250346f8ff8f21e3e8681c01b8a337a14e",
+  "corpus_sha256": "6ac3e3da31e10a18cd401c775d30a344a49760cc6c83fc7f87407899f2bffdb2",
+  "freeze_sha256": "3ee3ef6b668d3625924e0c2bc959f0bb5703a339e1f73fbda0c687ca3a44e414",
+  "code_verification": "All source_sha256 entries match archived source and uv.lock; archive preserves dirty-tree code without credentials or .env.",
+  "human_review": "Assisted human judgments explicitly approved by the developer; no expert clinical consensus claimed.",
+  "promotion": "Local copy by existing promote command; no commit, push or PR."
+}
