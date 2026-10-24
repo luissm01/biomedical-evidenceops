@@ -1,7 +1,10 @@
 # Evaluación offline de Generator
 
 La evaluación de retrieval M7 tiene su propio [dataset y runbook](retrieval/README.md),
-independientes de este generador.
+independientes de este generador. La evaluación end-to-end de RAG M8 tiene su
+[dataset, rúbrica y runbook](rag/README.md); reutiliza los mecanismos de revisión
+de este módulo con dimensiones RAG y N/A justificado. Los comandos siguientes
+corresponden exclusivamente a generación M4.
 
 Fuente del procedimiento de dataset, ejecución, promoción y revisión. El dataset
 [cases.json](cases.json) contiene la rúbrica; no es una respuesta ideal ni un

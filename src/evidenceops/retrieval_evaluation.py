@@ -1,6 +1,7 @@
 """Fixed-corpus retrieval evaluation, independent of generator evaluation."""
 
 import argparse
+from contextlib import contextmanager
 from datetime import datetime, timezone
 import hashlib
 from importlib.metadata import PackageNotFoundError, version
@@ -157,9 +158,47 @@ def package_version(name: str) -> str | None:
         return None
 
 
+@contextmanager
+def frozen_sessions(corpus: dict, database_url: str, encoder, environment: dict):
+    """Index the frozen corpus in a private schema; always release owned resources."""
+    schema = 'retrieval_eval_' + uuid4().hex
+    admin = create_engine(database_url)
+    engine = None
+    created = False
+    try:
+        with admin.begin() as connection:
+            environment['postgresql'] = connection.scalar(text('SHOW server_version'))
+            environment['pgvector_extension'] = connection.scalar(text("SELECT extversion FROM pg_extension WHERE extname = 'vector'"))
+            if environment['pgvector_extension'] is None:
+                raise ValueError('Install pgvector with the project migrations before evaluation')
+            connection.execute(text(f'CREATE SCHEMA {schema}'))
+            created = True
+        # Only this private schema contains evaluation tables; public resolves vector.
+        engine = create_engine(database_url, connect_args={'options': f'-csearch_path={schema},public'})
+        Base.metadata.create_all(engine, tables=[Publication.__table__, UnitEmbedding.__table__], checkfirst=False)
+        sessions = sessionmaker(engine, expire_on_commit=False)
+        ids = []
+        with sessions.begin() as session:
+            for doc in corpus['documents']:
+                document = BiomedicalDocument(**{key: value for key, value in doc.items() if key != 'area'})
+                ids.append(upsert_publication(session, document).id)
+        for i, publication_id in enumerate(ids, 1):
+            index_publication(sessions, publication_id, encoder)
+            print(f'Indexed {i}/{len(ids)}', flush=True)
+        yield sessions
+    finally:
+        if engine is not None:
+            engine.dispose()
+        try:
+            if created:
+                with admin.begin() as connection:
+                    connection.execute(text(f'DROP SCHEMA {schema} CASCADE'))
+        finally:
+            admin.dispose()
+
+
 def run_baseline(directory: Path, output: Path, database_url: str, encoder) -> dict:
     corpus, dataset, queries = load_inputs(directory)  # Always before inference.
-    schema = 'retrieval_eval_' + uuid4().hex
     run = {
         'run_version': '1', 'status': 'running', 'started_at_utc': datetime.now(timezone.utc).isoformat(),
         'corpus_version': corpus['version'], 'dataset_version': dataset['version'],
@@ -184,50 +223,21 @@ def run_baseline(directory: Path, output: Path, database_url: str, encoder) -> d
     output.parent.mkdir(parents=True, exist_ok=True)
     with output.open('x') as file:
         file.write(json.dumps(run, indent=2) + '\n')
-    admin = create_engine(database_url)
-    engine = None
-    created = False
     try:
-        with admin.begin() as connection:
-            run['environment']['postgresql'] = connection.scalar(text('SHOW server_version'))
-            run['environment']['pgvector_extension'] = connection.scalar(text("SELECT extversion FROM pg_extension WHERE extname = 'vector'"))
-            if run['environment']['pgvector_extension'] is None:
-                raise ValueError('Install pgvector with the project migrations before evaluation')
-            connection.execute(text(f'CREATE SCHEMA {schema}'))
-            created = True
-        # Only this private schema contains evaluation tables; public resolves vector.
-        engine = create_engine(database_url, connect_args={'options': f'-csearch_path={schema},public'})
-        Base.metadata.create_all(engine, tables=[Publication.__table__, UnitEmbedding.__table__], checkfirst=False)
-        sessions = sessionmaker(engine, expire_on_commit=False)
-        ids = []
-        with sessions.begin() as session:
-            for doc in corpus['documents']:
-                document = BiomedicalDocument(**{key: value for key, value in doc.items() if key != 'area'})
-                ids.append(upsert_publication(session, document).id)
-        for i, publication_id in enumerate(ids, 1):
-            index_publication(sessions, publication_id, encoder)
-            print(f'Indexed {i}/{len(ids)}', flush=True)
-        def checkpoint(results):
-            run['results'] = results
-            _write(output, run)
-        run['results'] = evaluate(sessions, encoder, queries, len(ids), checkpoint)
-        run['aggregate'] = aggregate_metrics(run['results'])
-        run['status'] = 'complete'
+        with frozen_sessions(corpus, database_url, encoder, run['environment']) as sessions:
+            def checkpoint(results):
+                run['results'] = results
+                _write(output, run)
+            run['results'] = evaluate(sessions, encoder, queries, len(corpus['documents']), checkpoint)
+            run['aggregate'] = aggregate_metrics(run['results'])
+            run['status'] = 'complete'
     except Exception as exc:
         run['status'] = 'failed'
         run['error_type'] = type(exc).__name__  # No URLs, credentials or raw exception messages.
         raise
     finally:
-        if engine is not None:
-            engine.dispose()
-        try:
-            if created:
-                with admin.begin() as connection:
-                    connection.execute(text(f'DROP SCHEMA {schema} CASCADE'))
-        finally:
-            admin.dispose()
-            run['finished_at_utc'] = datetime.now(timezone.utc).isoformat()
-            _write(output, run)
+        run['finished_at_utc'] = datetime.now(timezone.utc).isoformat()
+        _write(output, run)
     return run
 
 

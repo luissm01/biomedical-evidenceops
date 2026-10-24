@@ -180,7 +180,7 @@ def test_different_rubric_even_same_version_is_incompatible(artifacts):
 @pytest.mark.parametrize("update", [
     {"verdict": "fail"}, {"verdict": "fail", "notes": " \n"},
     {"verdict": "unknown"}, {"verdict": 1}, {"score": 1},
-    {"dimension": "groundedness"},
+    {"dimension": "unknown_dimension"},
 ])
 def test_judgment_schema_rejects_invalid_values(update):
     raw = {"case_id": "a", "dimension": "relevance", "verdict": "pass", **update}

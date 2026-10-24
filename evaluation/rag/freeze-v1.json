@@ -1,0 +1,9 @@
+{
+  "version": "rag-freeze-v1",
+  "created_date": "2026-10-24",
+  "sha256": {
+    "cases-v1.json": "17a965f3f47b63aaa9e591d2cabb4f250346f8ff8f21e3e8681c01b8a337a14e",
+    "corpus-v1.json": "6ac3e3da31e10a18cd401c775d30a344a49760cc6c83fc7f87407899f2bffdb2"
+  },
+  "revision_note": "Developer-approved r09 correction and approval metadata before any real RAG inference; corpus unchanged."
+}

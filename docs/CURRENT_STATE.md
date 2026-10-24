@@ -1,6 +1,6 @@
 # Estado actual
 
-Actualizado: 2026-10-15. Distingue código versionado de trabajo local pendiente.
+Actualizado: 2026-10-24. Distingue código versionado de trabajo local pendiente.
 
 ## Presente
 
@@ -23,6 +23,23 @@ Actualizado: 2026-10-15. Distingue código versionado de trabajo local pendiente
   tras completar retrieval/contexto/DeepSeek; no acredita una respuesta válida
   ni calidad semántica. Cierre de #46 aceptado con este límite.
   Decisiones de integración en [D027](decisions/D027-rag-http-errors-and-observability.md).
+
+  #47 completada: diez casos previos a outputs (4 suficientes,
+  2 parciales, 2 ausentes, 2 con distractores), auditados contra el corpus M7.
+  La única corrida real autorizada excepcionalmente con saldo recargado,
+  `a8b78e1c-02c4-4e8d-964d-9823f6d8b741`, terminó completa: diez éxitos
+  técnicos, abstenciones en r07/r08 y ningún retry/fallback.
+  Revisión humana asistida aprobada expresamente: 58 pass, 0 fail y 2 N/A
+  de citas semánticas en las abstenciones. Baseline RAG v1 promocionado en
+  [baseline-v1.json](../evaluation/rag/baseline-v1.json), con revisión, agregado
+  reproducible, observaciones y snapshot de código/entradas.
+  [Informe y límites](../evaluation/rag/REPORT-v1.md): retrieval y generación
+  se interpretan por separado; muestra pequeña, corpus cerrado y sin consenso
+  clínico experto. La diferencia generated/output.limitations en abstenciones
+  es normalización operacional intencionada de D026, sin defecto que corregir.
+  El estado de integración, cierre de #47 y milestone M8 se consulta en Git/GitHub.
+  [Procedimiento](../evaluation/rag/README.md), método en
+  [D028](decisions/D028-rag-evaluation.md).
 
 - **M7 — Retrieval & Embeddings** completado: transformación de #38 implementada:
   una unidad por publicación (`whole-publication-v1`),
@@ -86,8 +103,14 @@ Actualizado: 2026-10-15. Distingue código versionado de trabajo local pendiente
 
 ## Siguiente trabajo
 
-La evaluación RAG (#47) requiere su propio encargo. La corrida real de retrieval no resuelve
-el baseline de generación M4 pendiente.
-Cuando exista cuota y se solicite, obtener/promover/revisar el baseline real.
+La evaluación y promoción RAG v1 de #47 están terminadas; no queda otra corrida
+pendiente. M8 reúne contrato, servicio, integración HTTP y baseline revisado.
+Git/GitHub conserva el estado de integración y cierre; no se considera entregado
+antes de integrar la PR y cerrar las issues correspondientes. La autorización excepcional
+ya se consumió: no repetir casos ni ejecutar nuevos candidatos sin encargo.
+M9 requiere alcance propio conforme al roadmap; el baseline preservado servirá
+para comparar estrategias sin reescribir etiquetas ni juicios de M8.
+El baseline RAG no resuelve el baseline independiente de generación M4 pendiente.
+Cuando exista cuota gratuita y se solicite, obtener/promover/revisar ese baseline M4.
 Los comandos y requisitos de pruebas viven en el [README](../README.md);
 la secuencia futura, en el roadmap.

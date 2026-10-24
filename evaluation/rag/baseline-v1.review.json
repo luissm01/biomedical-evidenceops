@@ -1,0 +1,371 @@
+{
+  "review_version": "rag-1",
+  "evaluator": "human",
+  "reviewer": "developer — assisted human review; all 60 judgments explicitly approved in the conversation (2026-10-24)",
+  "run_id": "a8b78e1c-02c4-4e8d-964d-9823f6d8b741",
+  "run_sha256": "893b3c8c0c4254ae0025283d27a45f99765a4cba35d83e040364e637629674e8",
+  "dataset_version": "rag-m8-v1",
+  "dataset_sha256": "17a965f3f47b63aaa9e591d2cabb4f250346f8ff8f21e3e8681c01b8a337a14e",
+  "results": [
+    {
+      "case_id": "r01",
+      "dimension": "groundedness",
+      "verdict": "pass",
+      "notes": "Juicio sobre la respuesta completa aprobado expresamente por el desarrollador en revisión humana asistida."
+    },
+    {
+      "case_id": "r01",
+      "dimension": "citation_semantics",
+      "verdict": "pass",
+      "notes": "Juicio sobre la respuesta completa aprobado expresamente por el desarrollador en revisión humana asistida."
+    },
+    {
+      "case_id": "r01",
+      "dimension": "relevance",
+      "verdict": "pass",
+      "notes": "Juicio sobre la respuesta completa aprobado expresamente por el desarrollador en revisión humana asistida. Observación acordada: Recuperación de documentos irrelevantes; la respuesta selecciona las revisiones pertinentes."
+    },
+    {
+      "case_id": "r01",
+      "dimension": "unsupported_claims",
+      "verdict": "pass",
+      "notes": "Juicio sobre la respuesta completa aprobado expresamente por el desarrollador en revisión humana asistida."
+    },
+    {
+      "case_id": "r01",
+      "dimension": "abstention",
+      "verdict": "pass",
+      "notes": "Juicio sobre la respuesta completa aprobado expresamente por el desarrollador en revisión humana asistida."
+    },
+    {
+      "case_id": "r01",
+      "dimension": "limitations",
+      "verdict": "pass",
+      "notes": "Juicio sobre la respuesta completa aprobado expresamente por el desarrollador en revisión humana asistida. Observación acordada: Recuperación de documentos irrelevantes; la respuesta selecciona las revisiones pertinentes."
+    },
+    {
+      "case_id": "r02",
+      "dimension": "groundedness",
+      "verdict": "pass",
+      "notes": "Juicio sobre la respuesta completa aprobado expresamente por el desarrollador en revisión humana asistida."
+    },
+    {
+      "case_id": "r02",
+      "dimension": "citation_semantics",
+      "verdict": "pass",
+      "notes": "Juicio sobre la respuesta completa aprobado expresamente por el desarrollador en revisión humana asistida."
+    },
+    {
+      "case_id": "r02",
+      "dimension": "relevance",
+      "verdict": "pass",
+      "notes": "Juicio sobre la respuesta completa aprobado expresamente por el desarrollador en revisión humana asistida. Observación acordada: Discrepancia documental entre 24 señales en el GWAS y 25 loci en la revisión. Se conservan ambas atribuciones, sin resolverla artificialmente."
+    },
+    {
+      "case_id": "r02",
+      "dimension": "unsupported_claims",
+      "verdict": "pass",
+      "notes": "Juicio sobre la respuesta completa aprobado expresamente por el desarrollador en revisión humana asistida."
+    },
+    {
+      "case_id": "r02",
+      "dimension": "abstention",
+      "verdict": "pass",
+      "notes": "Juicio sobre la respuesta completa aprobado expresamente por el desarrollador en revisión humana asistida."
+    },
+    {
+      "case_id": "r02",
+      "dimension": "limitations",
+      "verdict": "pass",
+      "notes": "Juicio sobre la respuesta completa aprobado expresamente por el desarrollador en revisión humana asistida. Observación acordada: Discrepancia documental entre 24 señales en el GWAS y 25 loci en la revisión. Se conservan ambas atribuciones, sin resolverla artificialmente."
+    },
+    {
+      "case_id": "r03",
+      "dimension": "groundedness",
+      "verdict": "pass",
+      "notes": "Juicio sobre la respuesta completa aprobado expresamente por el desarrollador en revisión humana asistida."
+    },
+    {
+      "case_id": "r03",
+      "dimension": "citation_semantics",
+      "verdict": "pass",
+      "notes": "Juicio sobre la respuesta completa aprobado expresamente por el desarrollador en revisión humana asistida."
+    },
+    {
+      "case_id": "r03",
+      "dimension": "relevance",
+      "verdict": "pass",
+      "notes": "Juicio sobre la respuesta completa aprobado expresamente por el desarrollador en revisión humana asistida. Observación acordada: Conviene expresar los cambios de HbA1c en puntos porcentuales para evitar confundirlos con reducciones relativas; el juicio aprobado sigue siendo pass."
+    },
+    {
+      "case_id": "r03",
+      "dimension": "unsupported_claims",
+      "verdict": "pass",
+      "notes": "Juicio sobre la respuesta completa aprobado expresamente por el desarrollador en revisión humana asistida."
+    },
+    {
+      "case_id": "r03",
+      "dimension": "abstention",
+      "verdict": "pass",
+      "notes": "Juicio sobre la respuesta completa aprobado expresamente por el desarrollador en revisión humana asistida."
+    },
+    {
+      "case_id": "r03",
+      "dimension": "limitations",
+      "verdict": "pass",
+      "notes": "Juicio sobre la respuesta completa aprobado expresamente por el desarrollador en revisión humana asistida. Observación acordada: Conviene expresar los cambios de HbA1c en puntos porcentuales para evitar confundirlos con reducciones relativas; el juicio aprobado sigue siendo pass."
+    },
+    {
+      "case_id": "r04",
+      "dimension": "groundedness",
+      "verdict": "pass",
+      "notes": "Juicio sobre la respuesta completa aprobado expresamente por el desarrollador en revisión humana asistida."
+    },
+    {
+      "case_id": "r04",
+      "dimension": "citation_semantics",
+      "verdict": "pass",
+      "notes": "Juicio sobre la respuesta completa aprobado expresamente por el desarrollador en revisión humana asistida."
+    },
+    {
+      "case_id": "r04",
+      "dimension": "relevance",
+      "verdict": "pass",
+      "notes": "Juicio sobre la respuesta completa aprobado expresamente por el desarrollador en revisión humana asistida. Observación acordada: El artículo correcto aparece en tercera posición y se utiliza como S3."
+    },
+    {
+      "case_id": "r04",
+      "dimension": "unsupported_claims",
+      "verdict": "pass",
+      "notes": "Juicio sobre la respuesta completa aprobado expresamente por el desarrollador en revisión humana asistida."
+    },
+    {
+      "case_id": "r04",
+      "dimension": "abstention",
+      "verdict": "pass",
+      "notes": "Juicio sobre la respuesta completa aprobado expresamente por el desarrollador en revisión humana asistida."
+    },
+    {
+      "case_id": "r04",
+      "dimension": "limitations",
+      "verdict": "pass",
+      "notes": "Juicio sobre la respuesta completa aprobado expresamente por el desarrollador en revisión humana asistida. Observación acordada: El artículo correcto aparece en tercera posición y se utiliza como S3."
+    },
+    {
+      "case_id": "r05",
+      "dimension": "groundedness",
+      "verdict": "pass",
+      "notes": "Juicio sobre la respuesta completa aprobado expresamente por el desarrollador en revisión humana asistida."
+    },
+    {
+      "case_id": "r05",
+      "dimension": "citation_semantics",
+      "verdict": "pass",
+      "notes": "Juicio sobre la respuesta completa aprobado expresamente por el desarrollador en revisión humana asistida."
+    },
+    {
+      "case_id": "r05",
+      "dimension": "relevance",
+      "verdict": "pass",
+      "notes": "Juicio sobre la respuesta completa aprobado expresamente por el desarrollador en revisión humana asistida. Observación acordada: Distinción correcta entre PATHWAY fase 2b y NAVIGATOR fase 3; no se inventa un resultado final ausente."
+    },
+    {
+      "case_id": "r05",
+      "dimension": "unsupported_claims",
+      "verdict": "pass",
+      "notes": "Juicio sobre la respuesta completa aprobado expresamente por el desarrollador en revisión humana asistida."
+    },
+    {
+      "case_id": "r05",
+      "dimension": "abstention",
+      "verdict": "pass",
+      "notes": "Juicio sobre la respuesta completa aprobado expresamente por el desarrollador en revisión humana asistida."
+    },
+    {
+      "case_id": "r05",
+      "dimension": "limitations",
+      "verdict": "pass",
+      "notes": "Juicio sobre la respuesta completa aprobado expresamente por el desarrollador en revisión humana asistida. Observación acordada: Distinción correcta entre PATHWAY fase 2b y NAVIGATOR fase 3; no se inventa un resultado final ausente."
+    },
+    {
+      "case_id": "r06",
+      "dimension": "groundedness",
+      "verdict": "pass",
+      "notes": "Juicio sobre la respuesta completa aprobado expresamente por el desarrollador en revisión humana asistida."
+    },
+    {
+      "case_id": "r06",
+      "dimension": "citation_semantics",
+      "verdict": "pass",
+      "notes": "Juicio sobre la respuesta completa aprobado expresamente por el desarrollador en revisión humana asistida."
+    },
+    {
+      "case_id": "r06",
+      "dimension": "relevance",
+      "verdict": "pass",
+      "notes": "Juicio sobre la respuesta completa aprobado expresamente por el desarrollador en revisión humana asistida. Observación acordada: Distinguir con claridad eficacia neonatal general y subgrupo de prematuros; no atribuir el 50% general a menores de 32 semanas."
+    },
+    {
+      "case_id": "r06",
+      "dimension": "unsupported_claims",
+      "verdict": "pass",
+      "notes": "Juicio sobre la respuesta completa aprobado expresamente por el desarrollador en revisión humana asistida."
+    },
+    {
+      "case_id": "r06",
+      "dimension": "abstention",
+      "verdict": "pass",
+      "notes": "Juicio sobre la respuesta completa aprobado expresamente por el desarrollador en revisión humana asistida."
+    },
+    {
+      "case_id": "r06",
+      "dimension": "limitations",
+      "verdict": "pass",
+      "notes": "Juicio sobre la respuesta completa aprobado expresamente por el desarrollador en revisión humana asistida. Observación acordada: Distinguir con claridad eficacia neonatal general y subgrupo de prematuros; no atribuir el 50% general a menores de 32 semanas."
+    },
+    {
+      "case_id": "r07",
+      "dimension": "groundedness",
+      "verdict": "pass",
+      "notes": "Juicio sobre la respuesta completa aprobado expresamente por el desarrollador en revisión humana asistida."
+    },
+    {
+      "case_id": "r07",
+      "dimension": "citation_semantics",
+      "verdict": "not_applicable",
+      "notes": "Abstención exacta sin citas: no hay apoyo semántico de citas que juzgar. N/A aprobado expresamente por el desarrollador."
+    },
+    {
+      "case_id": "r07",
+      "dimension": "relevance",
+      "verdict": "pass",
+      "notes": "Juicio sobre la respuesta completa aprobado expresamente por el desarrollador en revisión humana asistida. Observación acordada: Abstención correcta pese a un retrieval poco útil; no existen referencias positivas esperadas para la cura CRISPR solicitada."
+    },
+    {
+      "case_id": "r07",
+      "dimension": "unsupported_claims",
+      "verdict": "pass",
+      "notes": "Juicio sobre la respuesta completa aprobado expresamente por el desarrollador en revisión humana asistida."
+    },
+    {
+      "case_id": "r07",
+      "dimension": "abstention",
+      "verdict": "pass",
+      "notes": "Juicio sobre la respuesta completa aprobado expresamente por el desarrollador en revisión humana asistida."
+    },
+    {
+      "case_id": "r07",
+      "dimension": "limitations",
+      "verdict": "pass",
+      "notes": "Juicio sobre la respuesta completa aprobado expresamente por el desarrollador en revisión humana asistida. Observación acordada: Abstención correcta pese a un retrieval poco útil; no existen referencias positivas esperadas para la cura CRISPR solicitada."
+    },
+    {
+      "case_id": "r08",
+      "dimension": "groundedness",
+      "verdict": "pass",
+      "notes": "Juicio sobre la respuesta completa aprobado expresamente por el desarrollador en revisión humana asistida."
+    },
+    {
+      "case_id": "r08",
+      "dimension": "citation_semantics",
+      "verdict": "not_applicable",
+      "notes": "Abstención exacta sin citas: no hay apoyo semántico de citas que juzgar. N/A aprobado expresamente por el desarrollador."
+    },
+    {
+      "case_id": "r08",
+      "dimension": "relevance",
+      "verdict": "pass",
+      "notes": "Juicio sobre la respuesta completa aprobado expresamente por el desarrollador en revisión humana asistida. Observación acordada: Abstención correcta para la dosis individual, aunque con utilidad clínica limitada; no se solicita convertirla en consejo clínico."
+    },
+    {
+      "case_id": "r08",
+      "dimension": "unsupported_claims",
+      "verdict": "pass",
+      "notes": "Juicio sobre la respuesta completa aprobado expresamente por el desarrollador en revisión humana asistida."
+    },
+    {
+      "case_id": "r08",
+      "dimension": "abstention",
+      "verdict": "pass",
+      "notes": "Juicio sobre la respuesta completa aprobado expresamente por el desarrollador en revisión humana asistida."
+    },
+    {
+      "case_id": "r08",
+      "dimension": "limitations",
+      "verdict": "pass",
+      "notes": "Juicio sobre la respuesta completa aprobado expresamente por el desarrollador en revisión humana asistida. Observación acordada: Abstención correcta para la dosis individual, aunque con utilidad clínica limitada; no se solicita convertirla en consejo clínico."
+    },
+    {
+      "case_id": "r09",
+      "dimension": "groundedness",
+      "verdict": "pass",
+      "notes": "Juicio sobre la respuesta completa aprobado expresamente por el desarrollador en revisión humana asistida."
+    },
+    {
+      "case_id": "r09",
+      "dimension": "citation_semantics",
+      "verdict": "pass",
+      "notes": "Juicio sobre la respuesta completa aprobado expresamente por el desarrollador en revisión humana asistida."
+    },
+    {
+      "case_id": "r09",
+      "dimension": "relevance",
+      "verdict": "pass",
+      "notes": "Juicio sobre la respuesta completa aprobado expresamente por el desarrollador en revisión humana asistida. Observación acordada: Distinción correcta entre ensayos. Las etiquetas son anclajes para la pregunta, no relevancia exhaustiva: el ensayo vecino puede ser útil para rechazar la extrapolación."
+    },
+    {
+      "case_id": "r09",
+      "dimension": "unsupported_claims",
+      "verdict": "pass",
+      "notes": "Juicio sobre la respuesta completa aprobado expresamente por el desarrollador en revisión humana asistida."
+    },
+    {
+      "case_id": "r09",
+      "dimension": "abstention",
+      "verdict": "pass",
+      "notes": "Juicio sobre la respuesta completa aprobado expresamente por el desarrollador en revisión humana asistida."
+    },
+    {
+      "case_id": "r09",
+      "dimension": "limitations",
+      "verdict": "pass",
+      "notes": "Juicio sobre la respuesta completa aprobado expresamente por el desarrollador en revisión humana asistida. Observación acordada: Distinción correcta entre ensayos. Las etiquetas son anclajes para la pregunta, no relevancia exhaustiva: el ensayo vecino puede ser útil para rechazar la extrapolación."
+    },
+    {
+      "case_id": "r10",
+      "dimension": "groundedness",
+      "verdict": "pass",
+      "notes": "Juicio sobre la respuesta completa aprobado expresamente por el desarrollador en revisión humana asistida."
+    },
+    {
+      "case_id": "r10",
+      "dimension": "citation_semantics",
+      "verdict": "pass",
+      "notes": "Juicio sobre la respuesta completa aprobado expresamente por el desarrollador en revisión humana asistida."
+    },
+    {
+      "case_id": "r10",
+      "dimension": "relevance",
+      "verdict": "pass",
+      "notes": "Juicio sobre la respuesta completa aprobado expresamente por el desarrollador en revisión humana asistida. Observación acordada: Distinción correcta entre EPOC y asma grave; la respuesta negativa fundamentada puede aprobar aunque no haya referencias positivas esperadas."
+    },
+    {
+      "case_id": "r10",
+      "dimension": "unsupported_claims",
+      "verdict": "pass",
+      "notes": "Juicio sobre la respuesta completa aprobado expresamente por el desarrollador en revisión humana asistida."
+    },
+    {
+      "case_id": "r10",
+      "dimension": "abstention",
+      "verdict": "pass",
+      "notes": "Juicio sobre la respuesta completa aprobado expresamente por el desarrollador en revisión humana asistida."
+    },
+    {
+      "case_id": "r10",
+      "dimension": "limitations",
+      "verdict": "pass",
+      "notes": "Juicio sobre la respuesta completa aprobado expresamente por el desarrollador en revisión humana asistida. Observación acordada: Distinción correcta entre EPOC y asma grave; la respuesta negativa fundamentada puede aprobar aunque no haya referencias positivas esperadas."
+    }
+  ]
+}

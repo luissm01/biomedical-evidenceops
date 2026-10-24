@@ -1,0 +1,57 @@
+{
+  "version": "rag-observations-v1",
+  "run_id": "a8b78e1c-02c4-4e8d-964d-9823f6d8b741",
+  "source": "Observations explicitly agreed and supplied by the developer in the conversation; recorded mechanically, not new automatic judgments.",
+  "case_observations": [
+    {
+      "case_id": "r01",
+      "category": "retrieval",
+      "observation": "Recuperación de documentos irrelevantes; la respuesta selecciona las revisiones pertinentes."
+    },
+    {
+      "case_id": "r02",
+      "category": "documentary_discrepancy",
+      "observation": "Discrepancia documental entre 24 señales en el GWAS y 25 loci en la revisión. Se conservan ambas atribuciones, sin resolverla artificialmente."
+    },
+    {
+      "case_id": "r03",
+      "category": "wording",
+      "observation": "Conviene expresar los cambios de HbA1c en puntos porcentuales para evitar confundirlos con reducciones relativas; el juicio aprobado sigue siendo pass."
+    },
+    {
+      "case_id": "r04",
+      "category": "retrieval_rank",
+      "observation": "El artículo correcto aparece en tercera posición y se utiliza como S3."
+    },
+    {
+      "case_id": "r05",
+      "category": "generation",
+      "observation": "Distinción correcta entre PATHWAY fase 2b y NAVIGATOR fase 3; no se inventa un resultado final ausente."
+    },
+    {
+      "case_id": "r06",
+      "category": "limitations",
+      "observation": "Distinguir con claridad eficacia neonatal general y subgrupo de prematuros; no atribuir el 50% general a menores de 32 semanas."
+    },
+    {
+      "case_id": "r07",
+      "category": "abstention",
+      "observation": "Abstención correcta pese a un retrieval poco útil; no existen referencias positivas esperadas para la cura CRISPR solicitada."
+    },
+    {
+      "case_id": "r08",
+      "category": "abstention",
+      "observation": "Abstención correcta para la dosis individual, aunque con utilidad clínica limitada; no se solicita convertirla en consejo clínico."
+    },
+    {
+      "case_id": "r09",
+      "category": "annotation_limits",
+      "observation": "Distinción correcta entre ensayos. Las etiquetas son anclajes para la pregunta, no relevancia exhaustiva: el ensayo vecino puede ser útil para rechazar la extrapolación."
+    },
+    {
+      "case_id": "r10",
+      "category": "generation",
+      "observation": "Distinción correcta entre EPOC y asma grave; la respuesta negativa fundamentada puede aprobar aunque no haya referencias positivas esperadas."
+    }
+  ]
+}

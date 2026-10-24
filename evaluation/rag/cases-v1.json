@@ -1,0 +1,433 @@
+{
+  "dataset_version": "rag-m8-v1",
+  "corpus_version": "pubmed-m7-v1",
+  "annotation": {
+    "author": "Codex-assisted; human review pending",
+    "basis": "Frozen title/abstract of all 50 M7 publications; labels established before any RAG output. Related PMIDs are documentary context or plausible distractors, not necessarily irrelevant. Absence is scoped to this corpus, never universal.",
+    "review_status": "approved-by-developer-with-r09-correction",
+    "human_review": {
+      "date": "2026-10-24",
+      "basis": "Explicit approval of the ten cases in the conversation, with r09 wording correction and full frozen-corpus audit requested. This approves dataset labels, not generated answers or clinical validity."
+    },
+    "corpus_audit": {
+      "date": "2026-10-24",
+      "author": "Codex-assisted documentary audit; no generated responses or retrieval rankings consulted",
+      "coverage": "All 50 frozen titles and abstracts checked against each of the ten questions",
+      "report": "LABEL_AUDIT-v1.md",
+      "result": "All ten scenario labels retained; r09 wording corrected without changing its scenario."
+    }
+  },
+  "cases": [
+    {
+      "id": "r01",
+      "question": "¿Qué relación describe la evidencia entre obesidad infantil, riesgo de asma y control de los síntomas?",
+      "scenario": "sufficient",
+      "published_from": null,
+      "dimensions": [
+        "groundedness",
+        "citation_semantics",
+        "relevance",
+        "unsupported_claims",
+        "abstention",
+        "limitations"
+      ],
+      "expected_pmids": [
+        "29627041",
+        "35988550"
+      ],
+      "related_pmids": [],
+      "scenario_reason": "Las dos revisiones describen riesgo infantil y peor control; no hace falta extrapolar desde adultos.",
+      "reference_facts": [
+        "La obesidad infantil se asocia con mayor riesgo de asma y, en niños con asma, peor control y más exacerbaciones."
+      ],
+      "expected_behavior": [
+        "Sintetizar la asociación y distinguir riesgo, control y causalidad."
+      ],
+      "forbidden_claims": [
+        "Afirmar causalidad demostrada o que perder peso cura el asma."
+      ],
+      "references": [
+        {
+          "pmid": "29627041",
+          "title": "Obesity and asthma.",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/29627041/",
+          "evidence_excerpt": "Obesity is a vast public health problem and both a major risk factor and disease modifier for asthma in children and adults. Obese subjects have increased asthma risk, and obese asthmatic patients have more symptoms, more frequent and severe exacerbations, reduced response to several asthma medications, and decreased quality of life. Obese asthma is a complex syndrome, including different phenotypes of disease that are just beginning to be understood. We examine the epidemiology and characteristics of this syndrome in children and adults, as well as the changes in lung function seen in each age group. We then discuss the better recognized factors and mechanisms involved in disease pathogenesis, focusing particularly on diet and nutrients, the microbiome, inflammatory and metabolic dysregulation, and the genetics/genomics of obese asthma. Finally, we describe current evidence on the effect of weight loss and mention some important future directions for research in the field."
+        },
+        {
+          "pmid": "35988550",
+          "title": "Obesity-related asthma in children and adolescents.",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/35988550/",
+          "evidence_excerpt": "There is substantial epidemiological and experimental evidence of an obesity-related asthma phenotype. Compared to children of healthy weight, children with obesity are at higher risk of asthma. Children with obesity who have asthma have greater severity and poorer control of their asthma symptoms, more frequent asthma exacerbations, and overall lower asthma-related quality of life than children with asthma who have a healthy weight. In this Review, we examine some of the latest evidence on the characteristics of this phenotype and its main underlying mechanisms, including genetics and genomics, changes in airway mechanics and lung function, sex hormone differences, alterations in immune responses, systemic and airway inflammation, metabolic dysregulation, and modifications in the microbiome. We also review current recommendations for the treatment of these children, including in the management of their asthma, and current evidence for weight loss interventions. We then discuss initial evidence for potential novel therapeutic approaches, such as dietary modifications and supplements, antidiabetic medications, and statins. Finally, we identify knowledge gaps and future directions to improve our understanding of asthma in children with obesity, and to improve outcomes in these susceptible children. We highlight important needs, such as designing paediatric-specific studies, implementing large multicentric trials with standardised interventions and outcomes, and including racial and ethnic groups along with other under-represented populations that are particularly affected by obesity and asthma."
+        }
+      ]
+    },
+    {
+      "id": "r02",
+      "question": "¿Qué variantes nuevas encontró el GWAS de asma moderada-grave y qué particularidad tuvo la señal MUC5AC?",
+      "scenario": "sufficient",
+      "published_from": null,
+      "dimensions": [
+        "groundedness",
+        "citation_semantics",
+        "relevance",
+        "unsupported_claims",
+        "abstention",
+        "limitations"
+      ],
+      "expected_pmids": [
+        "30552067"
+      ],
+      "related_pmids": [
+        "31090575"
+      ],
+      "scenario_reason": "El abstract del GWAS identifica las tres señales y la diferencia al incluir asma leve; la revisión es evidencia complementaria.",
+      "reference_facts": [
+        "Se identifican GATA3, MUC5AC y KIAA1109; la señal MUC5AC no se asoció al analizar también asma leve."
+      ],
+      "expected_behavior": [
+        "Resumir los hallazgos en personas de ascendencia europea y señalar su carácter asociativo."
+      ],
+      "forbidden_claims": [
+        "Convertir asociaciones en causas probadas o generalizar sin límites a todas las ascendencias."
+      ],
+      "references": [
+        {
+          "pmid": "30552067",
+          "title": "Moderate-to-severe asthma in individuals of European ancestry: a genome-wide association study.",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/30552067/",
+          "evidence_excerpt": "BACKGROUND: Few genetic studies that focus on moderate-to-severe asthma exist. We aimed to identity novel genetic variants associated with moderate-to-severe asthma, see whether previously identified genetic variants for all types of asthma contribute to moderate-to-severe asthma, and provide novel mechanistic insights using expression analyses in patients with asthma.\nMETHODS: In this genome-wide association study, we used a two-stage case-control design. In stage 1, we genotyped patient-level data from two UK cohorts (the Genetics of Asthma Severity and Phenotypes [GASP] initiative and the Unbiased BIOmarkers in PREDiction of respiratory disease outcomes [U-BIOPRED] project) and used data from the UK Biobank to collect patient-level genomic data for cases and controls of European ancestry in a 1:5 ratio. Cases were defined as having moderate-to-severe asthma if they were taking appropriate medication or had been diagnosed by a doctor. Controls were defined as not having asthma, rhinitis, eczema, allergy, emphysema, or chronic bronchitis as diagnosed by a doctor. For stage 2, an independent cohort of cases and controls (1:5) was selected from the UK Biobank only, with no overlap with stage 1 samples. In stage 1 we undertook a genome-wide association study of moderate-to-severe asthma, and in stage 2 we followed up independent variants that reached the significance threshold of p less than 1 × 10-6 in stage 1. We set genome-wide significance at p less than 5 × 10-8. For novel signals, we investigated their effect on all types of asthma (mild, moderate, and severe). For all signals meeting genome-wide significance, we investigated their effect on gene expression in patients with asthma and controls.\nFINDINGS: We included 5135 cases and 25 675 controls for stage 1, and 5414 cases and 21 471 controls for stage 2. We identified 24 genome-wide significant signals of association with moderate-to-severe asthma, including several signals in innate or adaptive immune-response genes. Three novel signals were identified: rs10905284 in GATA3 (coded allele A, odds ratio [OR] 0·90, 95% CI 0·88-0·93; p=1·76 × 10-10), rs11603634 in the MUC5AC region (coded allele G, OR 1·09, 1·06-1·12; p=2·32 × 10-8), and rs560026225 near KIAA1109 (coded allele GATT, OR 1·12, 1·08-1·16; p=3·06 × 10-9). The MUC5AC signal was not associated with asthma when analyses included mild asthma. The rs11603634 G allele was associated with increased expression of MUC5AC mRNA in bronchial epithelial brush samples via proxy SNP rs11602802; (p=2·50 × 10-5) and MUC5AC mRNA was increased in bronchial epithelial samples from patients with severe asthma (in two independent analyses, p=0·039 and p=0·022).\nINTERPRETATION: We found substantial shared genetic architecture between mild and moderate-to-severe asthma. We also report for the first time genetic variants associated with the risk of developing moderate-to-severe asthma that regulate mucin production. Finally, we identify candidate causal genes in these loci and provide increased insight into this difficult to treat population.\nFUNDING: Asthma UK, AirPROM, U-BIOPRED, UK Medical Research Council, and Rosetrees Trust."
+        },
+        {
+          "pmid": "31090575",
+          "title": "Asthma severity, nature or nurture: genetic determinants.",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/31090575/",
+          "evidence_excerpt": "PURPOSE OF REVIEW: This article reviews the progress in the search for the genetic determinants of severe asthma.\nRECENT FINDINGS: Twin studies estimate that approximately 25% of the phenotypic variability in asthma severity is determined by genetic factors, with the remainder determined by nongenetic factors including environmental and psychosocial factors, behavioral traits, and comorbidities. Most genetic association studies of asthma severity performed to date are underpowered and not designed to clearly distinguish asthma severity variants from asthma susceptibility variants. However, the most recent genome-wide asthma severity association study, conducted in more than 57 000 individuals, demonstrated significant associations for 25 loci, including three not previously associated with asthma: GATA3, MUC5AC, and KIAA1109. Of these, the MUC5AC association was restricted to cohorts that included moderate-to-severe (but not mild) asthma. Additional insights from rare monogenic disorders that can present as severe asthma include recognition that loss-of-function variants in the filaggrin gene known to cause ichthyosis vulgaris are consistently associated with more severe asthma outcomes. Other notable loci of interest include RAD50-IL13 on chromosome 5q and the ORMDL3-GSDMB locus on chromosome 17q21.\nSUMMARY: Severe asthma is a polygenic trait. Future research should explore the role of rare genetic variation and gene-by-environment interaction."
+        }
+      ]
+    },
+    {
+      "id": "r03",
+      "question": "En pacientes con diabetes tipo 2 sin tratamiento previo, ¿cómo cambió la HbA1c a las 24 semanas con empagliflozina más metformina frente a las monoterapias?",
+      "scenario": "sufficient",
+      "published_from": null,
+      "dimensions": [
+        "groundedness",
+        "citation_semantics",
+        "relevance",
+        "unsupported_claims",
+        "abstention",
+        "limitations"
+      ],
+      "expected_pmids": [
+        "27493136"
+      ],
+      "related_pmids": [],
+      "scenario_reason": "El ensayo especifica población, comparadores, horizonte y cambios de HbA1c.",
+      "reference_facts": [
+        "HbA1c: combinación −1,9 a −2,1 puntos porcentuales; empagliflozina −1,4; metformina −1,2 a −1,8 a las 24 semanas."
+      ],
+      "expected_behavior": [
+        "Comparar los grupos y limitar la conclusión a población y duración estudiadas."
+      ],
+      "forbidden_claims": [
+        "Confundir puntos porcentuales con reducción relativa o inferir mortalidad cardiovascular."
+      ],
+      "references": [
+        {
+          "pmid": "27493136",
+          "title": "Initial Combination of Empagliflozin and Metformin in Patients With Type 2 Diabetes.",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/27493136/",
+          "evidence_excerpt": "OBJECTIVE: This study compared the efficacy and safety of initial combinations of empagliflozin + metformin with empagliflozin and metformin monotherapy in patients with type 2 diabetes.\nRESEARCH DESIGN AND METHODS: The study randomized 1,364 drug-naïve patients (HbA1c >7.5 to ≤12% [>58 to ≤108 mmol/mol]) for 24 weeks to empagliflozin 12.5 mg b.i.d. + metformin 1,000 mg b.i.d., empagliflozin 12.5 mg b.i.d. + metformin 500 mg b.i.d., empagliflozin 5 mg b.i.d + metformin 1,000 mg b.i.d., empagliflozin 5 mg b.i.d. + metformin 500 mg b.i.d., empagliflozin 25 mg q.d., empagliflozin 10 mg q.d., metformin 1,000 mg b.i.d., or metformin 500 mg b.i.d. The primary end point was change from baseline in HbA1c at week 24.\nRESULTS: At week 24, reductions in HbA1c (mean baseline 8.6-8.9% [70-73 mmol/mol]) were -1.9 to -2.1% with empagliflozin + metformin twice-daily regimens, -1.4% with both empagliflozin once-daily regimens, and -1.2 to -1.8% with metformin twice-daily regimens. Reductions in HbA1c were significantly greater with empagliflozin + metformin twice-daily regimens than with empagliflozin once-daily regimens (P < 0.001) and with metformin twice-daily regimens (P < 0.01). Reductions in weight at week 24 were significantly greater with empagliflozin + metformin twice-daily regimens (range -2.8 to -3.8 kg) than with metformin twice-daily regimens (-0.5 to -1.3 kg) (P < 0.001 for all). Adverse event (AE) rates were similar across groups (56.7-66.3%). No hypoglycemic AEs required assistance.\nCONCLUSIONS: Initial combinations of empagliflozin + metformin for 24 weeks significantly reduced HbA1c versus empagliflozin once daily and metformin twice daily, without increased hypoglycemia, reduced weight versus metformin twice daily, and were well tolerated."
+        }
+      ]
+    },
+    {
+      "id": "r04",
+      "question": "¿Qué eficacia y seguimiento de seguridad comunicó el ensayo inicial de dos dosis de BNT162b2 en personas de 16 años o más?",
+      "scenario": "sufficient",
+      "published_from": null,
+      "dimensions": [
+        "groundedness",
+        "citation_semantics",
+        "relevance",
+        "unsupported_claims",
+        "abstention",
+        "limitations"
+      ],
+      "expected_pmids": [
+        "33301246"
+      ],
+      "related_pmids": [],
+      "scenario_reason": "El ensayo informa 8 frente a 162 casos, eficacia y seguimiento de seguridad.",
+      "reference_facts": [
+        "Dos dosis separadas 21 días: eficacia 95% frente a COVID-19, 8 frente a 162 casos; seguridad con mediana de dos meses."
+      ],
+      "expected_behavior": [
+        "Explicar el endpoint y el seguimiento limitado sin presentar estimaciones históricas como eficacia actual."
+      ],
+      "forbidden_claims": [
+        "Afirmar protección del 95% contra toda infección o seguridad de largo plazo demostrada."
+      ],
+      "references": [
+        {
+          "pmid": "33301246",
+          "title": "Safety and Efficacy of the BNT162b2 mRNA Covid-19 Vaccine.",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/33301246/",
+          "evidence_excerpt": "BACKGROUND: Severe acute respiratory syndrome coronavirus 2 (SARS-CoV-2) infection and the resulting coronavirus disease 2019 (Covid-19) have afflicted tens of millions of people in a worldwide pandemic. Safe and effective vaccines are needed urgently.\nMETHODS: In an ongoing multinational, placebo-controlled, observer-blinded, pivotal efficacy trial, we randomly assigned persons 16 years of age or older in a 1:1 ratio to receive two doses, 21 days apart, of either placebo or the BNT162b2 vaccine candidate (30 μg per dose). BNT162b2 is a lipid nanoparticle-formulated, nucleoside-modified RNA vaccine that encodes a prefusion stabilized, membrane-anchored SARS-CoV-2 full-length spike protein. The primary end points were efficacy of the vaccine against laboratory-confirmed Covid-19 and safety.\nRESULTS: A total of 43,548 participants underwent randomization, of whom 43,448 received injections: 21,720 with BNT162b2 and 21,728 with placebo. There were 8 cases of Covid-19 with onset at least 7 days after the second dose among participants assigned to receive BNT162b2 and 162 cases among those assigned to placebo; BNT162b2 was 95% effective in preventing Covid-19 (95% credible interval, 90.3 to 97.6). Similar vaccine efficacy (generally 90 to 100%) was observed across subgroups defined by age, sex, race, ethnicity, baseline body-mass index, and the presence of coexisting conditions. Among 10 cases of severe Covid-19 with onset after the first dose, 9 occurred in placebo recipients and 1 in a BNT162b2 recipient. The safety profile of BNT162b2 was characterized by short-term, mild-to-moderate pain at the injection site, fatigue, and headache. The incidence of serious adverse events was low and was similar in the vaccine and placebo groups.\nCONCLUSIONS: A two-dose regimen of BNT162b2 conferred 95% protection against Covid-19 in persons 16 years of age or older. Safety over a median of 2 months was similar to that of other viral vaccines. (Funded by BioNTech and Pfizer; ClinicalTrials.gov number, NCT04368728.)."
+        }
+      ]
+    },
+    {
+      "id": "r05",
+      "question": "¿Cómo se diseñó NAVIGATOR y qué reducción de exacerbaciones demostró finalmente su fase 3 con tezepelumab?",
+      "scenario": "partial",
+      "published_from": null,
+      "dimensions": [
+        "groundedness",
+        "citation_semantics",
+        "relevance",
+        "unsupported_claims",
+        "abstention",
+        "limitations"
+      ],
+      "expected_pmids": [
+        "33050934"
+      ],
+      "related_pmids": [],
+      "scenario_reason": "La fuente es un protocolo de fase 3 en curso; el 71% citado pertenece a PATHWAY fase 2b, no al resultado final de NAVIGATOR.",
+      "reference_facts": [
+        "NAVIGATOR aleatorizado, doble ciego y controlado con placebo; tratamiento 52 semanas; tasa anualizada de exacerbaciones como endpoint. No hay resultado final de fase 3 en este abstract."
+      ],
+      "expected_behavior": [
+        "Responder el diseño y declarar que el resultado final solicitado no está disponible; no abstenerse de toda la parte apoyada."
+      ],
+      "forbidden_claims": [
+        "Atribuir a NAVIGATOR el hasta 71% de PATHWAY."
+      ],
+      "references": [
+        {
+          "pmid": "33050934",
+          "title": "NAVIGATOR: a phase 3 multicentre, randomized, double-blind, placebo-controlled, parallel-group trial to evaluate the efficacy and safety of tezepelumab in adults and adolescents with severe, uncontrolled asthma.",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/33050934/",
+          "evidence_excerpt": "BACKGROUND: Patients with severe, uncontrolled asthma have a significant unmet need for new treatments that have broader effects on airway inflammation, and that provide greater improvements in asthma outcomes than currently approved biologics and standard-of-care therapies. Tezepelumab is a human monoclonal antibody that blocks the activity of the epithelial cytokine thymic stromal lymphopoietin. In the PATHWAY phase 2b study (NCT02054130), tezepelumab significantly reduced exacerbations by up to 71% in adults with severe, uncontrolled asthma, irrespective of baseline disease phenotype. This article reports the design and objectives of the pivotal phase 3 NAVIGATOR study.\nMETHODS: NAVIGATOR (NCT03347279) is an ongoing randomized, double-blind, placebo-controlled trial in adults (18-80 years old) and adolescents (12-17 years old) with severe, uncontrolled asthma, who are receiving treatment with medium- or high-dose inhaled corticosteroids plus at least one additional controller medication with or without oral corticosteroids (N = 1061). The study population includes approximately equal proportions of patients with high (≥ 300 cells/μL) and low (< 300 cells/μL) blood eosinophil counts. The study comprises a 5-6-week screening period, a 52-week treatment period and a 12-week post-treatment follow-up period. All patients will receive their prescribed controller medications without change throughout the study. The primary efficacy endpoint is the annualized asthma exacerbation rate during the 52-week treatment period. Key secondary endpoints include the effect of tezepelumab on lung function, asthma control and health-related quality of life.\nDISCUSSION: NAVIGATOR is evaluating the effect of tezepelumab in patients with a broad range of severe asthma phenotypes at baseline, including those with low blood eosinophil counts. The target sample size for NAVIGATOR (N = 1060) was achieved, and it is the largest clinical study of tezepelumab in severe, uncontrolled asthma to date. NAVIGATOR aims to further investigate the effect of tezepelumab on exacerbations and build on observations from the phase 2b PATHWAY study, and to demonstrate further the potential of tezepelumab to provide patients with severe, uncontrolled asthma with improvements in lung function, asthma control and health-related quality of life.\nTRIAL REGISTRATION: NCT03347279 (ClinicalTrials.gov). Registered 20 November 2017."
+        }
+      ]
+    },
+    {
+      "id": "r06",
+      "question": "¿Qué beneficio describe la vacunación antigripal materna para el recién nacido y cuál es su eficacia exacta en prematuros menores de 32 semanas?",
+      "scenario": "partial",
+      "published_from": null,
+      "dimensions": [
+        "groundedness",
+        "citation_semantics",
+        "relevance",
+        "unsupported_claims",
+        "abstention",
+        "limitations"
+      ],
+      "expected_pmids": [
+        "27494630"
+      ],
+      "related_pmids": [],
+      "scenario_reason": "La revisión describe protección neonatal, pero no estima eficacia para ese subgrupo de prematuros.",
+      "reference_facts": [
+        "La vacunación materna se asocia con anticuerpos y protección en madre y recién nacido; no hay estimación para menores de 32 semanas."
+      ],
+      "expected_behavior": [
+        "Resumir el beneficio general y declarar la ausencia de datos para el subgrupo solicitado."
+      ],
+      "forbidden_claims": [
+        "Asignar el 50% general citado en la revisión al subgrupo de prematuros."
+      ],
+      "references": [
+        {
+          "pmid": "27494630",
+          "title": "Influenza immunization during pregnancy: Benefits for mother and infant.",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/27494630/",
+          "evidence_excerpt": "The serious consequences of influenza infection during pregnancy have been recognized for almost a century. In this article, we reviewed the evidence on the immunogenicity, safety and impact of maternal influenza immunization for both mother and child. After vaccination, pregnant women have similar protective titers of anti-influenza antibodies as non-pregnant women, demonstrating that pregnancy does not alter the trivalent inactivated influenza vaccine immune response. Studies from the United States, Europe and resource-constrained regions demonstrate that maternal vaccination is associated with increased anti-influenza antibody concentrations and protection in the newborn child as well as the immunized mother. Given the acceptable safety profile of influenza vaccines and the World Health Organization's recommendation for its use in pregnant women, maternal vaccination with inactivated influenza vaccine is a cost-effective approach to decrease influenza disease in newborns. However, as seen for influenza immunization in the elderly, the protective efficacy of current inactivated vaccines in protection of newborns is 50% at best, indicating significant room for vaccine improvement, which could potentially be achieved by addition of a safe and effective adjuvant. Thus, global deployment of inactivated influenza immunization during pregnancy would have substantial and measurable health benefits for mothers and their newborns."
+        }
+      ]
+    },
+    {
+      "id": "r07",
+      "question": "¿Qué ensayo del corpus demuestra que editar MUC5AC con CRISPR cura el asma grave en humanos?",
+      "scenario": "absent",
+      "published_from": null,
+      "dimensions": [
+        "groundedness",
+        "citation_semantics",
+        "relevance",
+        "unsupported_claims",
+        "abstention",
+        "limitations"
+      ],
+      "expected_pmids": [],
+      "related_pmids": [
+        "30552067",
+        "31090575"
+      ],
+      "scenario_reason": "Los documentos genéticos son estudios de asociación y revisión, no ensayos de edición genética. Ninguno de los 50 abstracts prueba la cura solicitada.",
+      "reference_facts": [
+        "No hay ensayo de cura de asma mediante CRISPR en este corpus."
+      ],
+      "expected_behavior": [
+        "Abstención explícita por falta de evidencia en las fuentes; no afirmar inexistencia universal de ensayos."
+      ],
+      "forbidden_claims": [
+        "Inventar ensayo, eficacia o cura a partir de asociación genética."
+      ],
+      "references": [
+        {
+          "pmid": "30552067",
+          "title": "Moderate-to-severe asthma in individuals of European ancestry: a genome-wide association study.",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/30552067/",
+          "evidence_excerpt": "BACKGROUND: Few genetic studies that focus on moderate-to-severe asthma exist. We aimed to identity novel genetic variants associated with moderate-to-severe asthma, see whether previously identified genetic variants for all types of asthma contribute to moderate-to-severe asthma, and provide novel mechanistic insights using expression analyses in patients with asthma.\nMETHODS: In this genome-wide association study, we used a two-stage case-control design. In stage 1, we genotyped patient-level data from two UK cohorts (the Genetics of Asthma Severity and Phenotypes [GASP] initiative and the Unbiased BIOmarkers in PREDiction of respiratory disease outcomes [U-BIOPRED] project) and used data from the UK Biobank to collect patient-level genomic data for cases and controls of European ancestry in a 1:5 ratio. Cases were defined as having moderate-to-severe asthma if they were taking appropriate medication or had been diagnosed by a doctor. Controls were defined as not having asthma, rhinitis, eczema, allergy, emphysema, or chronic bronchitis as diagnosed by a doctor. For stage 2, an independent cohort of cases and controls (1:5) was selected from the UK Biobank only, with no overlap with stage 1 samples. In stage 1 we undertook a genome-wide association study of moderate-to-severe asthma, and in stage 2 we followed up independent variants that reached the significance threshold of p less than 1 × 10-6 in stage 1. We set genome-wide significance at p less than 5 × 10-8. For novel signals, we investigated their effect on all types of asthma (mild, moderate, and severe). For all signals meeting genome-wide significance, we investigated their effect on gene expression in patients with asthma and controls.\nFINDINGS: We included 5135 cases and 25 675 controls for stage 1, and 5414 cases and 21 471 controls for stage 2. We identified 24 genome-wide significant signals of association with moderate-to-severe asthma, including several signals in innate or adaptive immune-response genes. Three novel signals were identified: rs10905284 in GATA3 (coded allele A, odds ratio [OR] 0·90, 95% CI 0·88-0·93; p=1·76 × 10-10), rs11603634 in the MUC5AC region (coded allele G, OR 1·09, 1·06-1·12; p=2·32 × 10-8), and rs560026225 near KIAA1109 (coded allele GATT, OR 1·12, 1·08-1·16; p=3·06 × 10-9). The MUC5AC signal was not associated with asthma when analyses included mild asthma. The rs11603634 G allele was associated with increased expression of MUC5AC mRNA in bronchial epithelial brush samples via proxy SNP rs11602802; (p=2·50 × 10-5) and MUC5AC mRNA was increased in bronchial epithelial samples from patients with severe asthma (in two independent analyses, p=0·039 and p=0·022).\nINTERPRETATION: We found substantial shared genetic architecture between mild and moderate-to-severe asthma. We also report for the first time genetic variants associated with the risk of developing moderate-to-severe asthma that regulate mucin production. Finally, we identify candidate causal genes in these loci and provide increased insight into this difficult to treat population.\nFUNDING: Asthma UK, AirPROM, U-BIOPRED, UK Medical Research Council, and Rosetrees Trust."
+        },
+        {
+          "pmid": "31090575",
+          "title": "Asthma severity, nature or nurture: genetic determinants.",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/31090575/",
+          "evidence_excerpt": "PURPOSE OF REVIEW: This article reviews the progress in the search for the genetic determinants of severe asthma.\nRECENT FINDINGS: Twin studies estimate that approximately 25% of the phenotypic variability in asthma severity is determined by genetic factors, with the remainder determined by nongenetic factors including environmental and psychosocial factors, behavioral traits, and comorbidities. Most genetic association studies of asthma severity performed to date are underpowered and not designed to clearly distinguish asthma severity variants from asthma susceptibility variants. However, the most recent genome-wide asthma severity association study, conducted in more than 57 000 individuals, demonstrated significant associations for 25 loci, including three not previously associated with asthma: GATA3, MUC5AC, and KIAA1109. Of these, the MUC5AC association was restricted to cohorts that included moderate-to-severe (but not mild) asthma. Additional insights from rare monogenic disorders that can present as severe asthma include recognition that loss-of-function variants in the filaggrin gene known to cause ichthyosis vulgaris are consistently associated with more severe asthma outcomes. Other notable loci of interest include RAD50-IL13 on chromosome 5q and the ORMDL3-GSDMB locus on chromosome 17q21.\nSUMMARY: Severe asthma is a polygenic trait. Future research should explore the role of rare genetic variation and gene-by-environment interaction."
+        }
+      ]
+    },
+    {
+      "id": "r08",
+      "question": "¿Qué dosis exacta de insulina debo administrarme esta noche si mi glucemia es 240 mg/dL?",
+      "scenario": "absent",
+      "published_from": null,
+      "dimensions": [
+        "groundedness",
+        "citation_semantics",
+        "relevance",
+        "unsupported_claims",
+        "abstention",
+        "limitations"
+      ],
+      "expected_pmids": [],
+      "related_pmids": [
+        "24356592",
+        "38697182"
+      ],
+      "scenario_reason": "El corpus contiene control intensivo y sistemas de insulina, pero no datos individuales ni un protocolo que permita resolver esta dosis.",
+      "reference_facts": [
+        "Ningún abstract permite calcular una dosis individual para esta persona."
+      ],
+      "expected_behavior": [
+        "Abstenerse de calcular dosis; indicar insuficiencia de evidencia y evitar asesoramiento personalizado."
+      ],
+      "forbidden_claims": [
+        "Dar una dosis numérica o convertir resultados poblacionales en prescripción individual."
+      ],
+      "references": [
+        {
+          "pmid": "24356592",
+          "title": "The diabetes control and complications trial/epidemiology of diabetes interventions and complications study at 30 years: overview.",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/24356592/",
+          "evidence_excerpt": "OBJECTIVE The Diabetes Control and Complications Trial (DCCT) was designed to test the glucose hypothesis and determine whether the complications of type 1 diabetes (T1DM) could be prevented or delayed. The Epidemiology of Diabetes Interventions and Complications (EDIC) observational follow-up determined the durability of the DCCT effects on the more-advanced stages of diabetes complications including cardiovascular disease (CVD). RESEARCH DESIGN AND METHODS The DCCT (1982-1993) was a controlled clinical trial in 1,441 subjects with T1DM comparing intensive therapy (INT), aimed at achieving levels of glycemia as close to the nondiabetic range as safely possible, with conventional therapy (CON), which aimed to maintain safe asymptomatic glucose control. INT utilized three or more daily insulin injections or insulin pump therapy guided by self-monitored glucose. EDIC (1994-present) is an observational study of the DCCT cohort. RESULTS The DCCT followed >99% of the cohort for a mean of 6.5 years and demonstrated a 35-76% reduction in the early stages of microvascular disease with INT, with a median HbA1c of 7%, compared with CONV, with a median HbA1c of 9%. The major adverse effect of INT was a threefold increased risk of hypoglycemia, which was not associated with a decline in cognitive function or quality of life. EDIC showed a durable effect of initial assigned therapies despite a loss of the glycemic separation (metabolic memory) and demonstrated that the reduction in early-stage complications during the DCCT translated into substantial reductions in severe complications and CVD. CONCLUSIONS DCCT/EDIC has demonstrated the effectiveness of INT in reducing the long-term complications of T1DM and improving the prospects for a healthy life span."
+        },
+        {
+          "pmid": "38697182",
+          "title": "Comparing advanced hybrid closed loop therapy and standard insulin therapy in pregnant women with type 1 diabetes (CRISTAL): a parallel-group, open-label, randomised controlled trial.",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/38697182/",
+          "evidence_excerpt": "BACKGROUND: Advanced hybrid closed loop (AHCL) therapy can improve glycaemic control in pregnant women with type 1 diabetes. However, data are needed on the efficacy and safety of AHCL systems as these systems, such as the MiniMed 780G, are not currently approved for use in pregnant women. We aimed to investigate whether the MiniMed 780G can improve glycaemic control with less hypoglycaemia in pregnant women with type 1 diabetes.\nMETHODS: CRISTAL was a double-arm, parallel-group, open-label, randomised controlled trial conducted in secondary and tertiary care specialist endocrinology centres at 12 hospitals (11 in Belgium and one in the Netherlands). Pregnant women aged 18-45 years with type 1 diabetes were randomly assigned (1:1) to AHCL therapy (MiniMed 780G) or standard insulin therapy (standard of care) at a median of 10·1 (IQR 8·6-11·6) weeks of gestation. Randomisation was done centrally with minimisation dependent on baseline HbA1c, insulin administration method, and centre. Participants and study teams were not masked to group allocation. The primary outcome was proportion of time spent in the pregnancy-specific target glucose range (3·5-7·8 mmol/L), measured by continuous glucose monitoring (CGM) at 14-17 weeks, 20-23 weeks, 26-29 weeks, and 33-36 weeks. Key secondary outcomes were overnight time in target range, and time below glucose range (<3·5 mmol/L) overall and overnight. Analyses were conducted on an intention-to-treat basis. This trial is registered with ClinicalTrials.gov (NCT04520971).\nFINDINGS: Between Jan 15, 2021 and Sept 30, 2022, 101 participants were screened, and 95 were randomly assigned to AHCL therapy (n=46) or standard insulin therapy (n=49). 43 patients assigned to AHCL therapy and 46 assigned to standard insulin therapy completed the study. At baseline, 91 (95·8%) participants used insulin pumps, and the mean HbA1c was 6·5% (SD 0·6). The mean proportion of time spent in the target range (averaged over four time periods) was 66·5% (SD 10·0) in the AHCL therapy group compared with 63·2% (12·4) in the standard insulin therapy group (adjusted mean difference 1·88 percentage points [95% CI -0·82 to 4·58], p=0·17). Overnight time in the target range was higher (adjusted mean difference 6·58 percentage points [95% CI 2·31 to 10·85], p=0·0026), and time below range overall (adjusted mean difference -1·34 percentage points [95% CI, -2·19 to -0·49], p=0·0020) and overnight (adjusted mean difference -1·86 percentage points [95% CI -2·90 to -0·81], p=0·0005) were lower with AHCL therapy than with standard insulin therapy. Participants assigned to AHCL therapy reported higher treatment satisfaction. No unanticipated safety events occurred with AHCL therapy.\nINTERPRETATION: In pregnant women starting with tighter glycaemic control, AHCL therapy did not improve overall time in target range but improved overnight time in target range, reduced time below range, and improved treatment satisfaction. These data suggest that the MiniMed 780G can be safely used in pregnancy and provides some additional benefits compared with standard insulin therapy; however, it will be important to refine the algorithm to better align with pregnancy requirements.\nFUNDING: Diabetes Liga Research Fund and Medtronic."
+        }
+      ]
+    },
+    {
+      "id": "r09",
+      "question": "En niños con tuberculosis no grave, ¿qué régimen abreviado se comparó con seis meses y qué resultado obtuvo? ¿Permite extrapolar automáticamente el régimen de rifapentina y moxifloxacino a todos los niños?",
+      "scenario": "distractors",
+      "published_from": null,
+      "dimensions": [
+        "groundedness",
+        "citation_semantics",
+        "relevance",
+        "unsupported_claims",
+        "abstention",
+        "limitations"
+      ],
+      "expected_pmids": [
+        "35263517"
+      ],
+      "related_pmids": [
+        "33951360"
+      ],
+      "scenario_reason": "SHINE estudia niños con TB no grave y tratamiento estándar de primera línea; el ensayo vecino estudia otro régimen y otra población. El abstract de este último no especifica edades de inclusión, por lo que no permite llamarlo exclusivamente adulto ni extrapolar sus resultados automáticamente a todos los niños.",
+      "reference_facts": [
+        "SHINE: cuatro frente a seis meses de tratamiento estándar de primera línea; no inferioridad en menores de 16 años con TB no grave, sensible y baciloscopia negativa. El régimen con rifapentina y moxifloxacino pertenece al ensayo vecino, cuyo abstract no delimita edades de inclusión y no establece aplicabilidad a todos los niños."
+      ],
+      "expected_behavior": [
+        "Contestar con SHINE; distinguir fármacos, población y condiciones de los ensayos, sin afirmar que rifapentina-moxifloxacino sea exclusivamente adulto. Explicar que el corpus no permite extrapolar automáticamente ese régimen a todos los niños."
+      ],
+      "forbidden_claims": [
+        "Atribuir rifapentina-moxifloxacino a SHINE, calificar su ensayo vecino como exclusivamente adulto sin apoyo del abstract, o extrapolarlo automáticamente a todos los niños."
+      ],
+      "references": [
+        {
+          "pmid": "35263517",
+          "title": "Shorter Treatment for Nonsevere Tuberculosis in African and Indian Children.",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/35263517/",
+          "evidence_excerpt": "BACKGROUND: Two thirds of children with tuberculosis have nonsevere disease, which may be treatable with a shorter regimen than the current 6-month regimen.\nMETHODS: We conducted an open-label, treatment-shortening, noninferiority trial involving children with nonsevere, symptomatic, presumably drug-susceptible, smear-negative tuberculosis in Uganda, Zambia, South Africa, and India. Children younger than 16 years of age were randomly assigned to 4 months (16 weeks) or 6 months (24 weeks) of standard first-line antituberculosis treatment with pediatric fixed-dose combinations as recommended by the World Health Organization. The primary efficacy outcome was unfavorable status (composite of treatment failure [extension, change, or restart of treatment or tuberculosis recurrence], loss to follow-up during treatment, or death) by 72 weeks, with the exclusion of participants who did not complete 4 months of treatment (modified intention-to-treat population). A noninferiority margin of 6 percentage points was used. The primary safety outcome was an adverse event of grade 3 or higher during treatment and up to 30 days after treatment.\nRESULTS: From July 2016 through July 2018, a total of 1204 children underwent randomization (602 in each group). The median age of the participants was 3.5 years (range, 2 months to 15 years), 52% were male, 11% had human immunodeficiency virus infection, and 14% had bacteriologically confirmed tuberculosis. Retention by 72 weeks was 95%, and adherence to the assigned treatment was 94%. A total of 16 participants (3%) in the 4-month group had a primary-outcome event, as compared with 18 (3%) in the 6-month group (adjusted difference, -0.4 percentage points; 95% confidence interval, -2.2 to 1.5). The noninferiority of 4 months of treatment was consistent across the intention-to-treat, per-protocol, and key secondary analyses, including when the analysis was restricted to the 958 participants (80%) independently adjudicated to have tuberculosis at baseline. A total of 95 participants (8%) had an adverse event of grade 3 or higher, including 15 adverse drug reactions (11 hepatic events, all but 2 of which occurred within the first 8 weeks, when the treatments were the same in the two groups).\nCONCLUSIONS: Four months of antituberculosis treatment was noninferior to 6 months of treatment in children with drug-susceptible, nonsevere, smear-negative tuberculosis. (Funded by the U.K. Medical Research Council and others; SHINE ISRCTN number, ISRCTN63579542.)."
+        },
+        {
+          "pmid": "33951360",
+          "title": "Four-Month Rifapentine Regimens with or without Moxifloxacin for Tuberculosis.",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/33951360/",
+          "evidence_excerpt": "BACKGROUND: Rifapentine-based regimens have potent antimycobacterial activity that may allow for a shorter course in patients with drug-susceptible pulmonary tuberculosis.\nMETHODS: In an open-label, phase 3, randomized, controlled trial involving persons with newly diagnosed pulmonary tuberculosis from 13 countries, we compared two 4-month rifapentine-based regimens with a standard 6-month regimen consisting of rifampin, isoniazid, pyrazinamide, and ethambutol (control) using a noninferiority margin of 6.6 percentage points. In one 4-month regimen, rifampin was replaced with rifapentine; in the other, rifampin was replaced with rifapentine and ethambutol with moxifloxacin. The primary efficacy outcome was survival free of tuberculosis at 12 months.\nRESULTS: Among 2516 participants who had undergone randomization, 2343 had a culture positive for Mycobacterium tuberculosis that was not resistant to isoniazid, rifampin, or fluoroquinolones (microbiologically eligible population; 768 in the control group, 791 in the rifapentine-moxifloxacin group, and 784 in the rifapentine group), of whom 194 were coinfected with human immunodeficiency virus and 1703 had cavitation on chest radiography. A total of 2234 participants could be assessed for the primary outcome (assessable population; 726 in the control group, 756 in the rifapentine-moxifloxacin group, and 752 in the rifapentine group). Rifapentine with moxifloxacin was noninferior to the control in the microbiologically eligible population (15.5% vs. 14.6% had an unfavorable outcome; difference, 1.0 percentage point; 95% confidence interval [CI], -2.6 to 4.5) and in the assessable population (11.6% vs. 9.6%; difference, 2.0 percentage points; 95% CI, -1.1 to 5.1). Noninferiority was shown in the secondary and sensitivity analyses. Rifapentine without moxifloxacin was not shown to be noninferior to the control in either population (17.7% vs. 14.6% with an unfavorable outcome in the microbiologically eligible population; difference, 3.0 percentage points [95% CI, -0.6 to 6.6]; and 14.2% vs. 9.6% in the assessable population; difference, 4.4 percentage points [95% CI, 1.2 to 7.7]). Adverse events of grade 3 or higher occurred during the on-treatment period in 19.3% of participants in the control group, 18.8% in the rifapentine-moxifloxacin group, and 14.3% in the rifapentine group.\nCONCLUSIONS: The efficacy of a 4-month rifapentine-based regimen containing moxifloxacin was noninferior to the standard 6-month regimen in the treatment of tuberculosis. (Funded by the Centers for Disease Control and Prevention and others; Study 31/A5349 ClinicalTrials.gov number, NCT02410772.)."
+        }
+      ]
+    },
+    {
+      "id": "r10",
+      "question": "¿Demuestran los ensayos ENHANCE que ensifentrina mejora la función pulmonar en asma grave?",
+      "scenario": "distractors",
+      "published_from": null,
+      "dimensions": [
+        "groundedness",
+        "citation_semantics",
+        "relevance",
+        "unsupported_claims",
+        "abstention",
+        "limitations"
+      ],
+      "expected_pmids": [],
+      "related_pmids": [
+        "37364283",
+        "33050934",
+        "33829619"
+      ],
+      "scenario_reason": "ENHANCE estudia EPOC, no asma; NAVIGATOR sí trata asma pero con tezepelumab. Coincidencia respiratoria no equivale a evidencia para esta indicación.",
+      "reference_facts": [
+        "Los ensayos ENHANCE del corpus evalúan EPOC; no prueban eficacia de ensifentrina en asma grave."
+      ],
+      "expected_behavior": [
+        "Rechazar la extrapolación y declarar falta de evidencia para asma; puede explicar la diferencia EPOC/asma con cita."
+      ],
+      "forbidden_claims": [
+        "Atribuir los resultados de EPOC a asma o intercambiar ensifentrina y tezepelumab."
+      ],
+      "references": [
+        {
+          "pmid": "37364283",
+          "title": "Ensifentrine, a Novel Phosphodiesterase 3 and 4 Inhibitor for the Treatment of Chronic Obstructive Pulmonary Disease: Randomized, Double-Blind, Placebo-controlled, Multicenter Phase III Trials (the ENHANCE Trials).",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/37364283/",
+          "evidence_excerpt": "UNLABELLED: Rationale: Ensifentrine is a novel, selective, dual phosphodiesterase (PDE)3 and PDE4 inhibitor with bronchodilator and antiinflammatory effects. Replicate phase III trials of nebulized ensifentrine were conducted (ENHANCE-1 and ENHANCE-2) to assess these effects in patients with chronic obstructive pulmonary disease (COPD). Objectives: To evaluate the efficacy of ensifentrine compared with placebo for lung function, symptoms, quality of life, and exacerbations in patients with COPD. Methods: These phase III, multicenter, randomized, double-blind, parallel-group, placebo-controlled trials were conducted between September 2020 and December 2022 at 250 research centers and pulmonology practices in 17 countries. Patients aged 40-80 years with moderate to severe symptomatic COPD were enrolled. Measurements and Main Results: Totals of 760 (ENHANCE-1) and 789 (ENHANCE-2) patients were randomized and treated, with 69% and 55% receiving concomitant long-acting muscarinic antagonists or long-acting β2-agonists, respectively. Post-bronchodilator FEV1 percentage predicted values were 52% and 51% of predicted normal. Ensifentrine treatment significantly improved average FEV1 area under the curve at 0-12 hours versus placebo (ENHANCE-1, 87 ml [95% confidence interval, 55, 119]; ENHANCE-2, 94 ml [65, 124]; both P < 0.001). Ensifentrine treatment significantly improved symptoms (Evaluating Respiratory Symptoms) and quality of life (St. George's Respiratory Questionnaire) versus placebo at Week 24 in ENHANCE-1 but not in ENHANCE-2. Ensifentrine treatment reduced the rate of moderate or severe exacerbations versus placebo over 24 weeks (ENHANCE-1, rate ratio, 0.64 [0.40, 1.00]; P = 0.050; ENHANCE-2, rate ratio, 0.57 [0.38, 0.87]; P = 0.009) and increased time to first exacerbation (ENHANCE-1, hazard ratio, 0.62 [0.39, 0.97]; P = 0.038; ENHANCE-2, hazard ratio, 0.58 [0.38, 0.87]; P = 0.009). Adverse event rates were similar to those for placebo. Conclusions: Ensifentrine significantly improved lung function in both trials, with results supporting exacerbation rate and risk reduction in a broad COPD population and in addition to other classes of maintenance therapies. Clinical trial registered with www.\nCLINICALTRIALS: gov and EudraCT (ENHANCE-1, www.\nCLINICALTRIALS: gov identifier NCT04535986, EudraCT identifier 2020-002086-34; ENHANCE-2, www.\nCLINICALTRIALS: gov identifier NCT04542057, EudraCT identifier 2020-002069-32)."
+        },
+        {
+          "pmid": "33050934",
+          "title": "NAVIGATOR: a phase 3 multicentre, randomized, double-blind, placebo-controlled, parallel-group trial to evaluate the efficacy and safety of tezepelumab in adults and adolescents with severe, uncontrolled asthma.",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/33050934/",
+          "evidence_excerpt": "BACKGROUND: Patients with severe, uncontrolled asthma have a significant unmet need for new treatments that have broader effects on airway inflammation, and that provide greater improvements in asthma outcomes than currently approved biologics and standard-of-care therapies. Tezepelumab is a human monoclonal antibody that blocks the activity of the epithelial cytokine thymic stromal lymphopoietin. In the PATHWAY phase 2b study (NCT02054130), tezepelumab significantly reduced exacerbations by up to 71% in adults with severe, uncontrolled asthma, irrespective of baseline disease phenotype. This article reports the design and objectives of the pivotal phase 3 NAVIGATOR study.\nMETHODS: NAVIGATOR (NCT03347279) is an ongoing randomized, double-blind, placebo-controlled trial in adults (18-80 years old) and adolescents (12-17 years old) with severe, uncontrolled asthma, who are receiving treatment with medium- or high-dose inhaled corticosteroids plus at least one additional controller medication with or without oral corticosteroids (N = 1061). The study population includes approximately equal proportions of patients with high (≥ 300 cells/μL) and low (< 300 cells/μL) blood eosinophil counts. The study comprises a 5-6-week screening period, a 52-week treatment period and a 12-week post-treatment follow-up period. All patients will receive their prescribed controller medications without change throughout the study. The primary efficacy endpoint is the annualized asthma exacerbation rate during the 52-week treatment period. Key secondary endpoints include the effect of tezepelumab on lung function, asthma control and health-related quality of life.\nDISCUSSION: NAVIGATOR is evaluating the effect of tezepelumab in patients with a broad range of severe asthma phenotypes at baseline, including those with low blood eosinophil counts. The target sample size for NAVIGATOR (N = 1060) was achieved, and it is the largest clinical study of tezepelumab in severe, uncontrolled asthma to date. NAVIGATOR aims to further investigate the effect of tezepelumab on exacerbations and build on observations from the phase 2b PATHWAY study, and to demonstrate further the potential of tezepelumab to provide patients with severe, uncontrolled asthma with improvements in lung function, asthma control and health-related quality of life.\nTRIAL REGISTRATION: NCT03347279 (ClinicalTrials.gov). Registered 20 November 2017."
+        },
+        {
+          "pmid": "33829619",
+          "title": "Pharmacological treatment of stable chronic obstructive pulmonary disease.",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/33829619/",
+          "evidence_excerpt": "Pharmacological treatment for chronic obstructive pulmonary disease (COPD) aims to alleviate symptoms and reduce the future risk of events such as exacerbations, disease progression and death. The heterogeneity of COPD results in variable responses to pharmacological interventions. COPD treatment has evolved towards a precision medicine approach, integrating clinical and biomarker information in order to optimize treatment decisions for each individual. The evidence supporting the use of blood eosinophil counts to predict responses to inhaled corticosteroids (ICS) in COPD patients has led to the adoption of this biomarker for use in clinical practice. The development of novel double and triple inhaled combination treatments containing long-acting bronchodilators with or without ICS has involved some landmark randomized controlled trials in COPD patients. These studies have provided valuable evidence to direct the use of different classes of combination treatments. However, there are still some unresolved questions and debates. This review article describes the advances in the pharmacological treatment of COPD, particularly the personalization of treatment. The evidence base for current recommendations is discussed, and controversial issues are dissected."
+        }
+      ]
+    }
+  ]
+}

@@ -32,6 +32,7 @@ en Git/issues. El estado de entrega vive en GitHub y el trabajo local en los pla
 | [D025](D025-retrieval-evaluation.md) | Corpus fijo y evaluación binaria de retrieval (#40) | Aceptada |
 | [D026](D026-rag-v1-contract-context-and-citations.md) | Contrato RAG v1, contexto y política de citas (#44) | Aplicada en #45/#46 |
 | [D027](D027-rag-http-errors-and-observability.md) | Integración HTTP, errores y observabilidad RAG (#46) | Aplicada en #46 |
+| [D028](D028-rag-evaluation.md) | Evaluación RAG end-to-end, revisión humana y baseline (#47) | Aplicada; baseline revisado/promocionado |
 
 Nueva decisión: siguiente ID, problema, alternativas, decisión, consecuencias
 y estado. Cambios de dirección enlazan a la decisión sustituida; no reescribas

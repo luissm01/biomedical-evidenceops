@@ -143,6 +143,11 @@ Flujo y recursos en [arquitectura](docs/ARCHITECTURE.md).
 - [Evaluación](evaluation/README.md): dataset, runs, promoción, revisión humana
   y comparación. Un baseline de outputs no certifica calidad biomédica.
 
+Evaluación RAG end-to-end (#47): [casos para revisión previa](evaluation/rag/CASES-v1.md)
+y [runner, rúbrica y baseline](evaluation/rag/README.md).
+[Baseline RAG v1](evaluation/rag/REPORT-v1.md) real revisado y promocionado
+con 58 pass, 0 fail y 2 N/A y límites de muestra y revisión asistida.
+
 ## Ingestión PubMed (M6)
 
 `PubMedClient` en [pubmed.py](src/evidenceops/pubmed.py) usa ESearch para obtener
