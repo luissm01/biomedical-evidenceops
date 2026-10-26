@@ -1,0 +1,4300 @@
+{
+  "run_version": "1",
+  "status": "complete",
+  "started_at_utc": "2026-10-26T09:23:18.534622+00:00",
+  "corpus_version": "pubmed-m7-v1",
+  "dataset_version": "retrieval-queries-m7-v1",
+  "input_sha256": {
+    "corpus-v1.json": "6ac3e3da31e10a18cd401c775d30a344a49760cc6c83fc7f87407899f2bffdb2",
+    "queries-v1.json": "7609a0119ed0869d02fe4db24703eaab113a66c5ec4c288787e396419aed23e7",
+    "freeze-v1.json": "cf27a8d6f12155d13aba0d933f127b4046332bdaa81b04e88d5cd98cd88ac166"
+  },
+  "configuration": {
+    "article_model": "ncbi/MedCPT-Article-Encoder",
+    "article_revision": "d05a736da4bb84ee4057b7f7999485be6ed85465",
+    "query_model": "ncbi/MedCPT-Query-Encoder",
+    "query_revision": "d83a36cc6b8e3a5c5e9d9d6ba156808c1643dcbc",
+    "dimensions": 768,
+    "strategy": "whole-publication-v1",
+    "encoding": "medcpt-title-abstract-pair-cls-v1",
+    "article_max_tokens": 512,
+    "query_max_tokens": 64,
+    "overflow": "truncate-longest-first",
+    "normalization": "none",
+    "similarity": "inner-product",
+    "top_k": 5,
+    "published_from": null,
+    "mode": "hybrid",
+    "ranking": "bm25-pgvector-rrf",
+    "tie_break": "unit_id ascending",
+    "mrr_depth": 50,
+    "hybrid": {
+      "bm25_k1": 1.2,
+      "bm25_b": 0.75,
+      "tokenizer": "unicode-alphanumeric-casefold-v1",
+      "query_terms": "unique",
+      "statistics": "eligible-corpus",
+      "lexical_candidates": "positive-score-only",
+      "rrf_k": 60,
+      "candidate_k": 50
+    }
+  },
+  "code": {
+    "commit": "1ee065e1cc274f5568519fe0be1c29c8a5ab6491",
+    "working_tree_dirty": true,
+    "source_sha256": {
+      "src/evidenceops/rag.py": "acd8ad0fd1dec4771521df4452b54774aafdda9d20b063d9423f395972b4bff7",
+      "src/evidenceops/rag_observability.py": "eb55d4d6cb7169c41cde288e66fad46d96cc97e34c495a090cc4adcf7a8f3eae",
+      "src/evidenceops/ingestion_cli.py": "8d6254e3e9ab1a1a8df0c1c824c9f4aa7c9748e852ff66839bb673713ee33f6f",
+      "src/evidenceops/pubmed_parser.py": "e5f6c1a3e95d26c62e6a266aa82bb0ebdc956fc2021d3779469a289fd7610d59",
+      "src/evidenceops/pubmed.py": "f45e04c0c4f111fb8626878dde71210ace08aa3a28914a8b6c32d2016657b8f0",
+      "src/evidenceops/generation.py": "2054edff4e61557fb02748d0ccf7dc4e7b885e7ec99814a53bf7ffd44d4194a3",
+      "src/evidenceops/__init__.py": "7d62c3eb1c24d6dcb005128024fc2eb86f05db28c39798fe7683005076eebed8",
+      "src/evidenceops/embeddings.py": "1c61d8b30e26a5ae44b072a6fefc633e41c89f46d4879ebe67826a585736fbad",
+      "src/evidenceops/rag_evaluation.py": "6a41202cda565dfe5c7ddde482e699b7267fa977d53b5ca3659efff98569a20c",
+      "src/evidenceops/biomedical.py": "862df0f493650adb5d79227bb4fafdd09e2301a399833aaa00fa9f8cd673211d",
+      "src/evidenceops/gemini.py": "a83670ed8402e22e64a6969b03908db5d1b4aeeff4ad857e13785d601c3d6428",
+      "src/evidenceops/main.py": "3de549684e5de1bfd4008604d9f7d36dff62ab98f5b6d6d03a42fe0eabf097f2",
+      "src/evidenceops/retrieval_evaluation.py": "2bd272efeb02ccb72a52f21cad83d9e8c1e736d337461d06cf92e489eeee3f78",
+      "src/evidenceops/config.py": "b02b9feb8b745463199c33b42999d4bd2e11115e194f98542f049bd0e4aeebfc",
+      "src/evidenceops/deepseek.py": "c639bf9c36dbcfa51da2fe0e20d3e838768a3c9a19161101d5c23f9f73804181",
+      "src/evidenceops/rag_errors.py": "e48a20ba1951a579fedeafff111e32294f2fd22a5a01a9b907d9803dccb2b1ab",
+      "src/evidenceops/retrieval.py": "c46bd0ba6703251f8b38ddada4f3baefbf824682d111ebd52df6b8326b679b85",
+      "src/evidenceops/lexical.py": "44f2d9e14097aaaa1e78b6000efaf4078db9c12f0ab81c6983ab5679d522c176",
+      "src/evidenceops/chunking.py": "b8f73d0ab373f2b358d34f07d929ea3884883740bcd78ac6138fc19078e6657b",
+      "src/evidenceops/metrics.py": "236e7b8ea8f7f54b9a06aa1799e07fb6dabcaf8c7b22090903abf948b93bbfd8",
+      "src/evidenceops/generator_factory.py": "1ab7504c43bb76e73ec6da9546a60b033848909080699187a6e8bca1aa12f8dd",
+      "src/evidenceops/ingestion.py": "aa52e32d2c7fa14469c2e75000ece1fd8ccb7a724641aa589dc91d74f8c9cde8",
+      "src/evidenceops/evaluation_review.py": "72942cae21434d860dec93463e6e641407a93e4cad8e9999a35b4b2ce7af8db6",
+      "src/evidenceops/evaluation.py": "b4b06dacfc067d223a1789867561023c07e1986da451e4938edf9a00d40a21f5",
+      "src/evidenceops/generation_prompt.py": "34b42baeb1fa1a87bf79829a4ab259b56b3b28be206ed31b7dc3c713b2d73d07",
+      "src/evidenceops/retrieval_comparison.py": "c0a8e8e8d3e9d267350a9cc706579ea67f7d715f51186eee693d3ca777e2559f",
+      "src/evidenceops/models.py": "67cca49ddea53d3061b48dc5e806ee31dddcd40914434cadc2d787da10e9d435",
+      "src/evidenceops/database.py": "8b012dcfcf5c9e1337783d2cbc98ca2f0ae4c73e6c5ac6adce1a9f3f17c2f22f",
+      "src/evidenceops/observability.py": "53847e810a87ff4136fb58db086edf6dd8c573f547dcfc63d98a842e9eea328c",
+      "src/evidenceops/retrieval_demo.py": "bf28b6e89a6c8ff37bcc3fca94cc149731c55d31f9067abce9b402d155de0b06",
+      "src/evidenceops/schemas.py": "dc870773af8d2b464708b0ff421e757cdc52f3e0ef37139c307b462cf3c82f1a",
+      "src/evidenceops/publications.py": "937df31cf75b4cb3bac8edead47065951096cb20bc0c4c89635ac76c75b70fcd",
+      "src/evidenceops/tracing.py": "c01016aacc4d3122830834e39d70c1fcbb08e19f8deefc53103d8999a49ad9e9"
+    }
+  },
+  "environment": {
+    "python": "3.14.4",
+    "platform": "Linux-6.6.87.2-microsoft-standard-WSL2-x86_64-with-glibc2.43",
+    "packages": {
+      "evidenceops": "0.1.0",
+      "torch": "2.14.1+cpu",
+      "transformers": "4.57.6",
+      "pgvector": "0.5.0",
+      "sqlalchemy": "2.0.52",
+      "psycopg": "3.3.5"
+    },
+    "torch_threads": 6,
+    "torch_interop_threads": 6,
+    "device": "cpu",
+    "dtype": "float32",
+    "postgresql": "18.6 (Debian 18.6-1.pgdg13+2)",
+    "pgvector_extension": "0.8.7"
+  },
+  "results": [
+    {
+      "query_id": "q01",
+      "query": "association between childhood obesity and asthma risk",
+      "metrics": {
+        "hit_rate@5": 1.0,
+        "recall@5": 1.0,
+        "precision@5": 0.4,
+        "reciprocal_rank": 1.0
+      },
+      "top_5": [
+        "35988550",
+        "34353454",
+        "29627041",
+        "30552067",
+        "31090575"
+      ],
+      "ranking": [
+        {
+          "rank": 1,
+          "pmid": "35988550",
+          "unit_id": "5c453d941b1c0f73e9f6df0d8792c3174689556c5fe12a746c33a29116828930",
+          "content_fingerprint": "0d37af25659cbbbe1020b76df31aa7264f22ac333704c9d59e958156b034da50",
+          "score": 0.032266458495966696,
+          "relevant": true
+        },
+        {
+          "rank": 2,
+          "pmid": "34353454",
+          "unit_id": "f895c8e16a0355fcc079ecc1dbd3145e3432f464242673085d79ae216ee3d97f",
+          "content_fingerprint": "4df0516b6823e911072368e44a99fe8a39dd44d8eb1373fc6a5ecb1f6ca7ea9e",
+          "score": 0.032266458495966696,
+          "relevant": false
+        },
+        {
+          "rank": 3,
+          "pmid": "29627041",
+          "unit_id": "c7dd37835680fdff95f876add24a6f7e595d3a8eeaaaad7c0b235d0f509a4993",
+          "content_fingerprint": "662b0ebb4f5dfa481d22bfc43afc53949bfd48be2e5a42ae346c774abae3cde6",
+          "score": 0.031754032258064516,
+          "relevant": true
+        },
+        {
+          "rank": 4,
+          "pmid": "30552067",
+          "unit_id": "85127d7cd7661dd36a7e198331d1deca8fe60de41feb3e9994897adfae4b9e84",
+          "content_fingerprint": "fafb49e5c2aa55a1b0453b816f31fac6b85d41e6141d3b747a0e1e026d965779",
+          "score": 0.0315136476426799,
+          "relevant": false
+        },
+        {
+          "rank": 5,
+          "pmid": "31090575",
+          "unit_id": "457d49c267258cedb4ba5cc2e6e51a934ec608d6724f8b6399a4021af2363eb0",
+          "content_fingerprint": "533f12976ac165974236e5d92800e832ed3f87e18da19ff569fe81e58f5649ec",
+          "score": 0.031009615384615385,
+          "relevant": false
+        },
+        {
+          "rank": 6,
+          "pmid": "28371335",
+          "unit_id": "e423ca0bfce40e5ed2f9ea514a786b530c882da707e31539a50d625deec7219d",
+          "content_fingerprint": "25aaec2ddb93a1d5379154d8194927bac27218804b8ce895c24d236499c86d40",
+          "score": 0.029850746268656716,
+          "relevant": false
+        },
+        {
+          "rank": 7,
+          "pmid": "37425065",
+          "unit_id": "673d115eb699e8eef5898cb18cf92c6f5338f0fb3211112c63935e45312659b6",
+          "content_fingerprint": "e89de5a230a762770317103c9c223522b37fddf00177d663d7b143dd3094bc55",
+          "score": 0.028577260665441927,
+          "relevant": false
+        },
+        {
+          "rank": 8,
+          "pmid": "35896123",
+          "unit_id": "c73dfbda9bfae65cb7b28955252891dedae7093dfb11809f037831ce52b15bc4",
+          "content_fingerprint": "b4614b04366b6f4ffdbe9e8e0ea4528faa0e85c2b83693ec1901ec7cc7d50263",
+          "score": 0.028484848484848488,
+          "relevant": false
+        },
+        {
+          "rank": 9,
+          "pmid": "36774932",
+          "unit_id": "42454181e5db620a6fd3b3c80df987a226d9350fcd4f772f641e213ebd923526",
+          "content_fingerprint": "f3b12fa6fb0839bb4a50c779fb8871b7f8362c20d5bfcfdd474e3ac5a423d508",
+          "score": 0.02817460317460317,
+          "relevant": false
+        },
+        {
+          "rank": 10,
+          "pmid": "33050934",
+          "unit_id": "598e2d1081e35d9d8803e90fd95902896d3f7953fcbdcd03b661ef9c4456cc25",
+          "content_fingerprint": "ec276cc3119dc28b3f3b232dc92f48983b1c6778612f1e2a5c7cebf0f3d53cb2",
+          "score": 0.028006267136701922,
+          "relevant": false
+        },
+        {
+          "rank": 11,
+          "pmid": "38141902",
+          "unit_id": "d1dda3e79432839dc985e1338346306fbeefff9fc6e53574f67eca2d9d1f5bf8",
+          "content_fingerprint": "a27885e0849ec96b73e206c90d97a1c8ba79216a6f601ecb9354a664dc9c33cf",
+          "score": 0.027972027972027972,
+          "relevant": false
+        },
+        {
+          "rank": 12,
+          "pmid": "28292619",
+          "unit_id": "9323f2e0371651ae3b19b5b3e102695f7a2538a1c073f50d991fac9ee3a43e35",
+          "content_fingerprint": "864f6902ed6b38d28339d8ce3bb372edd9f2cbda3164e0a84cdb9e925ee20299",
+          "score": 0.027692895339954164,
+          "relevant": false
+        },
+        {
+          "rank": 13,
+          "pmid": "35040920",
+          "unit_id": "93c9c8a4539c5c35547771ab64a315c40567bcbe390d18dfb71cfec7ae1e1797",
+          "content_fingerprint": "abb1cc6f63eff4fff6c1ded23eb078dd9fb9f2a46146b7d2b3ce378549b0bec2",
+          "score": 0.027212143650499815,
+          "relevant": false
+        },
+        {
+          "rank": 14,
+          "pmid": "33683325",
+          "unit_id": "a2cb2c51608e8adc4eba5dd670dc39dd92a49037ef4825bd504cc20b9853a67c",
+          "content_fingerprint": "e595479d06d5d53912c5dd4c45a2390e375211b05525f5f3b9a15c9c3afc040a",
+          "score": 0.027046783625730993,
+          "relevant": false
+        },
+        {
+          "rank": 15,
+          "pmid": "28467922",
+          "unit_id": "a0657a4394eb3ff8907237d9b1367d178264909857b94bf87355fa253c0acb5b",
+          "content_fingerprint": "de0ca3ae0dd811041ab322da54751736981c16855adcaea79c186ceb0cff884f",
+          "score": 0.02694394213381555,
+          "relevant": false
+        },
+        {
+          "rank": 16,
+          "pmid": "34767960",
+          "unit_id": "403ed6090e1e8e32d16ae2a674d092fd9d6d48330b405a9a6d68d7dbe0fe980d",
+          "content_fingerprint": "0b161bfdb00533d28e88a3b237ca79839e115811dab9c694b5bf0f142de40233",
+          "score": 0.02651914295749912,
+          "relevant": false
+        },
+        {
+          "rank": 17,
+          "pmid": "33793326",
+          "unit_id": "99ca4d15c295638c2870f20deec1be1dec652e7bc7bcadf17e3c7d611decdeb1",
+          "content_fingerprint": "fa0fc6577bfbebc7a86bb1ffcee4d314d5cedb79d5265151983a209be06292c3",
+          "score": 0.026200135226504394,
+          "relevant": false
+        },
+        {
+          "rank": 18,
+          "pmid": "32430550",
+          "unit_id": "c09d8c61324e42b036137c235bda8354ee228f37d24031120bc576f889d181cd",
+          "content_fingerprint": "c3f025e08e1365ae186c83bf09dfcb8c1f8b09731ec1f3663fe0b2e513951dac",
+          "score": 0.025657894736842105,
+          "relevant": false
+        },
+        {
+          "rank": 19,
+          "pmid": "22000494",
+          "unit_id": "6f7633fc1833c15ce690dff1e576740430bf3ab98c36b7cdcb09085e111c418c",
+          "content_fingerprint": "f7c2a468c03288d587cb809ae622d16e10a89e40e45dab09a3a92e984616b149",
+          "score": 0.025448143405889884,
+          "relevant": false
+        },
+        {
+          "rank": 20,
+          "pmid": "37364283",
+          "unit_id": "e49e57f2abfc7c57849cf7e8f6dd6fd9367c0d12ad7ca33a575befedd7c2829b",
+          "content_fingerprint": "435fde88e01aaebd8db1022f8f08ca9db63630f6b3ee3268d88c34e6b600e08f",
+          "score": 0.0251821349382325,
+          "relevant": false
+        },
+        {
+          "rank": 21,
+          "pmid": "33650528",
+          "unit_id": "147295fdad5a9406bdc2af895008decebd915fe097342b9d794323b1e545ab77",
+          "content_fingerprint": "3907ce53664e18dcf56f552067f9d4148f96ceb3db66263cd599dc22fa1e66ff",
+          "score": 0.023581634068525453,
+          "relevant": false
+        },
+        {
+          "rank": 22,
+          "pmid": "38697182",
+          "unit_id": "ecc1d8123dcd9c53fb56de0a33ac9775c087a53484e52255bbf48031c62f4199",
+          "content_fingerprint": "3708a8164179889ada32bcba840a2630848fd673d70d3f3ba2b4d5b7050aaa64",
+          "score": 0.023128342245989305,
+          "relevant": false
+        },
+        {
+          "rank": 23,
+          "pmid": "29669543",
+          "unit_id": "2742ab4e7d7b48ff2c77e70dfe05f6a4e20b6dada18befdc6bdd4a89ee58fdb4",
+          "content_fingerprint": "4ceb3d956b2a347ed834b00b9747f5081f289b948c560997bd82f2d54498dfef",
+          "score": 0.023122159850307404,
+          "relevant": false
+        },
+        {
+          "rank": 24,
+          "pmid": "33829619",
+          "unit_id": "47d0f94cb5af56e8e2ef2170734548ff168189edfa27554304dc3c89e0482182",
+          "content_fingerprint": "ce90551b9976e8e9fab3364002cf03e94b573877af91446b7121ffc2d4eddde9",
+          "score": 0.023037203760095326,
+          "relevant": false
+        },
+        {
+          "rank": 25,
+          "pmid": "24356592",
+          "unit_id": "232a1531c4e4b44379486ca19a88c70b3668ed133d6a49eaafab8b6168611c57",
+          "content_fingerprint": "8415f5193289896681ec6ada7a72b86bea3100989ba0ff78c8ccfc8bd5265ae9",
+          "score": 0.022947810123262524,
+          "relevant": false
+        },
+        {
+          "rank": 26,
+          "pmid": "37161520",
+          "unit_id": "cc7e13789a2c4614f9d28c0eda087cf1d13dc0f08e836a6e34229047959f9dc8",
+          "content_fingerprint": "a3011da776b91f858bd26e41800c742724d843a97772dee758735d07a8c4d6d8",
+          "score": 0.022774327122153208,
+          "relevant": false
+        },
+        {
+          "rank": 27,
+          "pmid": "38512301",
+          "unit_id": "021c8cc8951335927d0ad4bc932e11b891fb1724e37e51ddb471125728127cd0",
+          "content_fingerprint": "289131b11feabb5977a6182c331d992f35fa6a63281ffb75a3ca26c7723ff5e1",
+          "score": 0.022759237949111367,
+          "relevant": false
+        },
+        {
+          "rank": 28,
+          "pmid": "33301246",
+          "unit_id": "70b6d754ccbe8f6ac5500f86622fd64c1e83629b58b812e9a5de332b7a441346",
+          "content_fingerprint": "64c84e01ca14176471b5daf0748a02c4ffc62a4ea3157c70db75dcc08d980a1b",
+          "score": 0.022704081632653063,
+          "relevant": false
+        },
+        {
+          "rank": 29,
+          "pmid": "35263517",
+          "unit_id": "4dac5faea6eed182f1086227ee2c4475c639dbada8d88b8b22655628f58a0c40",
+          "content_fingerprint": "c0f4973a7d8938289fc52b70aeea8e22a70416ce08634da2b599469149da57f8",
+          "score": 0.022424242424242423,
+          "relevant": false
+        },
+        {
+          "rank": 30,
+          "pmid": "36519436",
+          "unit_id": "a973a5f6273ca012cb313e27a768a5eccd8017c0e3d179a1205d179d1583724c",
+          "content_fingerprint": "61b54a500536079561e3ea1be2d2be030c9c89d2e524f54827d7b25756a9688c",
+          "score": 0.022291021671826623,
+          "relevant": false
+        },
+        {
+          "rank": 31,
+          "pmid": "38763510",
+          "unit_id": "b549f7cac78251e6c8b6d96e2a976d7a0d1282d3963181ffb30f2d238b35719d",
+          "content_fingerprint": "5cbde62e4e0c0c5da947fee5e888465be812b656ce989fde4b6625da2b6cb40e",
+          "score": 0.022266204849084613,
+          "relevant": false
+        },
+        {
+          "rank": 32,
+          "pmid": "24315724",
+          "unit_id": "71e6f9b6eb556f3650c2347085c953f244496aaffefd9f85fe310407c9798602",
+          "content_fingerprint": "2d952af296f3b250d5fb5ddc6e486fdc01193e82d00fe26ec64beda188f56254",
+          "score": 0.022054416876423347,
+          "relevant": false
+        },
+        {
+          "rank": 33,
+          "pmid": "35505000",
+          "unit_id": "7df84b762fa7930546ad3ad1ccfbc608ea0caf0ef95174468008c5425e7ca04f",
+          "content_fingerprint": "a12e03daa33308ad6ecc4f2181fe3c262d01a3a029782cc377169f5008b25eff",
+          "score": 0.022048192771084336,
+          "relevant": false
+        },
+        {
+          "rank": 34,
+          "pmid": "35653320",
+          "unit_id": "a4cf2995ab3f891b6890d5ac9a6a4a45a631f2e735ab82d97e2ac4744afedb94",
+          "content_fingerprint": "6cbd8f0ed164d31c32a353fd9f9f125ed58821b0b386a58caad5ad5932381dad",
+          "score": 0.021980676328502417,
+          "relevant": false
+        },
+        {
+          "rank": 35,
+          "pmid": "38184132",
+          "unit_id": "e5a1aacf824dfada803e96e78404432aa0f16e93fcfbcf0cd6f2caa820a06fe4",
+          "content_fingerprint": "dfe219115a9d562be7c9a77c687d814405155bf30794489eb9dab53870f32d0c",
+          "score": 0.021805752003771807,
+          "relevant": false
+        },
+        {
+          "rank": 36,
+          "pmid": "27494630",
+          "unit_id": "cab5aaada12b679453120676f8e4b998d463129a136055c7ef44f5e016b763f5",
+          "content_fingerprint": "b1d0eacad5325e37ac2454a29310f52e568a50fe73f9bc4b53a805404abd7fdb",
+          "score": 0.021298289339526454,
+          "relevant": false
+        },
+        {
+          "rank": 37,
+          "pmid": "33951360",
+          "unit_id": "d77b9cd775d531bcc8c425b4404abf8b96914a5a9473a91f32dea90827efb42d",
+          "content_fingerprint": "78de812a52810fa40bfc7e8ba1bfd1932391d6e51b139c032aa45a1b515a7878",
+          "score": 0.021136945155189678,
+          "relevant": false
+        },
+        {
+          "rank": 38,
+          "pmid": "35636910",
+          "unit_id": "1ab6a630ef83ba9ee6686043d2371cf205d3f9a492bb79c1042a251271da4758",
+          "content_fingerprint": "22a641e9fc27f16850d80974c541fd2b3a9bd51f58575f37ade206b69419501b",
+          "score": 0.021111111111111112,
+          "relevant": false
+        },
+        {
+          "rank": 39,
+          "pmid": "38924756",
+          "unit_id": "28082f8d2e9564a69e9972a2f4994ef5c57059e0aed2c8d78878eff3dc62f0fa",
+          "content_fingerprint": "ad8b0180f8a7f2dcd4f070e39aa8007cc7217d18c05a8783f5450291adba3725",
+          "score": 0.020186650436193956,
+          "relevant": false
+        },
+        {
+          "rank": 40,
+          "pmid": "38857504",
+          "unit_id": "bbb956bf6ee32e95f23c4b4446f188cb229bfed3eb75a82e56b58d189548fbb7",
+          "content_fingerprint": "59cd2f2f7d8c5441453598bbedd26800da04a9dbf8235ceeffd97950f6d4623f",
+          "score": 0.02016210739614995,
+          "relevant": false
+        },
+        {
+          "rank": 41,
+          "pmid": "37879444",
+          "unit_id": "ae4c0828013649d1f0acf673e5e676f239df541f69d552b28e9a2eca7499f77e",
+          "content_fingerprint": "7965c629c3428c50db60309506dd1831ce78d4756219b56dc92149c80818bbeb",
+          "score": 0.020141700404858298,
+          "relevant": false
+        },
+        {
+          "rank": 42,
+          "pmid": "28460827",
+          "unit_id": "02f38bf5543a99e8f64431ff498aa03d1630ea35aed8fc3db0066405b571c86a",
+          "content_fingerprint": "2c66d2006372ca8909f263953b9ad34294e9568de588daaaef610d54bcdaa504",
+          "score": 0.020113199919142913,
+          "relevant": false
+        },
+        {
+          "rank": 43,
+          "pmid": "27493136",
+          "unit_id": "7942ad2d033c9d415c0e49a10b6d2688c26e79cee82647baea8be8579d0d091a",
+          "content_fingerprint": "2a72790d0a1c68e09734101e397a236a99f4d08b563fb86e5458c198f215494d",
+          "score": 0.01991281949673073,
+          "relevant": false
+        },
+        {
+          "rank": 44,
+          "pmid": "33198517",
+          "unit_id": "072b7a00f7e3b8822dd2418b2c73a6ee98f4654452319d1ef21d4ad22adc9347",
+          "content_fingerprint": "5ec78335a600605c607cd3480d5bcb0818ae926c879a8fd64b5ec6b73bd1c184",
+          "score": 0.01976246105919003,
+          "relevant": false
+        },
+        {
+          "rank": 45,
+          "pmid": "29863955",
+          "unit_id": "81200f188ed546781b9968d828e8be43c99a40d80e025351f51423eb1e867e92",
+          "content_fingerprint": "3fd76151f8a6aab880d8e4750a94112770b1424f79c659f3861cf13779d21b60",
+          "score": 0.01959097859327217,
+          "relevant": false
+        },
+        {
+          "rank": 46,
+          "pmid": "27813430",
+          "unit_id": "5b4867036bce515d33bda6e35cae05436378e4647fd03ad509c65709e3381d63",
+          "content_fingerprint": "6da6b7c400f340a9d9f089c600407e9700c809d45fffa51a465f135969678b74",
+          "score": 0.019534972365161045,
+          "relevant": false
+        },
+        {
+          "rank": 47,
+          "pmid": "35115765",
+          "unit_id": "3edfc2ee9167c1a667afbadadbae13333e46a32e51ad7f48360cb047f1216698",
+          "content_fingerprint": "6b80e3c1f18f06c82e7300de5cdbea19760cf28abe15c80537ab43c1c1348d95",
+          "score": 0.019149715961150816,
+          "relevant": false
+        },
+        {
+          "rank": 48,
+          "pmid": "27184418",
+          "unit_id": "707db7dd8235e3b2310a3e24f0412662445e0cfd20821ab511f0e67813fe9a2f",
+          "content_fingerprint": "2621f600560be2bda08cf59aac3e200522d714f71cadc11db0864624dd578111",
+          "score": 0.018874643874643875,
+          "relevant": false
+        },
+        {
+          "rank": 49,
+          "pmid": "31018251",
+          "unit_id": "fc1f078bbdbfe12d3ac666c4d61640d4453416f31a23c20ff2c85641df17294f",
+          "content_fingerprint": "1ecfac1d5f4387ff17b2ca18b3e17deb028b7d6d5281e2f2027636a4813ea180",
+          "score": 0.01869812145041503,
+          "relevant": false
+        },
+        {
+          "rank": 50,
+          "pmid": "36252154",
+          "unit_id": "37db80a3de2c4fcb8600ef2df6859616f772966c4b8569c99745af4e2d38dcf3",
+          "content_fingerprint": "a8c4ff55cb50997a0d3371d955e017e60a163eb33dbd12024d22371ef7bff38a",
+          "score": 0.01835016835016835,
+          "relevant": false
+        }
+      ]
+    },
+    {
+      "query_id": "q02",
+      "query": "genetic factors associated with severe asthma",
+      "metrics": {
+        "hit_rate@5": 1.0,
+        "recall@5": 1.0,
+        "precision@5": 0.6,
+        "reciprocal_rank": 1.0
+      },
+      "top_5": [
+        "31090575",
+        "30552067",
+        "28371335",
+        "29627041",
+        "34353454"
+      ],
+      "ranking": [
+        {
+          "rank": 1,
+          "pmid": "31090575",
+          "unit_id": "457d49c267258cedb4ba5cc2e6e51a934ec608d6724f8b6399a4021af2363eb0",
+          "content_fingerprint": "533f12976ac165974236e5d92800e832ed3f87e18da19ff569fe81e58f5649ec",
+          "score": 0.03278688524590164,
+          "relevant": true
+        },
+        {
+          "rank": 2,
+          "pmid": "30552067",
+          "unit_id": "85127d7cd7661dd36a7e198331d1deca8fe60de41feb3e9994897adfae4b9e84",
+          "content_fingerprint": "fafb49e5c2aa55a1b0453b816f31fac6b85d41e6141d3b747a0e1e026d965779",
+          "score": 0.03225806451612903,
+          "relevant": true
+        },
+        {
+          "rank": 3,
+          "pmid": "28371335",
+          "unit_id": "e423ca0bfce40e5ed2f9ea514a786b530c882da707e31539a50d625deec7219d",
+          "content_fingerprint": "25aaec2ddb93a1d5379154d8194927bac27218804b8ce895c24d236499c86d40",
+          "score": 0.031746031746031744,
+          "relevant": true
+        },
+        {
+          "rank": 4,
+          "pmid": "29627041",
+          "unit_id": "c7dd37835680fdff95f876add24a6f7e595d3a8eeaaaad7c0b235d0f509a4993",
+          "content_fingerprint": "662b0ebb4f5dfa481d22bfc43afc53949bfd48be2e5a42ae346c774abae3cde6",
+          "score": 0.03125,
+          "relevant": false
+        },
+        {
+          "rank": 5,
+          "pmid": "34353454",
+          "unit_id": "f895c8e16a0355fcc079ecc1dbd3145e3432f464242673085d79ae216ee3d97f",
+          "content_fingerprint": "4df0516b6823e911072368e44a99fe8a39dd44d8eb1373fc6a5ecb1f6ca7ea9e",
+          "score": 0.030536130536130537,
+          "relevant": false
+        },
+        {
+          "rank": 6,
+          "pmid": "33050934",
+          "unit_id": "598e2d1081e35d9d8803e90fd95902896d3f7953fcbdcd03b661ef9c4456cc25",
+          "content_fingerprint": "ec276cc3119dc28b3f3b232dc92f48983b1c6778612f1e2a5c7cebf0f3d53cb2",
+          "score": 0.03007688828584351,
+          "relevant": false
+        },
+        {
+          "rank": 7,
+          "pmid": "35988550",
+          "unit_id": "5c453d941b1c0f73e9f6df0d8792c3174689556c5fe12a746c33a29116828930",
+          "content_fingerprint": "0d37af25659cbbbe1020b76df31aa7264f22ac333704c9d59e958156b034da50",
+          "score": 0.029877369007803793,
+          "relevant": false
+        },
+        {
+          "rank": 8,
+          "pmid": "32430550",
+          "unit_id": "c09d8c61324e42b036137c235bda8354ee228f37d24031120bc576f889d181cd",
+          "content_fingerprint": "c3f025e08e1365ae186c83bf09dfcb8c1f8b09731ec1f3663fe0b2e513951dac",
+          "score": 0.027526395173453996,
+          "relevant": false
+        },
+        {
+          "rank": 9,
+          "pmid": "29863955",
+          "unit_id": "81200f188ed546781b9968d828e8be43c99a40d80e025351f51423eb1e867e92",
+          "content_fingerprint": "3fd76151f8a6aab880d8e4750a94112770b1424f79c659f3861cf13779d21b60",
+          "score": 0.027402402402402402,
+          "relevant": false
+        },
+        {
+          "rank": 10,
+          "pmid": "28292619",
+          "unit_id": "9323f2e0371651ae3b19b5b3e102695f7a2538a1c073f50d991fac9ee3a43e35",
+          "content_fingerprint": "864f6902ed6b38d28339d8ce3bb372edd9f2cbda3164e0a84cdb9e925ee20299",
+          "score": 0.02690100430416069,
+          "relevant": false
+        },
+        {
+          "rank": 11,
+          "pmid": "37364283",
+          "unit_id": "e49e57f2abfc7c57849cf7e8f6dd6fd9367c0d12ad7ca33a575befedd7c2829b",
+          "content_fingerprint": "435fde88e01aaebd8db1022f8f08ca9db63630f6b3ee3268d88c34e6b600e08f",
+          "score": 0.0264808362369338,
+          "relevant": false
+        },
+        {
+          "rank": 12,
+          "pmid": "33301246",
+          "unit_id": "70b6d754ccbe8f6ac5500f86622fd64c1e83629b58b812e9a5de332b7a441346",
+          "content_fingerprint": "64c84e01ca14176471b5daf0748a02c4ffc62a4ea3157c70db75dcc08d980a1b",
+          "score": 0.02604430914933198,
+          "relevant": false
+        },
+        {
+          "rank": 13,
+          "pmid": "33683325",
+          "unit_id": "a2cb2c51608e8adc4eba5dd670dc39dd92a49037ef4825bd504cc20b9853a67c",
+          "content_fingerprint": "e595479d06d5d53912c5dd4c45a2390e375211b05525f5f3b9a15c9c3afc040a",
+          "score": 0.0259915611814346,
+          "relevant": false
+        },
+        {
+          "rank": 14,
+          "pmid": "37161520",
+          "unit_id": "cc7e13789a2c4614f9d28c0eda087cf1d13dc0f08e836a6e34229047959f9dc8",
+          "content_fingerprint": "a3011da776b91f858bd26e41800c742724d843a97772dee758735d07a8c4d6d8",
+          "score": 0.025914384123339348,
+          "relevant": false
+        },
+        {
+          "rank": 15,
+          "pmid": "35040920",
+          "unit_id": "93c9c8a4539c5c35547771ab64a315c40567bcbe390d18dfb71cfec7ae1e1797",
+          "content_fingerprint": "abb1cc6f63eff4fff6c1ded23eb078dd9fb9f2a46146b7d2b3ce378549b0bec2",
+          "score": 0.02557875991581674,
+          "relevant": false
+        },
+        {
+          "rank": 16,
+          "pmid": "35896123",
+          "unit_id": "c73dfbda9bfae65cb7b28955252891dedae7093dfb11809f037831ce52b15bc4",
+          "content_fingerprint": "b4614b04366b6f4ffdbe9e8e0ea4528faa0e85c2b83693ec1901ec7cc7d50263",
+          "score": 0.025332691999358666,
+          "relevant": false
+        },
+        {
+          "rank": 17,
+          "pmid": "29669543",
+          "unit_id": "2742ab4e7d7b48ff2c77e70dfe05f6a4e20b6dada18befdc6bdd4a89ee58fdb4",
+          "content_fingerprint": "4ceb3d956b2a347ed834b00b9747f5081f289b948c560997bd82f2d54498dfef",
+          "score": 0.025320462098433298,
+          "relevant": false
+        },
+        {
+          "rank": 18,
+          "pmid": "35505000",
+          "unit_id": "7df84b762fa7930546ad3ad1ccfbc608ea0caf0ef95174468008c5425e7ca04f",
+          "content_fingerprint": "a12e03daa33308ad6ecc4f2181fe3c262d01a3a029782cc377169f5008b25eff",
+          "score": 0.025062266500622665,
+          "relevant": false
+        },
+        {
+          "rank": 19,
+          "pmid": "36774932",
+          "unit_id": "42454181e5db620a6fd3b3c80df987a226d9350fcd4f772f641e213ebd923526",
+          "content_fingerprint": "f3b12fa6fb0839bb4a50c779fb8871b7f8362c20d5bfcfdd474e3ac5a423d508",
+          "score": 0.024868705591597158,
+          "relevant": false
+        },
+        {
+          "rank": 20,
+          "pmid": "33198517",
+          "unit_id": "072b7a00f7e3b8822dd2418b2c73a6ee98f4654452319d1ef21d4ad22adc9347",
+          "content_fingerprint": "5ec78335a600605c607cd3480d5bcb0818ae926c879a8fd64b5ec6b73bd1c184",
+          "score": 0.02459499263622975,
+          "relevant": false
+        },
+        {
+          "rank": 21,
+          "pmid": "37425065",
+          "unit_id": "673d115eb699e8eef5898cb18cf92c6f5338f0fb3211112c63935e45312659b6",
+          "content_fingerprint": "e89de5a230a762770317103c9c223522b37fddf00177d663d7b143dd3094bc55",
+          "score": 0.02454819277108434,
+          "relevant": false
+        },
+        {
+          "rank": 22,
+          "pmid": "35653320",
+          "unit_id": "a4cf2995ab3f891b6890d5ac9a6a4a45a631f2e735ab82d97e2ac4744afedb94",
+          "content_fingerprint": "6cbd8f0ed164d31c32a353fd9f9f125ed58821b0b386a58caad5ad5932381dad",
+          "score": 0.02438307873090482,
+          "relevant": false
+        },
+        {
+          "rank": 23,
+          "pmid": "28460827",
+          "unit_id": "02f38bf5543a99e8f64431ff498aa03d1630ea35aed8fc3db0066405b571c86a",
+          "content_fingerprint": "2c66d2006372ca8909f263953b9ad34294e9568de588daaaef610d54bcdaa504",
+          "score": 0.024086021505376344,
+          "relevant": false
+        },
+        {
+          "rank": 24,
+          "pmid": "33650528",
+          "unit_id": "147295fdad5a9406bdc2af895008decebd915fe097342b9d794323b1e545ab77",
+          "content_fingerprint": "3907ce53664e18dcf56f552067f9d4148f96ceb3db66263cd599dc22fa1e66ff",
+          "score": 0.02398989898989899,
+          "relevant": false
+        },
+        {
+          "rank": 25,
+          "pmid": "33829619",
+          "unit_id": "47d0f94cb5af56e8e2ef2170734548ff168189edfa27554304dc3c89e0482182",
+          "content_fingerprint": "ce90551b9976e8e9fab3364002cf03e94b573877af91446b7121ffc2d4eddde9",
+          "score": 0.02392671588733935,
+          "relevant": false
+        },
+        {
+          "rank": 26,
+          "pmid": "24356592",
+          "unit_id": "232a1531c4e4b44379486ca19a88c70b3668ed133d6a49eaafab8b6168611c57",
+          "content_fingerprint": "8415f5193289896681ec6ada7a72b86bea3100989ba0ff78c8ccfc8bd5265ae9",
+          "score": 0.023684210526315787,
+          "relevant": false
+        },
+        {
+          "rank": 27,
+          "pmid": "38924756",
+          "unit_id": "28082f8d2e9564a69e9972a2f4994ef5c57059e0aed2c8d78878eff3dc62f0fa",
+          "content_fingerprint": "ad8b0180f8a7f2dcd4f070e39aa8007cc7217d18c05a8783f5450291adba3725",
+          "score": 0.023467173087357567,
+          "relevant": false
+        },
+        {
+          "rank": 28,
+          "pmid": "35263517",
+          "unit_id": "4dac5faea6eed182f1086227ee2c4475c639dbada8d88b8b22655628f58a0c40",
+          "content_fingerprint": "c0f4973a7d8938289fc52b70aeea8e22a70416ce08634da2b599469149da57f8",
+          "score": 0.02319109461966605,
+          "relevant": false
+        },
+        {
+          "rank": 29,
+          "pmid": "33951360",
+          "unit_id": "d77b9cd775d531bcc8c425b4404abf8b96914a5a9473a91f32dea90827efb42d",
+          "content_fingerprint": "78de812a52810fa40bfc7e8ba1bfd1932391d6e51b139c032aa45a1b515a7878",
+          "score": 0.023138297872340424,
+          "relevant": false
+        },
+        {
+          "rank": 30,
+          "pmid": "27494630",
+          "unit_id": "cab5aaada12b679453120676f8e4b998d463129a136055c7ef44f5e016b763f5",
+          "content_fingerprint": "b1d0eacad5325e37ac2454a29310f52e568a50fe73f9bc4b53a805404abd7fdb",
+          "score": 0.0227390180878553,
+          "relevant": false
+        },
+        {
+          "rank": 31,
+          "pmid": "35636910",
+          "unit_id": "1ab6a630ef83ba9ee6686043d2371cf205d3f9a492bb79c1042a251271da4758",
+          "content_fingerprint": "22a641e9fc27f16850d80974c541fd2b3a9bd51f58575f37ade206b69419501b",
+          "score": 0.022658227848101266,
+          "relevant": false
+        },
+        {
+          "rank": 32,
+          "pmid": "38697182",
+          "unit_id": "ecc1d8123dcd9c53fb56de0a33ac9775c087a53484e52255bbf48031c62f4199",
+          "content_fingerprint": "3708a8164179889ada32bcba840a2630848fd673d70d3f3ba2b4d5b7050aaa64",
+          "score": 0.022380595148787197,
+          "relevant": false
+        },
+        {
+          "rank": 33,
+          "pmid": "34767960",
+          "unit_id": "403ed6090e1e8e32d16ae2a674d092fd9d6d48330b405a9a6d68d7dbe0fe980d",
+          "content_fingerprint": "0b161bfdb00533d28e88a3b237ca79839e115811dab9c694b5bf0f142de40233",
+          "score": 0.022005772005772008,
+          "relevant": false
+        },
+        {
+          "rank": 34,
+          "pmid": "35115765",
+          "unit_id": "3edfc2ee9167c1a667afbadadbae13333e46a32e51ad7f48360cb047f1216698",
+          "content_fingerprint": "6b80e3c1f18f06c82e7300de5cdbea19760cf28abe15c80537ab43c1c1348d95",
+          "score": 0.02147344374643061,
+          "relevant": false
+        },
+        {
+          "rank": 35,
+          "pmid": "28467922",
+          "unit_id": "a0657a4394eb3ff8907237d9b1367d178264909857b94bf87355fa253c0acb5b",
+          "content_fingerprint": "de0ca3ae0dd811041ab322da54751736981c16855adcaea79c186ceb0cff884f",
+          "score": 0.02142857142857143,
+          "relevant": false
+        },
+        {
+          "rank": 36,
+          "pmid": "37879444",
+          "unit_id": "ae4c0828013649d1f0acf673e5e676f239df541f69d552b28e9a2eca7499f77e",
+          "content_fingerprint": "7965c629c3428c50db60309506dd1831ce78d4756219b56dc92149c80818bbeb",
+          "score": 0.02129817444219067,
+          "relevant": false
+        },
+        {
+          "rank": 37,
+          "pmid": "38512301",
+          "unit_id": "021c8cc8951335927d0ad4bc932e11b891fb1724e37e51ddb471125728127cd0",
+          "content_fingerprint": "289131b11feabb5977a6182c331d992f35fa6a63281ffb75a3ca26c7723ff5e1",
+          "score": 0.02128623188405797,
+          "relevant": false
+        },
+        {
+          "rank": 38,
+          "pmid": "27184418",
+          "unit_id": "707db7dd8235e3b2310a3e24f0412662445e0cfd20821ab511f0e67813fe9a2f",
+          "content_fingerprint": "2621f600560be2bda08cf59aac3e200522d714f71cadc11db0864624dd578111",
+          "score": 0.021110500274876307,
+          "relevant": false
+        },
+        {
+          "rank": 39,
+          "pmid": "27813430",
+          "unit_id": "5b4867036bce515d33bda6e35cae05436378e4647fd03ad509c65709e3381d63",
+          "content_fingerprint": "6da6b7c400f340a9d9f089c600407e9700c809d45fffa51a465f135969678b74",
+          "score": 0.02097902097902098,
+          "relevant": false
+        },
+        {
+          "rank": 40,
+          "pmid": "27493136",
+          "unit_id": "7942ad2d033c9d415c0e49a10b6d2688c26e79cee82647baea8be8579d0d091a",
+          "content_fingerprint": "2a72790d0a1c68e09734101e397a236a99f4d08b563fb86e5458c198f215494d",
+          "score": 0.020669917320330716,
+          "relevant": false
+        },
+        {
+          "rank": 41,
+          "pmid": "38184132",
+          "unit_id": "e5a1aacf824dfada803e96e78404432aa0f16e93fcfbcf0cd6f2caa820a06fe4",
+          "content_fingerprint": "dfe219115a9d562be7c9a77c687d814405155bf30794489eb9dab53870f32d0c",
+          "score": 0.020634920634920638,
+          "relevant": false
+        },
+        {
+          "rank": 42,
+          "pmid": "38141902",
+          "unit_id": "d1dda3e79432839dc985e1338346306fbeefff9fc6e53574f67eca2d9d1f5bf8",
+          "content_fingerprint": "a27885e0849ec96b73e206c90d97a1c8ba79216a6f601ecb9354a664dc9c33cf",
+          "score": 0.020253682487725043,
+          "relevant": false
+        },
+        {
+          "rank": 43,
+          "pmid": "38763510",
+          "unit_id": "b549f7cac78251e6c8b6d96e2a976d7a0d1282d3963181ffb30f2d238b35719d",
+          "content_fingerprint": "5cbde62e4e0c0c5da947fee5e888465be812b656ce989fde4b6625da2b6cb40e",
+          "score": 0.020235053653551355,
+          "relevant": false
+        },
+        {
+          "rank": 44,
+          "pmid": "36252154",
+          "unit_id": "37db80a3de2c4fcb8600ef2df6859616f772966c4b8569c99745af4e2d38dcf3",
+          "content_fingerprint": "a8c4ff55cb50997a0d3371d955e017e60a163eb33dbd12024d22371ef7bff38a",
+          "score": 0.020163322915616497,
+          "relevant": false
+        },
+        {
+          "rank": 45,
+          "pmid": "36519436",
+          "unit_id": "a973a5f6273ca012cb313e27a768a5eccd8017c0e3d179a1205d179d1583724c",
+          "content_fingerprint": "61b54a500536079561e3ea1be2d2be030c9c89d2e524f54827d7b25756a9688c",
+          "score": 0.019801980198019802,
+          "relevant": false
+        },
+        {
+          "rank": 46,
+          "pmid": "24315724",
+          "unit_id": "71e6f9b6eb556f3650c2347085c953f244496aaffefd9f85fe310407c9798602",
+          "content_fingerprint": "2d952af296f3b250d5fb5ddc6e486fdc01193e82d00fe26ec64beda188f56254",
+          "score": 0.01950757575757576,
+          "relevant": false
+        },
+        {
+          "rank": 47,
+          "pmid": "22000494",
+          "unit_id": "6f7633fc1833c15ce690dff1e576740430bf3ab98c36b7cdcb09085e111c418c",
+          "content_fingerprint": "f7c2a468c03288d587cb809ae622d16e10a89e40e45dab09a3a92e984616b149",
+          "score": 0.019345794392523364,
+          "relevant": false
+        },
+        {
+          "rank": 48,
+          "pmid": "38857504",
+          "unit_id": "bbb956bf6ee32e95f23c4b4446f188cb229bfed3eb75a82e56b58d189548fbb7",
+          "content_fingerprint": "59cd2f2f7d8c5441453598bbedd26800da04a9dbf8235ceeffd97950f6d4623f",
+          "score": 0.018978233495232956,
+          "relevant": false
+        },
+        {
+          "rank": 49,
+          "pmid": "31018251",
+          "unit_id": "fc1f078bbdbfe12d3ac666c4d61640d4453416f31a23c20ff2c85641df17294f",
+          "content_fingerprint": "1ecfac1d5f4387ff17b2ca18b3e17deb028b7d6d5281e2f2027636a4813ea180",
+          "score": 0.018518518518518517,
+          "relevant": false
+        },
+        {
+          "rank": 50,
+          "pmid": "33793326",
+          "unit_id": "99ca4d15c295638c2870f20deec1be1dec652e7bc7bcadf17e3c7d611decdeb1",
+          "content_fingerprint": "fa0fc6577bfbebc7a86bb1ffcee4d314d5cedb79d5265151983a209be06292c3",
+          "score": 0.01020408163265306,
+          "relevant": false
+        }
+      ]
+    },
+    {
+      "query_id": "q03",
+      "query": "effectiveness of metformin for type 2 diabetes",
+      "metrics": {
+        "hit_rate@5": 1.0,
+        "recall@5": 1.0,
+        "precision@5": 0.6,
+        "reciprocal_rank": 1.0
+      },
+      "top_5": [
+        "22000494",
+        "27493136",
+        "38763510",
+        "29669543",
+        "24356592"
+      ],
+      "ranking": [
+        {
+          "rank": 1,
+          "pmid": "22000494",
+          "unit_id": "6f7633fc1833c15ce690dff1e576740430bf3ab98c36b7cdcb09085e111c418c",
+          "content_fingerprint": "f7c2a468c03288d587cb809ae622d16e10a89e40e45dab09a3a92e984616b149",
+          "score": 0.03278688524590164,
+          "relevant": true
+        },
+        {
+          "rank": 2,
+          "pmid": "27493136",
+          "unit_id": "7942ad2d033c9d415c0e49a10b6d2688c26e79cee82647baea8be8579d0d091a",
+          "content_fingerprint": "2a72790d0a1c68e09734101e397a236a99f4d08b563fb86e5458c198f215494d",
+          "score": 0.03200204813108039,
+          "relevant": true
+        },
+        {
+          "rank": 3,
+          "pmid": "38763510",
+          "unit_id": "b549f7cac78251e6c8b6d96e2a976d7a0d1282d3963181ffb30f2d238b35719d",
+          "content_fingerprint": "5cbde62e4e0c0c5da947fee5e888465be812b656ce989fde4b6625da2b6cb40e",
+          "score": 0.03200204813108039,
+          "relevant": true
+        },
+        {
+          "rank": 4,
+          "pmid": "29669543",
+          "unit_id": "2742ab4e7d7b48ff2c77e70dfe05f6a4e20b6dada18befdc6bdd4a89ee58fdb4",
+          "content_fingerprint": "4ceb3d956b2a347ed834b00b9747f5081f289b948c560997bd82f2d54498dfef",
+          "score": 0.031009615384615385,
+          "relevant": false
+        },
+        {
+          "rank": 5,
+          "pmid": "24356592",
+          "unit_id": "232a1531c4e4b44379486ca19a88c70b3668ed133d6a49eaafab8b6168611c57",
+          "content_fingerprint": "8415f5193289896681ec6ada7a72b86bea3100989ba0ff78c8ccfc8bd5265ae9",
+          "score": 0.030117753623188408,
+          "relevant": false
+        },
+        {
+          "rank": 6,
+          "pmid": "28467922",
+          "unit_id": "a0657a4394eb3ff8907237d9b1367d178264909857b94bf87355fa253c0acb5b",
+          "content_fingerprint": "de0ca3ae0dd811041ab322da54751736981c16855adcaea79c186ceb0cff884f",
+          "score": 0.03007688828584351,
+          "relevant": false
+        },
+        {
+          "rank": 7,
+          "pmid": "34767960",
+          "unit_id": "403ed6090e1e8e32d16ae2a674d092fd9d6d48330b405a9a6d68d7dbe0fe980d",
+          "content_fingerprint": "0b161bfdb00533d28e88a3b237ca79839e115811dab9c694b5bf0f142de40233",
+          "score": 0.029857397504456328,
+          "relevant": false
+        },
+        {
+          "rank": 8,
+          "pmid": "36774932",
+          "unit_id": "42454181e5db620a6fd3b3c80df987a226d9350fcd4f772f641e213ebd923526",
+          "content_fingerprint": "f3b12fa6fb0839bb4a50c779fb8871b7f8362c20d5bfcfdd474e3ac5a423d508",
+          "score": 0.02967032967032967,
+          "relevant": false
+        },
+        {
+          "rank": 9,
+          "pmid": "38697182",
+          "unit_id": "ecc1d8123dcd9c53fb56de0a33ac9775c087a53484e52255bbf48031c62f4199",
+          "content_fingerprint": "3708a8164179889ada32bcba840a2630848fd673d70d3f3ba2b4d5b7050aaa64",
+          "score": 0.029631255487269532,
+          "relevant": false
+        },
+        {
+          "rank": 10,
+          "pmid": "37425065",
+          "unit_id": "673d115eb699e8eef5898cb18cf92c6f5338f0fb3211112c63935e45312659b6",
+          "content_fingerprint": "e89de5a230a762770317103c9c223522b37fddf00177d663d7b143dd3094bc55",
+          "score": 0.028577260665441927,
+          "relevant": false
+        },
+        {
+          "rank": 11,
+          "pmid": "37161520",
+          "unit_id": "cc7e13789a2c4614f9d28c0eda087cf1d13dc0f08e836a6e34229047959f9dc8",
+          "content_fingerprint": "a3011da776b91f858bd26e41800c742724d843a97772dee758735d07a8c4d6d8",
+          "score": 0.027046783625730993,
+          "relevant": false
+        },
+        {
+          "rank": 12,
+          "pmid": "36519436",
+          "unit_id": "a973a5f6273ca012cb313e27a768a5eccd8017c0e3d179a1205d179d1583724c",
+          "content_fingerprint": "61b54a500536079561e3ea1be2d2be030c9c89d2e524f54827d7b25756a9688c",
+          "score": 0.026856524873828405,
+          "relevant": false
+        },
+        {
+          "rank": 13,
+          "pmid": "33793326",
+          "unit_id": "99ca4d15c295638c2870f20deec1be1dec652e7bc7bcadf17e3c7d611decdeb1",
+          "content_fingerprint": "fa0fc6577bfbebc7a86bb1ffcee4d314d5cedb79d5265151983a209be06292c3",
+          "score": 0.026785714285714288,
+          "relevant": false
+        },
+        {
+          "rank": 14,
+          "pmid": "38141902",
+          "unit_id": "d1dda3e79432839dc985e1338346306fbeefff9fc6e53574f67eca2d9d1f5bf8",
+          "content_fingerprint": "a27885e0849ec96b73e206c90d97a1c8ba79216a6f601ecb9354a664dc9c33cf",
+          "score": 0.026709401709401708,
+          "relevant": false
+        },
+        {
+          "rank": 15,
+          "pmid": "37364283",
+          "unit_id": "e49e57f2abfc7c57849cf7e8f6dd6fd9367c0d12ad7ca33a575befedd7c2829b",
+          "content_fingerprint": "435fde88e01aaebd8db1022f8f08ca9db63630f6b3ee3268d88c34e6b600e08f",
+          "score": 0.025561706284597852,
+          "relevant": false
+        },
+        {
+          "rank": 16,
+          "pmid": "33951360",
+          "unit_id": "d77b9cd775d531bcc8c425b4404abf8b96914a5a9473a91f32dea90827efb42d",
+          "content_fingerprint": "78de812a52810fa40bfc7e8ba1bfd1932391d6e51b139c032aa45a1b515a7878",
+          "score": 0.025098039215686277,
+          "relevant": false
+        },
+        {
+          "rank": 17,
+          "pmid": "35263517",
+          "unit_id": "4dac5faea6eed182f1086227ee2c4475c639dbada8d88b8b22655628f58a0c40",
+          "content_fingerprint": "c0f4973a7d8938289fc52b70aeea8e22a70416ce08634da2b599469149da57f8",
+          "score": 0.024481265860576206,
+          "relevant": false
+        },
+        {
+          "rank": 18,
+          "pmid": "29863955",
+          "unit_id": "81200f188ed546781b9968d828e8be43c99a40d80e025351f51423eb1e867e92",
+          "content_fingerprint": "3fd76151f8a6aab880d8e4750a94112770b1424f79c659f3861cf13779d21b60",
+          "score": 0.023581634068525453,
+          "relevant": false
+        },
+        {
+          "rank": 19,
+          "pmid": "27813430",
+          "unit_id": "5b4867036bce515d33bda6e35cae05436378e4647fd03ad509c65709e3381d63",
+          "content_fingerprint": "6da6b7c400f340a9d9f089c600407e9700c809d45fffa51a465f135969678b74",
+          "score": 0.023518469306404464,
+          "relevant": false
+        },
+        {
+          "rank": 20,
+          "pmid": "33650528",
+          "unit_id": "147295fdad5a9406bdc2af895008decebd915fe097342b9d794323b1e545ab77",
+          "content_fingerprint": "3907ce53664e18dcf56f552067f9d4148f96ceb3db66263cd599dc22fa1e66ff",
+          "score": 0.02350255170561375,
+          "relevant": false
+        },
+        {
+          "rank": 21,
+          "pmid": "28371335",
+          "unit_id": "e423ca0bfce40e5ed2f9ea514a786b530c882da707e31539a50d625deec7219d",
+          "content_fingerprint": "25aaec2ddb93a1d5379154d8194927bac27218804b8ce895c24d236499c86d40",
+          "score": 0.023434343434343436,
+          "relevant": false
+        },
+        {
+          "rank": 22,
+          "pmid": "33198517",
+          "unit_id": "072b7a00f7e3b8822dd2418b2c73a6ee98f4654452319d1ef21d4ad22adc9347",
+          "content_fingerprint": "5ec78335a600605c607cd3480d5bcb0818ae926c879a8fd64b5ec6b73bd1c184",
+          "score": 0.023414503612523417,
+          "relevant": false
+        },
+        {
+          "rank": 23,
+          "pmid": "28460827",
+          "unit_id": "02f38bf5543a99e8f64431ff498aa03d1630ea35aed8fc3db0066405b571c86a",
+          "content_fingerprint": "2c66d2006372ca8909f263953b9ad34294e9568de588daaaef610d54bcdaa504",
+          "score": 0.023346828609986506,
+          "relevant": false
+        },
+        {
+          "rank": 24,
+          "pmid": "37879444",
+          "unit_id": "ae4c0828013649d1f0acf673e5e676f239df541f69d552b28e9a2eca7499f77e",
+          "content_fingerprint": "7965c629c3428c50db60309506dd1831ce78d4756219b56dc92149c80818bbeb",
+          "score": 0.023306233062330622,
+          "relevant": false
+        },
+        {
+          "rank": 25,
+          "pmid": "36252154",
+          "unit_id": "37db80a3de2c4fcb8600ef2df6859616f772966c4b8569c99745af4e2d38dcf3",
+          "content_fingerprint": "a8c4ff55cb50997a0d3371d955e017e60a163eb33dbd12024d22371ef7bff38a",
+          "score": 0.02329652572044169,
+          "relevant": false
+        },
+        {
+          "rank": 26,
+          "pmid": "38184132",
+          "unit_id": "e5a1aacf824dfada803e96e78404432aa0f16e93fcfbcf0cd6f2caa820a06fe4",
+          "content_fingerprint": "dfe219115a9d562be7c9a77c687d814405155bf30794489eb9dab53870f32d0c",
+          "score": 0.023296291337528453,
+          "relevant": false
+        },
+        {
+          "rank": 27,
+          "pmid": "30552067",
+          "unit_id": "85127d7cd7661dd36a7e198331d1deca8fe60de41feb3e9994897adfae4b9e84",
+          "content_fingerprint": "fafb49e5c2aa55a1b0453b816f31fac6b85d41e6141d3b747a0e1e026d965779",
+          "score": 0.023268398268398268,
+          "relevant": false
+        },
+        {
+          "rank": 28,
+          "pmid": "38924756",
+          "unit_id": "28082f8d2e9564a69e9972a2f4994ef5c57059e0aed2c8d78878eff3dc62f0fa",
+          "content_fingerprint": "ad8b0180f8a7f2dcd4f070e39aa8007cc7217d18c05a8783f5450291adba3725",
+          "score": 0.0231841329402305,
+          "relevant": false
+        },
+        {
+          "rank": 29,
+          "pmid": "33301246",
+          "unit_id": "70b6d754ccbe8f6ac5500f86622fd64c1e83629b58b812e9a5de332b7a441346",
+          "content_fingerprint": "64c84e01ca14176471b5daf0748a02c4ffc62a4ea3157c70db75dcc08d980a1b",
+          "score": 0.023128342245989305,
+          "relevant": false
+        },
+        {
+          "rank": 30,
+          "pmid": "35040920",
+          "unit_id": "93c9c8a4539c5c35547771ab64a315c40567bcbe390d18dfb71cfec7ae1e1797",
+          "content_fingerprint": "abb1cc6f63eff4fff6c1ded23eb078dd9fb9f2a46146b7d2b3ce378549b0bec2",
+          "score": 0.023122159850307404,
+          "relevant": false
+        },
+        {
+          "rank": 31,
+          "pmid": "24315724",
+          "unit_id": "71e6f9b6eb556f3650c2347085c953f244496aaffefd9f85fe310407c9798602",
+          "content_fingerprint": "2d952af296f3b250d5fb5ddc6e486fdc01193e82d00fe26ec64beda188f56254",
+          "score": 0.022809278350515466,
+          "relevant": false
+        },
+        {
+          "rank": 32,
+          "pmid": "33683325",
+          "unit_id": "a2cb2c51608e8adc4eba5dd670dc39dd92a49037ef4825bd504cc20b9853a67c",
+          "content_fingerprint": "e595479d06d5d53912c5dd4c45a2390e375211b05525f5f3b9a15c9c3afc040a",
+          "score": 0.022774327122153208,
+          "relevant": false
+        },
+        {
+          "rank": 33,
+          "pmid": "35988550",
+          "unit_id": "5c453d941b1c0f73e9f6df0d8792c3174689556c5fe12a746c33a29116828930",
+          "content_fingerprint": "0d37af25659cbbbe1020b76df31aa7264f22ac333704c9d59e958156b034da50",
+          "score": 0.02234567901234568,
+          "relevant": false
+        },
+        {
+          "rank": 34,
+          "pmid": "28292619",
+          "unit_id": "9323f2e0371651ae3b19b5b3e102695f7a2538a1c073f50d991fac9ee3a43e35",
+          "content_fingerprint": "864f6902ed6b38d28339d8ce3bb372edd9f2cbda3164e0a84cdb9e925ee20299",
+          "score": 0.021917487107360523,
+          "relevant": false
+        },
+        {
+          "rank": 35,
+          "pmid": "35636910",
+          "unit_id": "1ab6a630ef83ba9ee6686043d2371cf205d3f9a492bb79c1042a251271da4758",
+          "content_fingerprint": "22a641e9fc27f16850d80974c541fd2b3a9bd51f58575f37ade206b69419501b",
+          "score": 0.021482155035235283,
+          "relevant": false
+        },
+        {
+          "rank": 36,
+          "pmid": "38512301",
+          "unit_id": "021c8cc8951335927d0ad4bc932e11b891fb1724e37e51ddb471125728127cd0",
+          "content_fingerprint": "289131b11feabb5977a6182c331d992f35fa6a63281ffb75a3ca26c7723ff5e1",
+          "score": 0.021235955056179777,
+          "relevant": false
+        },
+        {
+          "rank": 37,
+          "pmid": "33829619",
+          "unit_id": "47d0f94cb5af56e8e2ef2170734548ff168189edfa27554304dc3c89e0482182",
+          "content_fingerprint": "ce90551b9976e8e9fab3364002cf03e94b573877af91446b7121ffc2d4eddde9",
+          "score": 0.02116935483870968,
+          "relevant": false
+        },
+        {
+          "rank": 38,
+          "pmid": "29627041",
+          "unit_id": "c7dd37835680fdff95f876add24a6f7e595d3a8eeaaaad7c0b235d0f509a4993",
+          "content_fingerprint": "662b0ebb4f5dfa481d22bfc43afc53949bfd48be2e5a42ae346c774abae3cde6",
+          "score": 0.02089000108802089,
+          "relevant": false
+        },
+        {
+          "rank": 39,
+          "pmid": "34353454",
+          "unit_id": "f895c8e16a0355fcc079ecc1dbd3145e3432f464242673085d79ae216ee3d97f",
+          "content_fingerprint": "4df0516b6823e911072368e44a99fe8a39dd44d8eb1373fc6a5ecb1f6ca7ea9e",
+          "score": 0.02080221890334969,
+          "relevant": false
+        },
+        {
+          "rank": 40,
+          "pmid": "35896123",
+          "unit_id": "c73dfbda9bfae65cb7b28955252891dedae7093dfb11809f037831ce52b15bc4",
+          "content_fingerprint": "b4614b04366b6f4ffdbe9e8e0ea4528faa0e85c2b83693ec1901ec7cc7d50263",
+          "score": 0.020330237358101133,
+          "relevant": false
+        },
+        {
+          "rank": 41,
+          "pmid": "27184418",
+          "unit_id": "707db7dd8235e3b2310a3e24f0412662445e0cfd20821ab511f0e67813fe9a2f",
+          "content_fingerprint": "2621f600560be2bda08cf59aac3e200522d714f71cadc11db0864624dd578111",
+          "score": 0.020305091733663162,
+          "relevant": false
+        },
+        {
+          "rank": 42,
+          "pmid": "38857504",
+          "unit_id": "bbb956bf6ee32e95f23c4b4446f188cb229bfed3eb75a82e56b58d189548fbb7",
+          "content_fingerprint": "59cd2f2f7d8c5441453598bbedd26800da04a9dbf8235ceeffd97950f6d4623f",
+          "score": 0.02028542303771662,
+          "relevant": false
+        },
+        {
+          "rank": 43,
+          "pmid": "27494630",
+          "unit_id": "cab5aaada12b679453120676f8e4b998d463129a136055c7ef44f5e016b763f5",
+          "content_fingerprint": "b1d0eacad5325e37ac2454a29310f52e568a50fe73f9bc4b53a805404abd7fdb",
+          "score": 0.020276497695852536,
+          "relevant": false
+        },
+        {
+          "rank": 44,
+          "pmid": "35505000",
+          "unit_id": "7df84b762fa7930546ad3ad1ccfbc608ea0caf0ef95174468008c5425e7ca04f",
+          "content_fingerprint": "a12e03daa33308ad6ecc4f2181fe3c262d01a3a029782cc377169f5008b25eff",
+          "score": 0.020253682487725043,
+          "relevant": false
+        },
+        {
+          "rank": 45,
+          "pmid": "33050934",
+          "unit_id": "598e2d1081e35d9d8803e90fd95902896d3f7953fcbdcd03b661ef9c4456cc25",
+          "content_fingerprint": "ec276cc3119dc28b3f3b232dc92f48983b1c6778612f1e2a5c7cebf0f3d53cb2",
+          "score": 0.02021535960991467,
+          "relevant": false
+        },
+        {
+          "rank": 46,
+          "pmid": "35653320",
+          "unit_id": "a4cf2995ab3f891b6890d5ac9a6a4a45a631f2e735ab82d97e2ac4744afedb94",
+          "content_fingerprint": "6cbd8f0ed164d31c32a353fd9f9f125ed58821b0b386a58caad5ad5932381dad",
+          "score": 0.020125404530744337,
+          "relevant": false
+        },
+        {
+          "rank": 47,
+          "pmid": "32430550",
+          "unit_id": "c09d8c61324e42b036137c235bda8354ee228f37d24031120bc576f889d181cd",
+          "content_fingerprint": "c3f025e08e1365ae186c83bf09dfcb8c1f8b09731ec1f3663fe0b2e513951dac",
+          "score": 0.019463340891912317,
+          "relevant": false
+        },
+        {
+          "rank": 48,
+          "pmid": "31018251",
+          "unit_id": "fc1f078bbdbfe12d3ac666c4d61640d4453416f31a23c20ff2c85641df17294f",
+          "content_fingerprint": "1ecfac1d5f4387ff17b2ca18b3e17deb028b7d6d5281e2f2027636a4813ea180",
+          "score": 0.019324122479462285,
+          "relevant": false
+        },
+        {
+          "rank": 49,
+          "pmid": "31090575",
+          "unit_id": "457d49c267258cedb4ba5cc2e6e51a934ec608d6724f8b6399a4021af2363eb0",
+          "content_fingerprint": "533f12976ac165974236e5d92800e832ed3f87e18da19ff569fe81e58f5649ec",
+          "score": 0.018614718614718615,
+          "relevant": false
+        },
+        {
+          "rank": 50,
+          "pmid": "35115765",
+          "unit_id": "3edfc2ee9167c1a667afbadadbae13333e46a32e51ad7f48360cb047f1216698",
+          "content_fingerprint": "6b80e3c1f18f06c82e7300de5cdbea19760cf28abe15c80537ab43c1c1348d95",
+          "score": 0.018436703483432453,
+          "relevant": false
+        }
+      ]
+    },
+    {
+      "query_id": "q04",
+      "query": "relationship between obesity and insulin resistance",
+      "metrics": {
+        "hit_rate@5": 1.0,
+        "recall@5": 1.0,
+        "precision@5": 0.6,
+        "reciprocal_rank": 1.0
+      },
+      "top_5": [
+        "34767960",
+        "37425065",
+        "28467922",
+        "28292619",
+        "22000494"
+      ],
+      "ranking": [
+        {
+          "rank": 1,
+          "pmid": "34767960",
+          "unit_id": "403ed6090e1e8e32d16ae2a674d092fd9d6d48330b405a9a6d68d7dbe0fe980d",
+          "content_fingerprint": "0b161bfdb00533d28e88a3b237ca79839e115811dab9c694b5bf0f142de40233",
+          "score": 0.03278688524590164,
+          "relevant": true
+        },
+        {
+          "rank": 2,
+          "pmid": "37425065",
+          "unit_id": "673d115eb699e8eef5898cb18cf92c6f5338f0fb3211112c63935e45312659b6",
+          "content_fingerprint": "e89de5a230a762770317103c9c223522b37fddf00177d663d7b143dd3094bc55",
+          "score": 0.03200204813108039,
+          "relevant": true
+        },
+        {
+          "rank": 3,
+          "pmid": "28467922",
+          "unit_id": "a0657a4394eb3ff8907237d9b1367d178264909857b94bf87355fa253c0acb5b",
+          "content_fingerprint": "de0ca3ae0dd811041ab322da54751736981c16855adcaea79c186ceb0cff884f",
+          "score": 0.031754032258064516,
+          "relevant": true
+        },
+        {
+          "rank": 4,
+          "pmid": "28292619",
+          "unit_id": "9323f2e0371651ae3b19b5b3e102695f7a2538a1c073f50d991fac9ee3a43e35",
+          "content_fingerprint": "864f6902ed6b38d28339d8ce3bb372edd9f2cbda3164e0a84cdb9e925ee20299",
+          "score": 0.029957522915269395,
+          "relevant": false
+        },
+        {
+          "rank": 5,
+          "pmid": "22000494",
+          "unit_id": "6f7633fc1833c15ce690dff1e576740430bf3ab98c36b7cdcb09085e111c418c",
+          "content_fingerprint": "f7c2a468c03288d587cb809ae622d16e10a89e40e45dab09a3a92e984616b149",
+          "score": 0.029877369007803793,
+          "relevant": false
+        },
+        {
+          "rank": 6,
+          "pmid": "37161520",
+          "unit_id": "cc7e13789a2c4614f9d28c0eda087cf1d13dc0f08e836a6e34229047959f9dc8",
+          "content_fingerprint": "a3011da776b91f858bd26e41800c742724d843a97772dee758735d07a8c4d6d8",
+          "score": 0.029857397504456328,
+          "relevant": false
+        },
+        {
+          "rank": 7,
+          "pmid": "38141902",
+          "unit_id": "d1dda3e79432839dc985e1338346306fbeefff9fc6e53574f67eca2d9d1f5bf8",
+          "content_fingerprint": "a27885e0849ec96b73e206c90d97a1c8ba79216a6f601ecb9354a664dc9c33cf",
+          "score": 0.029709507042253523,
+          "relevant": false
+        },
+        {
+          "rank": 8,
+          "pmid": "29627041",
+          "unit_id": "c7dd37835680fdff95f876add24a6f7e595d3a8eeaaaad7c0b235d0f509a4993",
+          "content_fingerprint": "662b0ebb4f5dfa481d22bfc43afc53949bfd48be2e5a42ae346c774abae3cde6",
+          "score": 0.029083245521601686,
+          "relevant": false
+        },
+        {
+          "rank": 9,
+          "pmid": "36774932",
+          "unit_id": "42454181e5db620a6fd3b3c80df987a226d9350fcd4f772f641e213ebd923526",
+          "content_fingerprint": "f3b12fa6fb0839bb4a50c779fb8871b7f8362c20d5bfcfdd474e3ac5a423d508",
+          "score": 0.028991596638655463,
+          "relevant": false
+        },
+        {
+          "rank": 10,
+          "pmid": "35988550",
+          "unit_id": "5c453d941b1c0f73e9f6df0d8792c3174689556c5fe12a746c33a29116828930",
+          "content_fingerprint": "0d37af25659cbbbe1020b76df31aa7264f22ac333704c9d59e958156b034da50",
+          "score": 0.028814262023217248,
+          "relevant": false
+        },
+        {
+          "rank": 11,
+          "pmid": "38697182",
+          "unit_id": "ecc1d8123dcd9c53fb56de0a33ac9775c087a53484e52255bbf48031c62f4199",
+          "content_fingerprint": "3708a8164179889ada32bcba840a2630848fd673d70d3f3ba2b4d5b7050aaa64",
+          "score": 0.028438886647841874,
+          "relevant": false
+        },
+        {
+          "rank": 12,
+          "pmid": "34353454",
+          "unit_id": "f895c8e16a0355fcc079ecc1dbd3145e3432f464242673085d79ae216ee3d97f",
+          "content_fingerprint": "4df0516b6823e911072368e44a99fe8a39dd44d8eb1373fc6a5ecb1f6ca7ea9e",
+          "score": 0.027222222222222224,
+          "relevant": false
+        },
+        {
+          "rank": 13,
+          "pmid": "35040920",
+          "unit_id": "93c9c8a4539c5c35547771ab64a315c40567bcbe390d18dfb71cfec7ae1e1797",
+          "content_fingerprint": "abb1cc6f63eff4fff6c1ded23eb078dd9fb9f2a46146b7d2b3ce378549b0bec2",
+          "score": 0.02719970792259949,
+          "relevant": false
+        },
+        {
+          "rank": 14,
+          "pmid": "35653320",
+          "unit_id": "a4cf2995ab3f891b6890d5ac9a6a4a45a631f2e735ab82d97e2ac4744afedb94",
+          "content_fingerprint": "6cbd8f0ed164d31c32a353fd9f9f125ed58821b0b386a58caad5ad5932381dad",
+          "score": 0.02715098147128967,
+          "relevant": false
+        },
+        {
+          "rank": 15,
+          "pmid": "35896123",
+          "unit_id": "c73dfbda9bfae65cb7b28955252891dedae7093dfb11809f037831ce52b15bc4",
+          "content_fingerprint": "b4614b04366b6f4ffdbe9e8e0ea4528faa0e85c2b83693ec1901ec7cc7d50263",
+          "score": 0.026856524873828405,
+          "relevant": false
+        },
+        {
+          "rank": 16,
+          "pmid": "24356592",
+          "unit_id": "232a1531c4e4b44379486ca19a88c70b3668ed133d6a49eaafab8b6168611c57",
+          "content_fingerprint": "8415f5193289896681ec6ada7a72b86bea3100989ba0ff78c8ccfc8bd5265ae9",
+          "score": 0.026334026334026334,
+          "relevant": false
+        },
+        {
+          "rank": 17,
+          "pmid": "33793326",
+          "unit_id": "99ca4d15c295638c2870f20deec1be1dec652e7bc7bcadf17e3c7d611decdeb1",
+          "content_fingerprint": "fa0fc6577bfbebc7a86bb1ffcee4d314d5cedb79d5265151983a209be06292c3",
+          "score": 0.02632034632034632,
+          "relevant": false
+        },
+        {
+          "rank": 18,
+          "pmid": "38763510",
+          "unit_id": "b549f7cac78251e6c8b6d96e2a976d7a0d1282d3963181ffb30f2d238b35719d",
+          "content_fingerprint": "5cbde62e4e0c0c5da947fee5e888465be812b656ce989fde4b6625da2b6cb40e",
+          "score": 0.025035205758097326,
+          "relevant": false
+        },
+        {
+          "rank": 19,
+          "pmid": "30552067",
+          "unit_id": "85127d7cd7661dd36a7e198331d1deca8fe60de41feb3e9994897adfae4b9e84",
+          "content_fingerprint": "fafb49e5c2aa55a1b0453b816f31fac6b85d41e6141d3b747a0e1e026d965779",
+          "score": 0.024695121951219513,
+          "relevant": false
+        },
+        {
+          "rank": 20,
+          "pmid": "37364283",
+          "unit_id": "e49e57f2abfc7c57849cf7e8f6dd6fd9367c0d12ad7ca33a575befedd7c2829b",
+          "content_fingerprint": "435fde88e01aaebd8db1022f8f08ca9db63630f6b3ee3268d88c34e6b600e08f",
+          "score": 0.023647238837112255,
+          "relevant": false
+        },
+        {
+          "rank": 21,
+          "pmid": "38857504",
+          "unit_id": "bbb956bf6ee32e95f23c4b4446f188cb229bfed3eb75a82e56b58d189548fbb7",
+          "content_fingerprint": "59cd2f2f7d8c5441453598bbedd26800da04a9dbf8235ceeffd97950f6d4623f",
+          "score": 0.023431077007399288,
+          "relevant": false
+        },
+        {
+          "rank": 22,
+          "pmid": "29669543",
+          "unit_id": "2742ab4e7d7b48ff2c77e70dfe05f6a4e20b6dada18befdc6bdd4a89ee58fdb4",
+          "content_fingerprint": "4ceb3d956b2a347ed834b00b9747f5081f289b948c560997bd82f2d54498dfef",
+          "score": 0.023376623376623377,
+          "relevant": false
+        },
+        {
+          "rank": 23,
+          "pmid": "33301246",
+          "unit_id": "70b6d754ccbe8f6ac5500f86622fd64c1e83629b58b812e9a5de332b7a441346",
+          "content_fingerprint": "64c84e01ca14176471b5daf0748a02c4ffc62a4ea3157c70db75dcc08d980a1b",
+          "score": 0.023000660938532716,
+          "relevant": false
+        },
+        {
+          "rank": 24,
+          "pmid": "27493136",
+          "unit_id": "7942ad2d033c9d415c0e49a10b6d2688c26e79cee82647baea8be8579d0d091a",
+          "content_fingerprint": "2a72790d0a1c68e09734101e397a236a99f4d08b563fb86e5458c198f215494d",
+          "score": 0.022961816305469555,
+          "relevant": false
+        },
+        {
+          "rank": 25,
+          "pmid": "33951360",
+          "unit_id": "d77b9cd775d531bcc8c425b4404abf8b96914a5a9473a91f32dea90827efb42d",
+          "content_fingerprint": "78de812a52810fa40bfc7e8ba1bfd1932391d6e51b139c032aa45a1b515a7878",
+          "score": 0.02265495736286114,
+          "relevant": false
+        },
+        {
+          "rank": 26,
+          "pmid": "38184132",
+          "unit_id": "e5a1aacf824dfada803e96e78404432aa0f16e93fcfbcf0cd6f2caa820a06fe4",
+          "content_fingerprint": "dfe219115a9d562be7c9a77c687d814405155bf30794489eb9dab53870f32d0c",
+          "score": 0.02262443438914027,
+          "relevant": false
+        },
+        {
+          "rank": 27,
+          "pmid": "37879444",
+          "unit_id": "ae4c0828013649d1f0acf673e5e676f239df541f69d552b28e9a2eca7499f77e",
+          "content_fingerprint": "7965c629c3428c50db60309506dd1831ce78d4756219b56dc92149c80818bbeb",
+          "score": 0.022431077694235586,
+          "relevant": false
+        },
+        {
+          "rank": 28,
+          "pmid": "24315724",
+          "unit_id": "71e6f9b6eb556f3650c2347085c953f244496aaffefd9f85fe310407c9798602",
+          "content_fingerprint": "2d952af296f3b250d5fb5ddc6e486fdc01193e82d00fe26ec64beda188f56254",
+          "score": 0.02234567901234568,
+          "relevant": false
+        },
+        {
+          "rank": 29,
+          "pmid": "33198517",
+          "unit_id": "072b7a00f7e3b8822dd2418b2c73a6ee98f4654452319d1ef21d4ad22adc9347",
+          "content_fingerprint": "5ec78335a600605c607cd3480d5bcb0818ae926c879a8fd64b5ec6b73bd1c184",
+          "score": 0.022073984232868403,
+          "relevant": false
+        },
+        {
+          "rank": 30,
+          "pmid": "28371335",
+          "unit_id": "e423ca0bfce40e5ed2f9ea514a786b530c882da707e31539a50d625deec7219d",
+          "content_fingerprint": "25aaec2ddb93a1d5379154d8194927bac27218804b8ce895c24d236499c86d40",
+          "score": 0.022001934235976787,
+          "relevant": false
+        },
+        {
+          "rank": 31,
+          "pmid": "31090575",
+          "unit_id": "457d49c267258cedb4ba5cc2e6e51a934ec608d6724f8b6399a4021af2363eb0",
+          "content_fingerprint": "533f12976ac165974236e5d92800e832ed3f87e18da19ff569fe81e58f5649ec",
+          "score": 0.021805752003771807,
+          "relevant": false
+        },
+        {
+          "rank": 32,
+          "pmid": "38512301",
+          "unit_id": "021c8cc8951335927d0ad4bc932e11b891fb1724e37e51ddb471125728127cd0",
+          "content_fingerprint": "289131b11feabb5977a6182c331d992f35fa6a63281ffb75a3ca26c7723ff5e1",
+          "score": 0.02172891707775429,
+          "relevant": false
+        },
+        {
+          "rank": 33,
+          "pmid": "36519436",
+          "unit_id": "a973a5f6273ca012cb313e27a768a5eccd8017c0e3d179a1205d179d1583724c",
+          "content_fingerprint": "61b54a500536079561e3ea1be2d2be030c9c89d2e524f54827d7b25756a9688c",
+          "score": 0.021698334506216277,
+          "relevant": false
+        },
+        {
+          "rank": 34,
+          "pmid": "35263517",
+          "unit_id": "4dac5faea6eed182f1086227ee2c4475c639dbada8d88b8b22655628f58a0c40",
+          "content_fingerprint": "c0f4973a7d8938289fc52b70aeea8e22a70416ce08634da2b599469149da57f8",
+          "score": 0.021674311926605506,
+          "relevant": false
+        },
+        {
+          "rank": 35,
+          "pmid": "33829619",
+          "unit_id": "47d0f94cb5af56e8e2ef2170734548ff168189edfa27554304dc3c89e0482182",
+          "content_fingerprint": "ce90551b9976e8e9fab3364002cf03e94b573877af91446b7121ffc2d4eddde9",
+          "score": 0.02128623188405797,
+          "relevant": false
+        },
+        {
+          "rank": 36,
+          "pmid": "38924756",
+          "unit_id": "28082f8d2e9564a69e9972a2f4994ef5c57059e0aed2c8d78878eff3dc62f0fa",
+          "content_fingerprint": "ad8b0180f8a7f2dcd4f070e39aa8007cc7217d18c05a8783f5450291adba3725",
+          "score": 0.02115171650055371,
+          "relevant": false
+        },
+        {
+          "rank": 37,
+          "pmid": "33650528",
+          "unit_id": "147295fdad5a9406bdc2af895008decebd915fe097342b9d794323b1e545ab77",
+          "content_fingerprint": "3907ce53664e18dcf56f552067f9d4148f96ceb3db66263cd599dc22fa1e66ff",
+          "score": 0.021073646850044363,
+          "relevant": false
+        },
+        {
+          "rank": 38,
+          "pmid": "35505000",
+          "unit_id": "7df84b762fa7930546ad3ad1ccfbc608ea0caf0ef95174468008c5425e7ca04f",
+          "content_fingerprint": "a12e03daa33308ad6ecc4f2181fe3c262d01a3a029782cc377169f5008b25eff",
+          "score": 0.021018062397372743,
+          "relevant": false
+        },
+        {
+          "rank": 39,
+          "pmid": "33050934",
+          "unit_id": "598e2d1081e35d9d8803e90fd95902896d3f7953fcbdcd03b661ef9c4456cc25",
+          "content_fingerprint": "ec276cc3119dc28b3f3b232dc92f48983b1c6778612f1e2a5c7cebf0f3d53cb2",
+          "score": 0.021012101210121013,
+          "relevant": false
+        },
+        {
+          "rank": 40,
+          "pmid": "27494630",
+          "unit_id": "cab5aaada12b679453120676f8e4b998d463129a136055c7ef44f5e016b763f5",
+          "content_fingerprint": "b1d0eacad5325e37ac2454a29310f52e568a50fe73f9bc4b53a805404abd7fdb",
+          "score": 0.02097902097902098,
+          "relevant": false
+        },
+        {
+          "rank": 41,
+          "pmid": "33683325",
+          "unit_id": "a2cb2c51608e8adc4eba5dd670dc39dd92a49037ef4825bd504cc20b9853a67c",
+          "content_fingerprint": "e595479d06d5d53912c5dd4c45a2390e375211b05525f5f3b9a15c9c3afc040a",
+          "score": 0.020638297872340425,
+          "relevant": false
+        },
+        {
+          "rank": 42,
+          "pmid": "35115765",
+          "unit_id": "3edfc2ee9167c1a667afbadadbae13333e46a32e51ad7f48360cb047f1216698",
+          "content_fingerprint": "6b80e3c1f18f06c82e7300de5cdbea19760cf28abe15c80537ab43c1c1348d95",
+          "score": 0.020545073375262055,
+          "relevant": false
+        },
+        {
+          "rank": 43,
+          "pmid": "28460827",
+          "unit_id": "02f38bf5543a99e8f64431ff498aa03d1630ea35aed8fc3db0066405b571c86a",
+          "content_fingerprint": "2c66d2006372ca8909f263953b9ad34294e9568de588daaaef610d54bcdaa504",
+          "score": 0.020517676767676768,
+          "relevant": false
+        },
+        {
+          "rank": 44,
+          "pmid": "35636910",
+          "unit_id": "1ab6a630ef83ba9ee6686043d2371cf205d3f9a492bb79c1042a251271da4758",
+          "content_fingerprint": "22a641e9fc27f16850d80974c541fd2b3a9bd51f58575f37ade206b69419501b",
+          "score": 0.020235053653551355,
+          "relevant": false
+        },
+        {
+          "rank": 45,
+          "pmid": "32430550",
+          "unit_id": "c09d8c61324e42b036137c235bda8354ee228f37d24031120bc576f889d181cd",
+          "content_fingerprint": "c3f025e08e1365ae186c83bf09dfcb8c1f8b09731ec1f3663fe0b2e513951dac",
+          "score": 0.020163322915616497,
+          "relevant": false
+        },
+        {
+          "rank": 46,
+          "pmid": "29863955",
+          "unit_id": "81200f188ed546781b9968d828e8be43c99a40d80e025351f51423eb1e867e92",
+          "content_fingerprint": "3fd76151f8a6aab880d8e4750a94112770b1424f79c659f3861cf13779d21b60",
+          "score": 0.02001194743130227,
+          "relevant": false
+        },
+        {
+          "rank": 47,
+          "pmid": "27813430",
+          "unit_id": "5b4867036bce515d33bda6e35cae05436378e4647fd03ad509c65709e3381d63",
+          "content_fingerprint": "6da6b7c400f340a9d9f089c600407e9700c809d45fffa51a465f135969678b74",
+          "score": 0.019843597262952102,
+          "relevant": false
+        },
+        {
+          "rank": 48,
+          "pmid": "31018251",
+          "unit_id": "fc1f078bbdbfe12d3ac666c4d61640d4453416f31a23c20ff2c85641df17294f",
+          "content_fingerprint": "1ecfac1d5f4387ff17b2ca18b3e17deb028b7d6d5281e2f2027636a4813ea180",
+          "score": 0.019049346879535557,
+          "relevant": false
+        },
+        {
+          "rank": 49,
+          "pmid": "27184418",
+          "unit_id": "707db7dd8235e3b2310a3e24f0412662445e0cfd20821ab511f0e67813fe9a2f",
+          "content_fingerprint": "2621f600560be2bda08cf59aac3e200522d714f71cadc11db0864624dd578111",
+          "score": 0.018967997123336928,
+          "relevant": false
+        },
+        {
+          "rank": 50,
+          "pmid": "36252154",
+          "unit_id": "37db80a3de2c4fcb8600ef2df6859616f772966c4b8569c99745af4e2d38dcf3",
+          "content_fingerprint": "a8c4ff55cb50997a0d3371d955e017e60a163eb33dbd12024d22371ef7bff38a",
+          "score": 0.018691588785046728,
+          "relevant": false
+        }
+      ]
+    },
+    {
+      "query_id": "q05",
+      "query": "association between hypertension and cardiovascular disease risk",
+      "metrics": {
+        "hit_rate@5": 1.0,
+        "recall@5": 0.75,
+        "precision@5": 0.6,
+        "reciprocal_rank": 1.0
+      },
+      "top_5": [
+        "33793326",
+        "38141902",
+        "35653320",
+        "37161520",
+        "29669543"
+      ],
+      "ranking": [
+        {
+          "rank": 1,
+          "pmid": "33793326",
+          "unit_id": "99ca4d15c295638c2870f20deec1be1dec652e7bc7bcadf17e3c7d611decdeb1",
+          "content_fingerprint": "fa0fc6577bfbebc7a86bb1ffcee4d314d5cedb79d5265151983a209be06292c3",
+          "score": 0.03252247488101534,
+          "relevant": true
+        },
+        {
+          "rank": 2,
+          "pmid": "38141902",
+          "unit_id": "d1dda3e79432839dc985e1338346306fbeefff9fc6e53574f67eca2d9d1f5bf8",
+          "content_fingerprint": "a27885e0849ec96b73e206c90d97a1c8ba79216a6f601ecb9354a664dc9c33cf",
+          "score": 0.03252247488101534,
+          "relevant": false
+        },
+        {
+          "rank": 3,
+          "pmid": "35653320",
+          "unit_id": "a4cf2995ab3f891b6890d5ac9a6a4a45a631f2e735ab82d97e2ac4744afedb94",
+          "content_fingerprint": "6cbd8f0ed164d31c32a353fd9f9f125ed58821b0b386a58caad5ad5932381dad",
+          "score": 0.03125763125763126,
+          "relevant": false
+        },
+        {
+          "rank": 4,
+          "pmid": "37161520",
+          "unit_id": "cc7e13789a2c4614f9d28c0eda087cf1d13dc0f08e836a6e34229047959f9dc8",
+          "content_fingerprint": "a3011da776b91f858bd26e41800c742724d843a97772dee758735d07a8c4d6d8",
+          "score": 0.031024531024531024,
+          "relevant": true
+        },
+        {
+          "rank": 5,
+          "pmid": "29669543",
+          "unit_id": "2742ab4e7d7b48ff2c77e70dfe05f6a4e20b6dada18befdc6bdd4a89ee58fdb4",
+          "content_fingerprint": "4ceb3d956b2a347ed834b00b9747f5081f289b948c560997bd82f2d54498dfef",
+          "score": 0.031009615384615385,
+          "relevant": true
+        },
+        {
+          "rank": 6,
+          "pmid": "36519436",
+          "unit_id": "a973a5f6273ca012cb313e27a768a5eccd8017c0e3d179a1205d179d1583724c",
+          "content_fingerprint": "61b54a500536079561e3ea1be2d2be030c9c89d2e524f54827d7b25756a9688c",
+          "score": 0.03055037313432836,
+          "relevant": true
+        },
+        {
+          "rank": 7,
+          "pmid": "35896123",
+          "unit_id": "c73dfbda9bfae65cb7b28955252891dedae7093dfb11809f037831ce52b15bc4",
+          "content_fingerprint": "b4614b04366b6f4ffdbe9e8e0ea4528faa0e85c2b83693ec1901ec7cc7d50263",
+          "score": 0.03007688828584351,
+          "relevant": false
+        },
+        {
+          "rank": 8,
+          "pmid": "37425065",
+          "unit_id": "673d115eb699e8eef5898cb18cf92c6f5338f0fb3211112c63935e45312659b6",
+          "content_fingerprint": "e89de5a230a762770317103c9c223522b37fddf00177d663d7b143dd3094bc55",
+          "score": 0.028790389395194696,
+          "relevant": false
+        },
+        {
+          "rank": 9,
+          "pmid": "36774932",
+          "unit_id": "42454181e5db620a6fd3b3c80df987a226d9350fcd4f772f641e213ebd923526",
+          "content_fingerprint": "f3b12fa6fb0839bb4a50c779fb8871b7f8362c20d5bfcfdd474e3ac5a423d508",
+          "score": 0.028370221327967807,
+          "relevant": false
+        },
+        {
+          "rank": 10,
+          "pmid": "30552067",
+          "unit_id": "85127d7cd7661dd36a7e198331d1deca8fe60de41feb3e9994897adfae4b9e84",
+          "content_fingerprint": "fafb49e5c2aa55a1b0453b816f31fac6b85d41e6141d3b747a0e1e026d965779",
+          "score": 0.027051561365286855,
+          "relevant": false
+        },
+        {
+          "rank": 11,
+          "pmid": "38763510",
+          "unit_id": "b549f7cac78251e6c8b6d96e2a976d7a0d1282d3963181ffb30f2d238b35719d",
+          "content_fingerprint": "5cbde62e4e0c0c5da947fee5e888465be812b656ce989fde4b6625da2b6cb40e",
+          "score": 0.027046783625730993,
+          "relevant": false
+        },
+        {
+          "rank": 12,
+          "pmid": "38184132",
+          "unit_id": "e5a1aacf824dfada803e96e78404432aa0f16e93fcfbcf0cd6f2caa820a06fe4",
+          "content_fingerprint": "dfe219115a9d562be7c9a77c687d814405155bf30794489eb9dab53870f32d0c",
+          "score": 0.026992753623188405,
+          "relevant": false
+        },
+        {
+          "rank": 13,
+          "pmid": "24356592",
+          "unit_id": "232a1531c4e4b44379486ca19a88c70b3668ed133d6a49eaafab8b6168611c57",
+          "content_fingerprint": "8415f5193289896681ec6ada7a72b86bea3100989ba0ff78c8ccfc8bd5265ae9",
+          "score": 0.02684684684684685,
+          "relevant": false
+        },
+        {
+          "rank": 14,
+          "pmid": "28467922",
+          "unit_id": "a0657a4394eb3ff8907237d9b1367d178264909857b94bf87355fa253c0acb5b",
+          "content_fingerprint": "de0ca3ae0dd811041ab322da54751736981c16855adcaea79c186ceb0cff884f",
+          "score": 0.0261986301369863,
+          "relevant": false
+        },
+        {
+          "rank": 15,
+          "pmid": "34767960",
+          "unit_id": "403ed6090e1e8e32d16ae2a674d092fd9d6d48330b405a9a6d68d7dbe0fe980d",
+          "content_fingerprint": "0b161bfdb00533d28e88a3b237ca79839e115811dab9c694b5bf0f142de40233",
+          "score": 0.02604430914933198,
+          "relevant": false
+        },
+        {
+          "rank": 16,
+          "pmid": "28460827",
+          "unit_id": "02f38bf5543a99e8f64431ff498aa03d1630ea35aed8fc3db0066405b571c86a",
+          "content_fingerprint": "2c66d2006372ca8909f263953b9ad34294e9568de588daaaef610d54bcdaa504",
+          "score": 0.025779967159277502,
+          "relevant": false
+        },
+        {
+          "rank": 17,
+          "pmid": "22000494",
+          "unit_id": "6f7633fc1833c15ce690dff1e576740430bf3ab98c36b7cdcb09085e111c418c",
+          "content_fingerprint": "f7c2a468c03288d587cb809ae622d16e10a89e40e45dab09a3a92e984616b149",
+          "score": 0.025728708679368183,
+          "relevant": false
+        },
+        {
+          "rank": 18,
+          "pmid": "37364283",
+          "unit_id": "e49e57f2abfc7c57849cf7e8f6dd6fd9367c0d12ad7ca33a575befedd7c2829b",
+          "content_fingerprint": "435fde88e01aaebd8db1022f8f08ca9db63630f6b3ee3268d88c34e6b600e08f",
+          "score": 0.025478740668614087,
+          "relevant": false
+        },
+        {
+          "rank": 19,
+          "pmid": "29627041",
+          "unit_id": "c7dd37835680fdff95f876add24a6f7e595d3a8eeaaaad7c0b235d0f509a4993",
+          "content_fingerprint": "662b0ebb4f5dfa481d22bfc43afc53949bfd48be2e5a42ae346c774abae3cde6",
+          "score": 0.02538152610441767,
+          "relevant": false
+        },
+        {
+          "rank": 20,
+          "pmid": "24315724",
+          "unit_id": "71e6f9b6eb556f3650c2347085c953f244496aaffefd9f85fe310407c9798602",
+          "content_fingerprint": "2d952af296f3b250d5fb5ddc6e486fdc01193e82d00fe26ec64beda188f56254",
+          "score": 0.02506265664160401,
+          "relevant": false
+        },
+        {
+          "rank": 21,
+          "pmid": "31090575",
+          "unit_id": "457d49c267258cedb4ba5cc2e6e51a934ec608d6724f8b6399a4021af2363eb0",
+          "content_fingerprint": "533f12976ac165974236e5d92800e832ed3f87e18da19ff569fe81e58f5649ec",
+          "score": 0.02441520467836257,
+          "relevant": false
+        },
+        {
+          "rank": 22,
+          "pmid": "35988550",
+          "unit_id": "5c453d941b1c0f73e9f6df0d8792c3174689556c5fe12a746c33a29116828930",
+          "content_fingerprint": "0d37af25659cbbbe1020b76df31aa7264f22ac333704c9d59e958156b034da50",
+          "score": 0.024098124098124098,
+          "relevant": false
+        },
+        {
+          "rank": 23,
+          "pmid": "35505000",
+          "unit_id": "7df84b762fa7930546ad3ad1ccfbc608ea0caf0ef95174468008c5425e7ca04f",
+          "content_fingerprint": "a12e03daa33308ad6ecc4f2181fe3c262d01a3a029782cc377169f5008b25eff",
+          "score": 0.023513513513513516,
+          "relevant": false
+        },
+        {
+          "rank": 24,
+          "pmid": "33829619",
+          "unit_id": "47d0f94cb5af56e8e2ef2170734548ff168189edfa27554304dc3c89e0482182",
+          "content_fingerprint": "ce90551b9976e8e9fab3364002cf03e94b573877af91446b7121ffc2d4eddde9",
+          "score": 0.023392612859097127,
+          "relevant": false
+        },
+        {
+          "rank": 25,
+          "pmid": "38512301",
+          "unit_id": "021c8cc8951335927d0ad4bc932e11b891fb1724e37e51ddb471125728127cd0",
+          "content_fingerprint": "289131b11feabb5977a6182c331d992f35fa6a63281ffb75a3ca26c7723ff5e1",
+          "score": 0.023088023088023088,
+          "relevant": false
+        },
+        {
+          "rank": 26,
+          "pmid": "35040920",
+          "unit_id": "93c9c8a4539c5c35547771ab64a315c40567bcbe390d18dfb71cfec7ae1e1797",
+          "content_fingerprint": "abb1cc6f63eff4fff6c1ded23eb078dd9fb9f2a46146b7d2b3ce378549b0bec2",
+          "score": 0.022947810123262524,
+          "relevant": false
+        },
+        {
+          "rank": 27,
+          "pmid": "38697182",
+          "unit_id": "ecc1d8123dcd9c53fb56de0a33ac9775c087a53484e52255bbf48031c62f4199",
+          "content_fingerprint": "3708a8164179889ada32bcba840a2630848fd673d70d3f3ba2b4d5b7050aaa64",
+          "score": 0.022857889237199582,
+          "relevant": false
+        },
+        {
+          "rank": 28,
+          "pmid": "33683325",
+          "unit_id": "a2cb2c51608e8adc4eba5dd670dc39dd92a49037ef4825bd504cc20b9853a67c",
+          "content_fingerprint": "e595479d06d5d53912c5dd4c45a2390e375211b05525f5f3b9a15c9c3afc040a",
+          "score": 0.0227390180878553,
+          "relevant": false
+        },
+        {
+          "rank": 29,
+          "pmid": "33301246",
+          "unit_id": "70b6d754ccbe8f6ac5500f86622fd64c1e83629b58b812e9a5de332b7a441346",
+          "content_fingerprint": "64c84e01ca14176471b5daf0748a02c4ffc62a4ea3157c70db75dcc08d980a1b",
+          "score": 0.022464859437751006,
+          "relevant": false
+        },
+        {
+          "rank": 30,
+          "pmid": "28292619",
+          "unit_id": "9323f2e0371651ae3b19b5b3e102695f7a2538a1c073f50d991fac9ee3a43e35",
+          "content_fingerprint": "864f6902ed6b38d28339d8ce3bb372edd9f2cbda3164e0a84cdb9e925ee20299",
+          "score": 0.022366965712178936,
+          "relevant": false
+        },
+        {
+          "rank": 31,
+          "pmid": "28371335",
+          "unit_id": "e423ca0bfce40e5ed2f9ea514a786b530c882da707e31539a50d625deec7219d",
+          "content_fingerprint": "25aaec2ddb93a1d5379154d8194927bac27218804b8ce895c24d236499c86d40",
+          "score": 0.022344322344322345,
+          "relevant": false
+        },
+        {
+          "rank": 32,
+          "pmid": "35263517",
+          "unit_id": "4dac5faea6eed182f1086227ee2c4475c639dbada8d88b8b22655628f58a0c40",
+          "content_fingerprint": "c0f4973a7d8938289fc52b70aeea8e22a70416ce08634da2b599469149da57f8",
+          "score": 0.022005772005772008,
+          "relevant": false
+        },
+        {
+          "rank": 33,
+          "pmid": "33951360",
+          "unit_id": "d77b9cd775d531bcc8c425b4404abf8b96914a5a9473a91f32dea90827efb42d",
+          "content_fingerprint": "78de812a52810fa40bfc7e8ba1bfd1932391d6e51b139c032aa45a1b515a7878",
+          "score": 0.021764705882352943,
+          "relevant": false
+        },
+        {
+          "rank": 34,
+          "pmid": "34353454",
+          "unit_id": "f895c8e16a0355fcc079ecc1dbd3145e3432f464242673085d79ae216ee3d97f",
+          "content_fingerprint": "4df0516b6823e911072368e44a99fe8a39dd44d8eb1373fc6a5ecb1f6ca7ea9e",
+          "score": 0.021718931475029037,
+          "relevant": false
+        },
+        {
+          "rank": 35,
+          "pmid": "33650528",
+          "unit_id": "147295fdad5a9406bdc2af895008decebd915fe097342b9d794323b1e545ab77",
+          "content_fingerprint": "3907ce53664e18dcf56f552067f9d4148f96ceb3db66263cd599dc22fa1e66ff",
+          "score": 0.021440036688832834,
+          "relevant": false
+        },
+        {
+          "rank": 36,
+          "pmid": "37879444",
+          "unit_id": "ae4c0828013649d1f0acf673e5e676f239df541f69d552b28e9a2eca7499f77e",
+          "content_fingerprint": "7965c629c3428c50db60309506dd1831ce78d4756219b56dc92149c80818bbeb",
+          "score": 0.021298289339526454,
+          "relevant": false
+        },
+        {
+          "rank": 37,
+          "pmid": "29863955",
+          "unit_id": "81200f188ed546781b9968d828e8be43c99a40d80e025351f51423eb1e867e92",
+          "content_fingerprint": "3fd76151f8a6aab880d8e4750a94112770b1424f79c659f3861cf13779d21b60",
+          "score": 0.021264626462646263,
+          "relevant": false
+        },
+        {
+          "rank": 38,
+          "pmid": "38924756",
+          "unit_id": "28082f8d2e9564a69e9972a2f4994ef5c57059e0aed2c8d78878eff3dc62f0fa",
+          "content_fingerprint": "ad8b0180f8a7f2dcd4f070e39aa8007cc7217d18c05a8783f5450291adba3725",
+          "score": 0.021178843567906766,
+          "relevant": false
+        },
+        {
+          "rank": 39,
+          "pmid": "35636910",
+          "unit_id": "1ab6a630ef83ba9ee6686043d2371cf205d3f9a492bb79c1042a251271da4758",
+          "content_fingerprint": "22a641e9fc27f16850d80974c541fd2b3a9bd51f58575f37ade206b69419501b",
+          "score": 0.02116935483870968,
+          "relevant": false
+        },
+        {
+          "rank": 40,
+          "pmid": "33050934",
+          "unit_id": "598e2d1081e35d9d8803e90fd95902896d3f7953fcbdcd03b661ef9c4456cc25",
+          "content_fingerprint": "ec276cc3119dc28b3f3b232dc92f48983b1c6778612f1e2a5c7cebf0f3d53cb2",
+          "score": 0.020842379504993486,
+          "relevant": false
+        },
+        {
+          "rank": 41,
+          "pmid": "33198517",
+          "unit_id": "072b7a00f7e3b8822dd2418b2c73a6ee98f4654452319d1ef21d4ad22adc9347",
+          "content_fingerprint": "5ec78335a600605c607cd3480d5bcb0818ae926c879a8fd64b5ec6b73bd1c184",
+          "score": 0.020427305888483585,
+          "relevant": false
+        },
+        {
+          "rank": 42,
+          "pmid": "27493136",
+          "unit_id": "7942ad2d033c9d415c0e49a10b6d2688c26e79cee82647baea8be8579d0d091a",
+          "content_fingerprint": "2a72790d0a1c68e09734101e397a236a99f4d08b563fb86e5458c198f215494d",
+          "score": 0.020422973253161933,
+          "relevant": false
+        },
+        {
+          "rank": 43,
+          "pmid": "27494630",
+          "unit_id": "cab5aaada12b679453120676f8e4b998d463129a136055c7ef44f5e016b763f5",
+          "content_fingerprint": "b1d0eacad5325e37ac2454a29310f52e568a50fe73f9bc4b53a805404abd7fdb",
+          "score": 0.020253682487725043,
+          "relevant": false
+        },
+        {
+          "rank": 44,
+          "pmid": "32430550",
+          "unit_id": "c09d8c61324e42b036137c235bda8354ee228f37d24031120bc576f889d181cd",
+          "content_fingerprint": "c3f025e08e1365ae186c83bf09dfcb8c1f8b09731ec1f3663fe0b2e513951dac",
+          "score": 0.02021535960991467,
+          "relevant": false
+        },
+        {
+          "rank": 45,
+          "pmid": "38857504",
+          "unit_id": "bbb956bf6ee32e95f23c4b4446f188cb229bfed3eb75a82e56b58d189548fbb7",
+          "content_fingerprint": "59cd2f2f7d8c5441453598bbedd26800da04a9dbf8235ceeffd97950f6d4623f",
+          "score": 0.0196078431372549,
+          "relevant": false
+        },
+        {
+          "rank": 46,
+          "pmid": "35115765",
+          "unit_id": "3edfc2ee9167c1a667afbadadbae13333e46a32e51ad7f48360cb047f1216698",
+          "content_fingerprint": "6b80e3c1f18f06c82e7300de5cdbea19760cf28abe15c80537ab43c1c1348d95",
+          "score": 0.018883049790683174,
+          "relevant": false
+        },
+        {
+          "rank": 47,
+          "pmid": "27813430",
+          "unit_id": "5b4867036bce515d33bda6e35cae05436378e4647fd03ad509c65709e3381d63",
+          "content_fingerprint": "6da6b7c400f340a9d9f089c600407e9700c809d45fffa51a465f135969678b74",
+          "score": 0.01878969654199012,
+          "relevant": false
+        },
+        {
+          "rank": 48,
+          "pmid": "27184418",
+          "unit_id": "707db7dd8235e3b2310a3e24f0412662445e0cfd20821ab511f0e67813fe9a2f",
+          "content_fingerprint": "2621f600560be2bda08cf59aac3e200522d714f71cadc11db0864624dd578111",
+          "score": 0.018605053651782624,
+          "relevant": false
+        },
+        {
+          "rank": 49,
+          "pmid": "36252154",
+          "unit_id": "37db80a3de2c4fcb8600ef2df6859616f772966c4b8569c99745af4e2d38dcf3",
+          "content_fingerprint": "a8c4ff55cb50997a0d3371d955e017e60a163eb33dbd12024d22371ef7bff38a",
+          "score": 0.018524871355060035,
+          "relevant": false
+        },
+        {
+          "rank": 50,
+          "pmid": "31018251",
+          "unit_id": "fc1f078bbdbfe12d3ac666c4d61640d4453416f31a23c20ff2c85641df17294f",
+          "content_fingerprint": "1ecfac1d5f4387ff17b2ca18b3e17deb028b7d6d5281e2f2027636a4813ea180",
+          "score": 0.01835016835016835,
+          "relevant": false
+        }
+      ]
+    },
+    {
+      "query_id": "q06",
+      "query": "effect of lifestyle interventions on blood pressure",
+      "metrics": {
+        "hit_rate@5": 1.0,
+        "recall@5": 1.0,
+        "precision@5": 0.2,
+        "reciprocal_rank": 1.0
+      },
+      "top_5": [
+        "37161520",
+        "33793326",
+        "36774932",
+        "35896123",
+        "36519436"
+      ],
+      "ranking": [
+        {
+          "rank": 1,
+          "pmid": "37161520",
+          "unit_id": "cc7e13789a2c4614f9d28c0eda087cf1d13dc0f08e836a6e34229047959f9dc8",
+          "content_fingerprint": "a3011da776b91f858bd26e41800c742724d843a97772dee758735d07a8c4d6d8",
+          "score": 0.03278688524590164,
+          "relevant": true
+        },
+        {
+          "rank": 2,
+          "pmid": "33793326",
+          "unit_id": "99ca4d15c295638c2870f20deec1be1dec652e7bc7bcadf17e3c7d611decdeb1",
+          "content_fingerprint": "fa0fc6577bfbebc7a86bb1ffcee4d314d5cedb79d5265151983a209be06292c3",
+          "score": 0.03225806451612903,
+          "relevant": false
+        },
+        {
+          "rank": 3,
+          "pmid": "36774932",
+          "unit_id": "42454181e5db620a6fd3b3c80df987a226d9350fcd4f772f641e213ebd923526",
+          "content_fingerprint": "f3b12fa6fb0839bb4a50c779fb8871b7f8362c20d5bfcfdd474e3ac5a423d508",
+          "score": 0.03149801587301587,
+          "relevant": false
+        },
+        {
+          "rank": 4,
+          "pmid": "35896123",
+          "unit_id": "c73dfbda9bfae65cb7b28955252891dedae7093dfb11809f037831ce52b15bc4",
+          "content_fingerprint": "b4614b04366b6f4ffdbe9e8e0ea4528faa0e85c2b83693ec1901ec7cc7d50263",
+          "score": 0.03125763125763126,
+          "relevant": false
+        },
+        {
+          "rank": 5,
+          "pmid": "36519436",
+          "unit_id": "a973a5f6273ca012cb313e27a768a5eccd8017c0e3d179a1205d179d1583724c",
+          "content_fingerprint": "61b54a500536079561e3ea1be2d2be030c9c89d2e524f54827d7b25756a9688c",
+          "score": 0.031009615384615385,
+          "relevant": false
+        },
+        {
+          "rank": 6,
+          "pmid": "35653320",
+          "unit_id": "a4cf2995ab3f891b6890d5ac9a6a4a45a631f2e735ab82d97e2ac4744afedb94",
+          "content_fingerprint": "6cbd8f0ed164d31c32a353fd9f9f125ed58821b0b386a58caad5ad5932381dad",
+          "score": 0.029418126757516764,
+          "relevant": false
+        },
+        {
+          "rank": 7,
+          "pmid": "24356592",
+          "unit_id": "232a1531c4e4b44379486ca19a88c70b3668ed133d6a49eaafab8b6168611c57",
+          "content_fingerprint": "8415f5193289896681ec6ada7a72b86bea3100989ba0ff78c8ccfc8bd5265ae9",
+          "score": 0.02900988017658188,
+          "relevant": false
+        },
+        {
+          "rank": 8,
+          "pmid": "38763510",
+          "unit_id": "b549f7cac78251e6c8b6d96e2a976d7a0d1282d3963181ffb30f2d238b35719d",
+          "content_fingerprint": "5cbde62e4e0c0c5da947fee5e888465be812b656ce989fde4b6625da2b6cb40e",
+          "score": 0.028665028665028666,
+          "relevant": false
+        },
+        {
+          "rank": 9,
+          "pmid": "29669543",
+          "unit_id": "2742ab4e7d7b48ff2c77e70dfe05f6a4e20b6dada18befdc6bdd4a89ee58fdb4",
+          "content_fingerprint": "4ceb3d956b2a347ed834b00b9747f5081f289b948c560997bd82f2d54498dfef",
+          "score": 0.028404512489927477,
+          "relevant": false
+        },
+        {
+          "rank": 10,
+          "pmid": "35988550",
+          "unit_id": "5c453d941b1c0f73e9f6df0d8792c3174689556c5fe12a746c33a29116828930",
+          "content_fingerprint": "0d37af25659cbbbe1020b76df31aa7264f22ac333704c9d59e958156b034da50",
+          "score": 0.028370221327967807,
+          "relevant": false
+        },
+        {
+          "rank": 11,
+          "pmid": "28292619",
+          "unit_id": "9323f2e0371651ae3b19b5b3e102695f7a2538a1c073f50d991fac9ee3a43e35",
+          "content_fingerprint": "864f6902ed6b38d28339d8ce3bb372edd9f2cbda3164e0a84cdb9e925ee20299",
+          "score": 0.02803921568627451,
+          "relevant": false
+        },
+        {
+          "rank": 12,
+          "pmid": "29627041",
+          "unit_id": "c7dd37835680fdff95f876add24a6f7e595d3a8eeaaaad7c0b235d0f509a4993",
+          "content_fingerprint": "662b0ebb4f5dfa481d22bfc43afc53949bfd48be2e5a42ae346c774abae3cde6",
+          "score": 0.027777777777777776,
+          "relevant": false
+        },
+        {
+          "rank": 13,
+          "pmid": "33050934",
+          "unit_id": "598e2d1081e35d9d8803e90fd95902896d3f7953fcbdcd03b661ef9c4456cc25",
+          "content_fingerprint": "ec276cc3119dc28b3f3b232dc92f48983b1c6778612f1e2a5c7cebf0f3d53cb2",
+          "score": 0.026779422128259338,
+          "relevant": false
+        },
+        {
+          "rank": 14,
+          "pmid": "28460827",
+          "unit_id": "02f38bf5543a99e8f64431ff498aa03d1630ea35aed8fc3db0066405b571c86a",
+          "content_fingerprint": "2c66d2006372ca8909f263953b9ad34294e9568de588daaaef610d54bcdaa504",
+          "score": 0.026334026334026334,
+          "relevant": false
+        },
+        {
+          "rank": 15,
+          "pmid": "33829619",
+          "unit_id": "47d0f94cb5af56e8e2ef2170734548ff168189edfa27554304dc3c89e0482182",
+          "content_fingerprint": "ce90551b9976e8e9fab3364002cf03e94b573877af91446b7121ffc2d4eddde9",
+          "score": 0.026050420168067225,
+          "relevant": false
+        },
+        {
+          "rank": 16,
+          "pmid": "38141902",
+          "unit_id": "d1dda3e79432839dc985e1338346306fbeefff9fc6e53574f67eca2d9d1f5bf8",
+          "content_fingerprint": "a27885e0849ec96b73e206c90d97a1c8ba79216a6f601ecb9354a664dc9c33cf",
+          "score": 0.025987006496751626,
+          "relevant": false
+        },
+        {
+          "rank": 17,
+          "pmid": "37425065",
+          "unit_id": "673d115eb699e8eef5898cb18cf92c6f5338f0fb3211112c63935e45312659b6",
+          "content_fingerprint": "e89de5a230a762770317103c9c223522b37fddf00177d663d7b143dd3094bc55",
+          "score": 0.0251661918328585,
+          "relevant": false
+        },
+        {
+          "rank": 18,
+          "pmid": "38184132",
+          "unit_id": "e5a1aacf824dfada803e96e78404432aa0f16e93fcfbcf0cd6f2caa820a06fe4",
+          "content_fingerprint": "dfe219115a9d562be7c9a77c687d814405155bf30794489eb9dab53870f32d0c",
+          "score": 0.025035205758097326,
+          "relevant": false
+        },
+        {
+          "rank": 19,
+          "pmid": "34767960",
+          "unit_id": "403ed6090e1e8e32d16ae2a674d092fd9d6d48330b405a9a6d68d7dbe0fe980d",
+          "content_fingerprint": "0b161bfdb00533d28e88a3b237ca79839e115811dab9c694b5bf0f142de40233",
+          "score": 0.025,
+          "relevant": false
+        },
+        {
+          "rank": 20,
+          "pmid": "22000494",
+          "unit_id": "6f7633fc1833c15ce690dff1e576740430bf3ab98c36b7cdcb09085e111c418c",
+          "content_fingerprint": "f7c2a468c03288d587cb809ae622d16e10a89e40e45dab09a3a92e984616b149",
+          "score": 0.024451318309029312,
+          "relevant": false
+        },
+        {
+          "rank": 21,
+          "pmid": "30552067",
+          "unit_id": "85127d7cd7661dd36a7e198331d1deca8fe60de41feb3e9994897adfae4b9e84",
+          "content_fingerprint": "fafb49e5c2aa55a1b0453b816f31fac6b85d41e6141d3b747a0e1e026d965779",
+          "score": 0.02439384979302188,
+          "relevant": false
+        },
+        {
+          "rank": 22,
+          "pmid": "33683325",
+          "unit_id": "a2cb2c51608e8adc4eba5dd670dc39dd92a49037ef4825bd504cc20b9853a67c",
+          "content_fingerprint": "e595479d06d5d53912c5dd4c45a2390e375211b05525f5f3b9a15c9c3afc040a",
+          "score": 0.024098124098124098,
+          "relevant": false
+        },
+        {
+          "rank": 23,
+          "pmid": "38697182",
+          "unit_id": "ecc1d8123dcd9c53fb56de0a33ac9775c087a53484e52255bbf48031c62f4199",
+          "content_fingerprint": "3708a8164179889ada32bcba840a2630848fd673d70d3f3ba2b4d5b7050aaa64",
+          "score": 0.02389418290428104,
+          "relevant": false
+        },
+        {
+          "rank": 24,
+          "pmid": "32430550",
+          "unit_id": "c09d8c61324e42b036137c235bda8354ee228f37d24031120bc576f889d181cd",
+          "content_fingerprint": "c3f025e08e1365ae186c83bf09dfcb8c1f8b09731ec1f3663fe0b2e513951dac",
+          "score": 0.023333333333333334,
+          "relevant": false
+        },
+        {
+          "rank": 25,
+          "pmid": "35040920",
+          "unit_id": "93c9c8a4539c5c35547771ab64a315c40567bcbe390d18dfb71cfec7ae1e1797",
+          "content_fingerprint": "abb1cc6f63eff4fff6c1ded23eb078dd9fb9f2a46146b7d2b3ce378549b0bec2",
+          "score": 0.02261178861788618,
+          "relevant": false
+        },
+        {
+          "rank": 26,
+          "pmid": "38857504",
+          "unit_id": "bbb956bf6ee32e95f23c4b4446f188cb229bfed3eb75a82e56b58d189548fbb7",
+          "content_fingerprint": "59cd2f2f7d8c5441453598bbedd26800da04a9dbf8235ceeffd97950f6d4623f",
+          "score": 0.022504400301734978,
+          "relevant": false
+        },
+        {
+          "rank": 27,
+          "pmid": "28467922",
+          "unit_id": "a0657a4394eb3ff8907237d9b1367d178264909857b94bf87355fa253c0acb5b",
+          "content_fingerprint": "de0ca3ae0dd811041ab322da54751736981c16855adcaea79c186ceb0cff884f",
+          "score": 0.02250368912936547,
+          "relevant": false
+        },
+        {
+          "rank": 28,
+          "pmid": "35636910",
+          "unit_id": "1ab6a630ef83ba9ee6686043d2371cf205d3f9a492bb79c1042a251271da4758",
+          "content_fingerprint": "22a641e9fc27f16850d80974c541fd2b3a9bd51f58575f37ade206b69419501b",
+          "score": 0.022366965712178936,
+          "relevant": false
+        },
+        {
+          "rank": 29,
+          "pmid": "24315724",
+          "unit_id": "71e6f9b6eb556f3650c2347085c953f244496aaffefd9f85fe310407c9798602",
+          "content_fingerprint": "2d952af296f3b250d5fb5ddc6e486fdc01193e82d00fe26ec64beda188f56254",
+          "score": 0.022357471121599803,
+          "relevant": false
+        },
+        {
+          "rank": 30,
+          "pmid": "37879444",
+          "unit_id": "ae4c0828013649d1f0acf673e5e676f239df541f69d552b28e9a2eca7499f77e",
+          "content_fingerprint": "7965c629c3428c50db60309506dd1831ce78d4756219b56dc92149c80818bbeb",
+          "score": 0.022181372549019605,
+          "relevant": false
+        },
+        {
+          "rank": 31,
+          "pmid": "33951360",
+          "unit_id": "d77b9cd775d531bcc8c425b4404abf8b96914a5a9473a91f32dea90827efb42d",
+          "content_fingerprint": "78de812a52810fa40bfc7e8ba1bfd1932391d6e51b139c032aa45a1b515a7878",
+          "score": 0.021980676328502417,
+          "relevant": false
+        },
+        {
+          "rank": 32,
+          "pmid": "37364283",
+          "unit_id": "e49e57f2abfc7c57849cf7e8f6dd6fd9367c0d12ad7ca33a575befedd7c2829b",
+          "content_fingerprint": "435fde88e01aaebd8db1022f8f08ca9db63630f6b3ee3268d88c34e6b600e08f",
+          "score": 0.021805752003771807,
+          "relevant": false
+        },
+        {
+          "rank": 33,
+          "pmid": "33301246",
+          "unit_id": "70b6d754ccbe8f6ac5500f86622fd64c1e83629b58b812e9a5de332b7a441346",
+          "content_fingerprint": "64c84e01ca14176471b5daf0748a02c4ffc62a4ea3157c70db75dcc08d980a1b",
+          "score": 0.021698334506216277,
+          "relevant": false
+        },
+        {
+          "rank": 34,
+          "pmid": "27493136",
+          "unit_id": "7942ad2d033c9d415c0e49a10b6d2688c26e79cee82647baea8be8579d0d091a",
+          "content_fingerprint": "2a72790d0a1c68e09734101e397a236a99f4d08b563fb86e5458c198f215494d",
+          "score": 0.021604938271604937,
+          "relevant": false
+        },
+        {
+          "rank": 35,
+          "pmid": "31090575",
+          "unit_id": "457d49c267258cedb4ba5cc2e6e51a934ec608d6724f8b6399a4021af2363eb0",
+          "content_fingerprint": "533f12976ac165974236e5d92800e832ed3f87e18da19ff569fe81e58f5649ec",
+          "score": 0.02152014652014652,
+          "relevant": false
+        },
+        {
+          "rank": 36,
+          "pmid": "35263517",
+          "unit_id": "4dac5faea6eed182f1086227ee2c4475c639dbada8d88b8b22655628f58a0c40",
+          "content_fingerprint": "c0f4973a7d8938289fc52b70aeea8e22a70416ce08634da2b599469149da57f8",
+          "score": 0.021464646464646464,
+          "relevant": false
+        },
+        {
+          "rank": 37,
+          "pmid": "35505000",
+          "unit_id": "7df84b762fa7930546ad3ad1ccfbc608ea0caf0ef95174468008c5425e7ca04f",
+          "content_fingerprint": "a12e03daa33308ad6ecc4f2181fe3c262d01a3a029782cc377169f5008b25eff",
+          "score": 0.02115171650055371,
+          "relevant": false
+        },
+        {
+          "rank": 38,
+          "pmid": "27184418",
+          "unit_id": "707db7dd8235e3b2310a3e24f0412662445e0cfd20821ab511f0e67813fe9a2f",
+          "content_fingerprint": "2621f600560be2bda08cf59aac3e200522d714f71cadc11db0864624dd578111",
+          "score": 0.020792932557638442,
+          "relevant": false
+        },
+        {
+          "rank": 39,
+          "pmid": "34353454",
+          "unit_id": "f895c8e16a0355fcc079ecc1dbd3145e3432f464242673085d79ae216ee3d97f",
+          "content_fingerprint": "4df0516b6823e911072368e44a99fe8a39dd44d8eb1373fc6a5ecb1f6ca7ea9e",
+          "score": 0.020638297872340425,
+          "relevant": false
+        },
+        {
+          "rank": 40,
+          "pmid": "36252154",
+          "unit_id": "37db80a3de2c4fcb8600ef2df6859616f772966c4b8569c99745af4e2d38dcf3",
+          "content_fingerprint": "a8c4ff55cb50997a0d3371d955e017e60a163eb33dbd12024d22371ef7bff38a",
+          "score": 0.020627325890483786,
+          "relevant": false
+        },
+        {
+          "rank": 41,
+          "pmid": "29863955",
+          "unit_id": "81200f188ed546781b9968d828e8be43c99a40d80e025351f51423eb1e867e92",
+          "content_fingerprint": "3fd76151f8a6aab880d8e4750a94112770b1424f79c659f3861cf13779d21b60",
+          "score": 0.020604395604395608,
+          "relevant": false
+        },
+        {
+          "rank": 42,
+          "pmid": "35115765",
+          "unit_id": "3edfc2ee9167c1a667afbadadbae13333e46a32e51ad7f48360cb047f1216698",
+          "content_fingerprint": "6b80e3c1f18f06c82e7300de5cdbea19760cf28abe15c80537ab43c1c1348d95",
+          "score": 0.02053794829024187,
+          "relevant": false
+        },
+        {
+          "rank": 43,
+          "pmid": "27494630",
+          "unit_id": "cab5aaada12b679453120676f8e4b998d463129a136055c7ef44f5e016b763f5",
+          "content_fingerprint": "b1d0eacad5325e37ac2454a29310f52e568a50fe73f9bc4b53a805404abd7fdb",
+          "score": 0.020303527481542245,
+          "relevant": false
+        },
+        {
+          "rank": 44,
+          "pmid": "38924756",
+          "unit_id": "28082f8d2e9564a69e9972a2f4994ef5c57059e0aed2c8d78878eff3dc62f0fa",
+          "content_fingerprint": "ad8b0180f8a7f2dcd4f070e39aa8007cc7217d18c05a8783f5450291adba3725",
+          "score": 0.020276497695852536,
+          "relevant": false
+        },
+        {
+          "rank": 45,
+          "pmid": "27813430",
+          "unit_id": "5b4867036bce515d33bda6e35cae05436378e4647fd03ad509c65709e3381d63",
+          "content_fingerprint": "6da6b7c400f340a9d9f089c600407e9700c809d45fffa51a465f135969678b74",
+          "score": 0.019729206963249514,
+          "relevant": false
+        },
+        {
+          "rank": 46,
+          "pmid": "33650528",
+          "unit_id": "147295fdad5a9406bdc2af895008decebd915fe097342b9d794323b1e545ab77",
+          "content_fingerprint": "3907ce53664e18dcf56f552067f9d4148f96ceb3db66263cd599dc22fa1e66ff",
+          "score": 0.019638043896804003,
+          "relevant": false
+        },
+        {
+          "rank": 47,
+          "pmid": "38512301",
+          "unit_id": "021c8cc8951335927d0ad4bc932e11b891fb1724e37e51ddb471125728127cd0",
+          "content_fingerprint": "289131b11feabb5977a6182c331d992f35fa6a63281ffb75a3ca26c7723ff5e1",
+          "score": 0.019617224880382776,
+          "relevant": false
+        },
+        {
+          "rank": 48,
+          "pmid": "31018251",
+          "unit_id": "fc1f078bbdbfe12d3ac666c4d61640d4453416f31a23c20ff2c85641df17294f",
+          "content_fingerprint": "1ecfac1d5f4387ff17b2ca18b3e17deb028b7d6d5281e2f2027636a4813ea180",
+          "score": 0.019075302025615408,
+          "relevant": false
+        },
+        {
+          "rank": 49,
+          "pmid": "28371335",
+          "unit_id": "e423ca0bfce40e5ed2f9ea514a786b530c882da707e31539a50d625deec7219d",
+          "content_fingerprint": "25aaec2ddb93a1d5379154d8194927bac27218804b8ce895c24d236499c86d40",
+          "score": 0.01906318082788671,
+          "relevant": false
+        },
+        {
+          "rank": 50,
+          "pmid": "33198517",
+          "unit_id": "072b7a00f7e3b8822dd2418b2c73a6ee98f4654452319d1ef21d4ad22adc9347",
+          "content_fingerprint": "5ec78335a600605c607cd3480d5bcb0818ae926c879a8fd64b5ec6b73bd1c184",
+          "score": 0.01905453225660103,
+          "relevant": false
+        }
+      ]
+    },
+    {
+      "query_id": "q07",
+      "query": "effectiveness of immunotherapy in non-small-cell lung cancer",
+      "metrics": {
+        "hit_rate@5": 1.0,
+        "recall@5": 0.6666666666666666,
+        "precision@5": 0.4,
+        "reciprocal_rank": 1.0
+      },
+      "top_5": [
+        "38512301",
+        "29863955",
+        "38924756",
+        "37879444",
+        "32430550"
+      ],
+      "ranking": [
+        {
+          "rank": 1,
+          "pmid": "38512301",
+          "unit_id": "021c8cc8951335927d0ad4bc932e11b891fb1724e37e51ddb471125728127cd0",
+          "content_fingerprint": "289131b11feabb5977a6182c331d992f35fa6a63281ffb75a3ca26c7723ff5e1",
+          "score": 0.03278688524590164,
+          "relevant": true
+        },
+        {
+          "rank": 2,
+          "pmid": "29863955",
+          "unit_id": "81200f188ed546781b9968d828e8be43c99a40d80e025351f51423eb1e867e92",
+          "content_fingerprint": "3fd76151f8a6aab880d8e4750a94112770b1424f79c659f3861cf13779d21b60",
+          "score": 0.03200204813108039,
+          "relevant": true
+        },
+        {
+          "rank": 3,
+          "pmid": "38924756",
+          "unit_id": "28082f8d2e9564a69e9972a2f4994ef5c57059e0aed2c8d78878eff3dc62f0fa",
+          "content_fingerprint": "ad8b0180f8a7f2dcd4f070e39aa8007cc7217d18c05a8783f5450291adba3725",
+          "score": 0.03149801587301587,
+          "relevant": false
+        },
+        {
+          "rank": 4,
+          "pmid": "37879444",
+          "unit_id": "ae4c0828013649d1f0acf673e5e676f239df541f69d552b28e9a2eca7499f77e",
+          "content_fingerprint": "7965c629c3428c50db60309506dd1831ce78d4756219b56dc92149c80818bbeb",
+          "score": 0.031009615384615385,
+          "relevant": false
+        },
+        {
+          "rank": 5,
+          "pmid": "32430550",
+          "unit_id": "c09d8c61324e42b036137c235bda8354ee228f37d24031120bc576f889d181cd",
+          "content_fingerprint": "c3f025e08e1365ae186c83bf09dfcb8c1f8b09731ec1f3663fe0b2e513951dac",
+          "score": 0.02946912242686891,
+          "relevant": false
+        },
+        {
+          "rank": 6,
+          "pmid": "33198517",
+          "unit_id": "072b7a00f7e3b8822dd2418b2c73a6ee98f4654452319d1ef21d4ad22adc9347",
+          "content_fingerprint": "5ec78335a600605c607cd3480d5bcb0818ae926c879a8fd64b5ec6b73bd1c184",
+          "score": 0.02904040404040404,
+          "relevant": false
+        },
+        {
+          "rank": 7,
+          "pmid": "33050934",
+          "unit_id": "598e2d1081e35d9d8803e90fd95902896d3f7953fcbdcd03b661ef9c4456cc25",
+          "content_fingerprint": "ec276cc3119dc28b3f3b232dc92f48983b1c6778612f1e2a5c7cebf0f3d53cb2",
+          "score": 0.028665028665028666,
+          "relevant": false
+        },
+        {
+          "rank": 8,
+          "pmid": "38857504",
+          "unit_id": "bbb956bf6ee32e95f23c4b4446f188cb229bfed3eb75a82e56b58d189548fbb7",
+          "content_fingerprint": "59cd2f2f7d8c5441453598bbedd26800da04a9dbf8235ceeffd97950f6d4623f",
+          "score": 0.027984344422700584,
+          "relevant": false
+        },
+        {
+          "rank": 9,
+          "pmid": "36252154",
+          "unit_id": "37db80a3de2c4fcb8600ef2df6859616f772966c4b8569c99745af4e2d38dcf3",
+          "content_fingerprint": "a8c4ff55cb50997a0d3371d955e017e60a163eb33dbd12024d22371ef7bff38a",
+          "score": 0.027313266443701224,
+          "relevant": false
+        },
+        {
+          "rank": 10,
+          "pmid": "33650528",
+          "unit_id": "147295fdad5a9406bdc2af895008decebd915fe097342b9d794323b1e545ab77",
+          "content_fingerprint": "3907ce53664e18dcf56f552067f9d4148f96ceb3db66263cd599dc22fa1e66ff",
+          "score": 0.02690501986276634,
+          "relevant": false
+        },
+        {
+          "rank": 11,
+          "pmid": "31018251",
+          "unit_id": "fc1f078bbdbfe12d3ac666c4d61640d4453416f31a23c20ff2c85641df17294f",
+          "content_fingerprint": "1ecfac1d5f4387ff17b2ca18b3e17deb028b7d6d5281e2f2027636a4813ea180",
+          "score": 0.026333113890717574,
+          "relevant": true
+        },
+        {
+          "rank": 12,
+          "pmid": "27813430",
+          "unit_id": "5b4867036bce515d33bda6e35cae05436378e4647fd03ad509c65709e3381d63",
+          "content_fingerprint": "6da6b7c400f340a9d9f089c600407e9700c809d45fffa51a465f135969678b74",
+          "score": 0.02625745950554135,
+          "relevant": false
+        },
+        {
+          "rank": 13,
+          "pmid": "37364283",
+          "unit_id": "e49e57f2abfc7c57849cf7e8f6dd6fd9367c0d12ad7ca33a575befedd7c2829b",
+          "content_fingerprint": "435fde88e01aaebd8db1022f8f08ca9db63630f6b3ee3268d88c34e6b600e08f",
+          "score": 0.026144907723855092,
+          "relevant": false
+        },
+        {
+          "rank": 14,
+          "pmid": "37161520",
+          "unit_id": "cc7e13789a2c4614f9d28c0eda087cf1d13dc0f08e836a6e34229047959f9dc8",
+          "content_fingerprint": "a3011da776b91f858bd26e41800c742724d843a97772dee758735d07a8c4d6d8",
+          "score": 0.025914384123339348,
+          "relevant": false
+        },
+        {
+          "rank": 15,
+          "pmid": "35115765",
+          "unit_id": "3edfc2ee9167c1a667afbadadbae13333e46a32e51ad7f48360cb047f1216698",
+          "content_fingerprint": "6b80e3c1f18f06c82e7300de5cdbea19760cf28abe15c80537ab43c1c1348d95",
+          "score": 0.02564935064935065,
+          "relevant": false
+        },
+        {
+          "rank": 16,
+          "pmid": "33301246",
+          "unit_id": "70b6d754ccbe8f6ac5500f86622fd64c1e83629b58b812e9a5de332b7a441346",
+          "content_fingerprint": "64c84e01ca14176471b5daf0748a02c4ffc62a4ea3157c70db75dcc08d980a1b",
+          "score": 0.025451688923802042,
+          "relevant": false
+        },
+        {
+          "rank": 17,
+          "pmid": "22000494",
+          "unit_id": "6f7633fc1833c15ce690dff1e576740430bf3ab98c36b7cdcb09085e111c418c",
+          "content_fingerprint": "f7c2a468c03288d587cb809ae622d16e10a89e40e45dab09a3a92e984616b149",
+          "score": 0.025383141762452106,
+          "relevant": false
+        },
+        {
+          "rank": 18,
+          "pmid": "27184418",
+          "unit_id": "707db7dd8235e3b2310a3e24f0412662445e0cfd20821ab511f0e67813fe9a2f",
+          "content_fingerprint": "2621f600560be2bda08cf59aac3e200522d714f71cadc11db0864624dd578111",
+          "score": 0.02531645569620253,
+          "relevant": false
+        },
+        {
+          "rank": 19,
+          "pmid": "35040920",
+          "unit_id": "93c9c8a4539c5c35547771ab64a315c40567bcbe390d18dfb71cfec7ae1e1797",
+          "content_fingerprint": "abb1cc6f63eff4fff6c1ded23eb078dd9fb9f2a46146b7d2b3ce378549b0bec2",
+          "score": 0.025278219395866455,
+          "relevant": false
+        },
+        {
+          "rank": 20,
+          "pmid": "37425065",
+          "unit_id": "673d115eb699e8eef5898cb18cf92c6f5338f0fb3211112c63935e45312659b6",
+          "content_fingerprint": "e89de5a230a762770317103c9c223522b37fddf00177d663d7b143dd3094bc55",
+          "score": 0.025122549019607844,
+          "relevant": false
+        },
+        {
+          "rank": 21,
+          "pmid": "29627041",
+          "unit_id": "c7dd37835680fdff95f876add24a6f7e595d3a8eeaaaad7c0b235d0f509a4993",
+          "content_fingerprint": "662b0ebb4f5dfa481d22bfc43afc53949bfd48be2e5a42ae346c774abae3cde6",
+          "score": 0.024961240310077522,
+          "relevant": false
+        },
+        {
+          "rank": 22,
+          "pmid": "33951360",
+          "unit_id": "d77b9cd775d531bcc8c425b4404abf8b96914a5a9473a91f32dea90827efb42d",
+          "content_fingerprint": "78de812a52810fa40bfc7e8ba1bfd1932391d6e51b139c032aa45a1b515a7878",
+          "score": 0.024827586206896554,
+          "relevant": false
+        },
+        {
+          "rank": 23,
+          "pmid": "35988550",
+          "unit_id": "5c453d941b1c0f73e9f6df0d8792c3174689556c5fe12a746c33a29116828930",
+          "content_fingerprint": "0d37af25659cbbbe1020b76df31aa7264f22ac333704c9d59e958156b034da50",
+          "score": 0.02454080096356519,
+          "relevant": false
+        },
+        {
+          "rank": 24,
+          "pmid": "27494630",
+          "unit_id": "cab5aaada12b679453120676f8e4b998d463129a136055c7ef44f5e016b763f5",
+          "content_fingerprint": "b1d0eacad5325e37ac2454a29310f52e568a50fe73f9bc4b53a805404abd7fdb",
+          "score": 0.02454080096356519,
+          "relevant": false
+        },
+        {
+          "rank": 25,
+          "pmid": "30552067",
+          "unit_id": "85127d7cd7661dd36a7e198331d1deca8fe60de41feb3e9994897adfae4b9e84",
+          "content_fingerprint": "fafb49e5c2aa55a1b0453b816f31fac6b85d41e6141d3b747a0e1e026d965779",
+          "score": 0.024269005847953218,
+          "relevant": false
+        },
+        {
+          "rank": 26,
+          "pmid": "35505000",
+          "unit_id": "7df84b762fa7930546ad3ad1ccfbc608ea0caf0ef95174468008c5425e7ca04f",
+          "content_fingerprint": "a12e03daa33308ad6ecc4f2181fe3c262d01a3a029782cc377169f5008b25eff",
+          "score": 0.023952954675846242,
+          "relevant": false
+        },
+        {
+          "rank": 27,
+          "pmid": "35636910",
+          "unit_id": "1ab6a630ef83ba9ee6686043d2371cf205d3f9a492bb79c1042a251271da4758",
+          "content_fingerprint": "22a641e9fc27f16850d80974c541fd2b3a9bd51f58575f37ade206b69419501b",
+          "score": 0.02388019427954668,
+          "relevant": false
+        },
+        {
+          "rank": 28,
+          "pmid": "33829619",
+          "unit_id": "47d0f94cb5af56e8e2ef2170734548ff168189edfa27554304dc3c89e0482182",
+          "content_fingerprint": "ce90551b9976e8e9fab3364002cf03e94b573877af91446b7121ffc2d4eddde9",
+          "score": 0.02348901098901099,
+          "relevant": false
+        },
+        {
+          "rank": 29,
+          "pmid": "35263517",
+          "unit_id": "4dac5faea6eed182f1086227ee2c4475c639dbada8d88b8b22655628f58a0c40",
+          "content_fingerprint": "c0f4973a7d8938289fc52b70aeea8e22a70416ce08634da2b599469149da57f8",
+          "score": 0.023222439660795825,
+          "relevant": false
+        },
+        {
+          "rank": 30,
+          "pmid": "33683325",
+          "unit_id": "a2cb2c51608e8adc4eba5dd670dc39dd92a49037ef4825bd504cc20b9853a67c",
+          "content_fingerprint": "e595479d06d5d53912c5dd4c45a2390e375211b05525f5f3b9a15c9c3afc040a",
+          "score": 0.02314071696094168,
+          "relevant": false
+        },
+        {
+          "rank": 31,
+          "pmid": "24356592",
+          "unit_id": "232a1531c4e4b44379486ca19a88c70b3668ed133d6a49eaafab8b6168611c57",
+          "content_fingerprint": "8415f5193289896681ec6ada7a72b86bea3100989ba0ff78c8ccfc8bd5265ae9",
+          "score": 0.022510822510822513,
+          "relevant": false
+        },
+        {
+          "rank": 32,
+          "pmid": "38184132",
+          "unit_id": "e5a1aacf824dfada803e96e78404432aa0f16e93fcfbcf0cd6f2caa820a06fe4",
+          "content_fingerprint": "dfe219115a9d562be7c9a77c687d814405155bf30794489eb9dab53870f32d0c",
+          "score": 0.0225,
+          "relevant": false
+        },
+        {
+          "rank": 33,
+          "pmid": "34767960",
+          "unit_id": "403ed6090e1e8e32d16ae2a674d092fd9d6d48330b405a9a6d68d7dbe0fe980d",
+          "content_fingerprint": "0b161bfdb00533d28e88a3b237ca79839e115811dab9c694b5bf0f142de40233",
+          "score": 0.0222522744037374,
+          "relevant": false
+        },
+        {
+          "rank": 34,
+          "pmid": "34353454",
+          "unit_id": "f895c8e16a0355fcc079ecc1dbd3145e3432f464242673085d79ae216ee3d97f",
+          "content_fingerprint": "4df0516b6823e911072368e44a99fe8a39dd44d8eb1373fc6a5ecb1f6ca7ea9e",
+          "score": 0.02210552027357108,
+          "relevant": false
+        },
+        {
+          "rank": 35,
+          "pmid": "24315724",
+          "unit_id": "71e6f9b6eb556f3650c2347085c953f244496aaffefd9f85fe310407c9798602",
+          "content_fingerprint": "2d952af296f3b250d5fb5ddc6e486fdc01193e82d00fe26ec64beda188f56254",
+          "score": 0.021622253389434316,
+          "relevant": false
+        },
+        {
+          "rank": 36,
+          "pmid": "29669543",
+          "unit_id": "2742ab4e7d7b48ff2c77e70dfe05f6a4e20b6dada18befdc6bdd4a89ee58fdb4",
+          "content_fingerprint": "4ceb3d956b2a347ed834b00b9747f5081f289b948c560997bd82f2d54498dfef",
+          "score": 0.021336644840821855,
+          "relevant": false
+        },
+        {
+          "rank": 37,
+          "pmid": "36774932",
+          "unit_id": "42454181e5db620a6fd3b3c80df987a226d9350fcd4f772f641e213ebd923526",
+          "content_fingerprint": "f3b12fa6fb0839bb4a50c779fb8871b7f8362c20d5bfcfdd474e3ac5a423d508",
+          "score": 0.02072649572649573,
+          "relevant": false
+        },
+        {
+          "rank": 38,
+          "pmid": "36519436",
+          "unit_id": "a973a5f6273ca012cb313e27a768a5eccd8017c0e3d179a1205d179d1583724c",
+          "content_fingerprint": "61b54a500536079561e3ea1be2d2be030c9c89d2e524f54827d7b25756a9688c",
+          "score": 0.020622895622895623,
+          "relevant": false
+        },
+        {
+          "rank": 39,
+          "pmid": "28371335",
+          "unit_id": "e423ca0bfce40e5ed2f9ea514a786b530c882da707e31539a50d625deec7219d",
+          "content_fingerprint": "25aaec2ddb93a1d5379154d8194927bac27218804b8ce895c24d236499c86d40",
+          "score": 0.020526315789473684,
+          "relevant": false
+        },
+        {
+          "rank": 40,
+          "pmid": "38697182",
+          "unit_id": "ecc1d8123dcd9c53fb56de0a33ac9775c087a53484e52255bbf48031c62f4199",
+          "content_fingerprint": "3708a8164179889ada32bcba840a2630848fd673d70d3f3ba2b4d5b7050aaa64",
+          "score": 0.020442219440967878,
+          "relevant": false
+        },
+        {
+          "rank": 41,
+          "pmid": "33793326",
+          "unit_id": "99ca4d15c295638c2870f20deec1be1dec652e7bc7bcadf17e3c7d611decdeb1",
+          "content_fingerprint": "fa0fc6577bfbebc7a86bb1ffcee4d314d5cedb79d5265151983a209be06292c3",
+          "score": 0.020210268449525365,
+          "relevant": false
+        },
+        {
+          "rank": 42,
+          "pmid": "38763510",
+          "unit_id": "b549f7cac78251e6c8b6d96e2a976d7a0d1282d3963181ffb30f2d238b35719d",
+          "content_fingerprint": "5cbde62e4e0c0c5da947fee5e888465be812b656ce989fde4b6625da2b6cb40e",
+          "score": 0.020202020202020204,
+          "relevant": false
+        },
+        {
+          "rank": 43,
+          "pmid": "31090575",
+          "unit_id": "457d49c267258cedb4ba5cc2e6e51a934ec608d6724f8b6399a4021af2363eb0",
+          "content_fingerprint": "533f12976ac165974236e5d92800e832ed3f87e18da19ff569fe81e58f5649ec",
+          "score": 0.020186650436193956,
+          "relevant": false
+        },
+        {
+          "rank": 44,
+          "pmid": "28460827",
+          "unit_id": "02f38bf5543a99e8f64431ff498aa03d1630ea35aed8fc3db0066405b571c86a",
+          "content_fingerprint": "2c66d2006372ca8909f263953b9ad34294e9568de588daaaef610d54bcdaa504",
+          "score": 0.02003205128205128,
+          "relevant": false
+        },
+        {
+          "rank": 45,
+          "pmid": "28292619",
+          "unit_id": "9323f2e0371651ae3b19b5b3e102695f7a2538a1c073f50d991fac9ee3a43e35",
+          "content_fingerprint": "864f6902ed6b38d28339d8ce3bb372edd9f2cbda3164e0a84cdb9e925ee20299",
+          "score": 0.019812609798945932,
+          "relevant": false
+        },
+        {
+          "rank": 46,
+          "pmid": "28467922",
+          "unit_id": "a0657a4394eb3ff8907237d9b1367d178264909857b94bf87355fa253c0acb5b",
+          "content_fingerprint": "de0ca3ae0dd811041ab322da54751736981c16855adcaea79c186ceb0cff884f",
+          "score": 0.019743240614666407,
+          "relevant": false
+        },
+        {
+          "rank": 47,
+          "pmid": "27493136",
+          "unit_id": "7942ad2d033c9d415c0e49a10b6d2688c26e79cee82647baea8be8579d0d091a",
+          "content_fingerprint": "2a72790d0a1c68e09734101e397a236a99f4d08b563fb86e5458c198f215494d",
+          "score": 0.019246784491533265,
+          "relevant": false
+        },
+        {
+          "rank": 48,
+          "pmid": "35653320",
+          "unit_id": "a4cf2995ab3f891b6890d5ac9a6a4a45a631f2e735ab82d97e2ac4744afedb94",
+          "content_fingerprint": "6cbd8f0ed164d31c32a353fd9f9f125ed58821b0b386a58caad5ad5932381dad",
+          "score": 0.01906318082788671,
+          "relevant": false
+        },
+        {
+          "rank": 49,
+          "pmid": "35896123",
+          "unit_id": "c73dfbda9bfae65cb7b28955252891dedae7093dfb11809f037831ce52b15bc4",
+          "content_fingerprint": "b4614b04366b6f4ffdbe9e8e0ea4528faa0e85c2b83693ec1901ec7cc7d50263",
+          "score": 0.01905453225660103,
+          "relevant": false
+        },
+        {
+          "rank": 50,
+          "pmid": "38141902",
+          "unit_id": "d1dda3e79432839dc985e1338346306fbeefff9fc6e53574f67eca2d9d1f5bf8",
+          "content_fingerprint": "a27885e0849ec96b73e206c90d97a1c8ba79216a6f601ecb9354a664dc9c33cf",
+          "score": 0.01818181818181818,
+          "relevant": false
+        }
+      ]
+    },
+    {
+      "query_id": "q08",
+      "query": "biomarkers associated with breast cancer prognosis",
+      "metrics": {
+        "hit_rate@5": 1.0,
+        "recall@5": 1.0,
+        "precision@5": 0.4,
+        "reciprocal_rank": 1.0
+      },
+      "top_5": [
+        "33198517",
+        "35115765",
+        "38857504",
+        "27184418",
+        "30552067"
+      ],
+      "ranking": [
+        {
+          "rank": 1,
+          "pmid": "33198517",
+          "unit_id": "072b7a00f7e3b8822dd2418b2c73a6ee98f4654452319d1ef21d4ad22adc9347",
+          "content_fingerprint": "5ec78335a600605c607cd3480d5bcb0818ae926c879a8fd64b5ec6b73bd1c184",
+          "score": 0.03278688524590164,
+          "relevant": true
+        },
+        {
+          "rank": 2,
+          "pmid": "35115765",
+          "unit_id": "3edfc2ee9167c1a667afbadadbae13333e46a32e51ad7f48360cb047f1216698",
+          "content_fingerprint": "6b80e3c1f18f06c82e7300de5cdbea19760cf28abe15c80537ab43c1c1348d95",
+          "score": 0.03200204813108039,
+          "relevant": true
+        },
+        {
+          "rank": 3,
+          "pmid": "38857504",
+          "unit_id": "bbb956bf6ee32e95f23c4b4446f188cb229bfed3eb75a82e56b58d189548fbb7",
+          "content_fingerprint": "59cd2f2f7d8c5441453598bbedd26800da04a9dbf8235ceeffd97950f6d4623f",
+          "score": 0.03200204813108039,
+          "relevant": false
+        },
+        {
+          "rank": 4,
+          "pmid": "27184418",
+          "unit_id": "707db7dd8235e3b2310a3e24f0412662445e0cfd20821ab511f0e67813fe9a2f",
+          "content_fingerprint": "2621f600560be2bda08cf59aac3e200522d714f71cadc11db0864624dd578111",
+          "score": 0.030330882352941176,
+          "relevant": false
+        },
+        {
+          "rank": 5,
+          "pmid": "30552067",
+          "unit_id": "85127d7cd7661dd36a7e198331d1deca8fe60de41feb3e9994897adfae4b9e84",
+          "content_fingerprint": "fafb49e5c2aa55a1b0453b816f31fac6b85d41e6141d3b747a0e1e026d965779",
+          "score": 0.03007688828584351,
+          "relevant": false
+        },
+        {
+          "rank": 6,
+          "pmid": "29863955",
+          "unit_id": "81200f188ed546781b9968d828e8be43c99a40d80e025351f51423eb1e867e92",
+          "content_fingerprint": "3fd76151f8a6aab880d8e4750a94112770b1424f79c659f3861cf13779d21b60",
+          "score": 0.029709507042253523,
+          "relevant": false
+        },
+        {
+          "rank": 7,
+          "pmid": "22000494",
+          "unit_id": "6f7633fc1833c15ce690dff1e576740430bf3ab98c36b7cdcb09085e111c418c",
+          "content_fingerprint": "f7c2a468c03288d587cb809ae622d16e10a89e40e45dab09a3a92e984616b149",
+          "score": 0.02877846790890269,
+          "relevant": false
+        },
+        {
+          "rank": 8,
+          "pmid": "38924756",
+          "unit_id": "28082f8d2e9564a69e9972a2f4994ef5c57059e0aed2c8d78878eff3dc62f0fa",
+          "content_fingerprint": "ad8b0180f8a7f2dcd4f070e39aa8007cc7217d18c05a8783f5450291adba3725",
+          "score": 0.02854251012145749,
+          "relevant": false
+        },
+        {
+          "rank": 9,
+          "pmid": "38512301",
+          "unit_id": "021c8cc8951335927d0ad4bc932e11b891fb1724e37e51ddb471125728127cd0",
+          "content_fingerprint": "289131b11feabb5977a6182c331d992f35fa6a63281ffb75a3ca26c7723ff5e1",
+          "score": 0.028484848484848488,
+          "relevant": false
+        },
+        {
+          "rank": 10,
+          "pmid": "37425065",
+          "unit_id": "673d115eb699e8eef5898cb18cf92c6f5338f0fb3211112c63935e45312659b6",
+          "content_fingerprint": "e89de5a230a762770317103c9c223522b37fddf00177d663d7b143dd3094bc55",
+          "score": 0.028258706467661692,
+          "relevant": false
+        },
+        {
+          "rank": 11,
+          "pmid": "36252154",
+          "unit_id": "37db80a3de2c4fcb8600ef2df6859616f772966c4b8569c99745af4e2d38dcf3",
+          "content_fingerprint": "a8c4ff55cb50997a0d3371d955e017e60a163eb33dbd12024d22371ef7bff38a",
+          "score": 0.027984344422700584,
+          "relevant": false
+        },
+        {
+          "rank": 12,
+          "pmid": "34353454",
+          "unit_id": "f895c8e16a0355fcc079ecc1dbd3145e3432f464242673085d79ae216ee3d97f",
+          "content_fingerprint": "4df0516b6823e911072368e44a99fe8a39dd44d8eb1373fc6a5ecb1f6ca7ea9e",
+          "score": 0.027402402402402402,
+          "relevant": false
+        },
+        {
+          "rank": 13,
+          "pmid": "37879444",
+          "unit_id": "ae4c0828013649d1f0acf673e5e676f239df541f69d552b28e9a2eca7499f77e",
+          "content_fingerprint": "7965c629c3428c50db60309506dd1831ce78d4756219b56dc92149c80818bbeb",
+          "score": 0.027313266443701224,
+          "relevant": false
+        },
+        {
+          "rank": 14,
+          "pmid": "34767960",
+          "unit_id": "403ed6090e1e8e32d16ae2a674d092fd9d6d48330b405a9a6d68d7dbe0fe980d",
+          "content_fingerprint": "0b161bfdb00533d28e88a3b237ca79839e115811dab9c694b5bf0f142de40233",
+          "score": 0.027051561365286855,
+          "relevant": false
+        },
+        {
+          "rank": 15,
+          "pmid": "31090575",
+          "unit_id": "457d49c267258cedb4ba5cc2e6e51a934ec608d6724f8b6399a4021af2363eb0",
+          "content_fingerprint": "533f12976ac165974236e5d92800e832ed3f87e18da19ff569fe81e58f5649ec",
+          "score": 0.02651914295749912,
+          "relevant": false
+        },
+        {
+          "rank": 16,
+          "pmid": "35505000",
+          "unit_id": "7df84b762fa7930546ad3ad1ccfbc608ea0caf0ef95174468008c5425e7ca04f",
+          "content_fingerprint": "a12e03daa33308ad6ecc4f2181fe3c262d01a3a029782cc377169f5008b25eff",
+          "score": 0.026137303556658397,
+          "relevant": false
+        },
+        {
+          "rank": 17,
+          "pmid": "35040920",
+          "unit_id": "93c9c8a4539c5c35547771ab64a315c40567bcbe390d18dfb71cfec7ae1e1797",
+          "content_fingerprint": "abb1cc6f63eff4fff6c1ded23eb078dd9fb9f2a46146b7d2b3ce378549b0bec2",
+          "score": 0.02485334979932078,
+          "relevant": false
+        },
+        {
+          "rank": 18,
+          "pmid": "37364283",
+          "unit_id": "e49e57f2abfc7c57849cf7e8f6dd6fd9367c0d12ad7ca33a575befedd7c2829b",
+          "content_fingerprint": "435fde88e01aaebd8db1022f8f08ca9db63630f6b3ee3268d88c34e6b600e08f",
+          "score": 0.024266201685556526,
+          "relevant": false
+        },
+        {
+          "rank": 19,
+          "pmid": "28292619",
+          "unit_id": "9323f2e0371651ae3b19b5b3e102695f7a2538a1c073f50d991fac9ee3a43e35",
+          "content_fingerprint": "864f6902ed6b38d28339d8ce3bb372edd9f2cbda3164e0a84cdb9e925ee20299",
+          "score": 0.024096385542168676,
+          "relevant": false
+        },
+        {
+          "rank": 20,
+          "pmid": "33050934",
+          "unit_id": "598e2d1081e35d9d8803e90fd95902896d3f7953fcbdcd03b661ef9c4456cc25",
+          "content_fingerprint": "ec276cc3119dc28b3f3b232dc92f48983b1c6778612f1e2a5c7cebf0f3d53cb2",
+          "score": 0.023735955056179776,
+          "relevant": false
+        },
+        {
+          "rank": 21,
+          "pmid": "33683325",
+          "unit_id": "a2cb2c51608e8adc4eba5dd670dc39dd92a49037ef4825bd504cc20b9853a67c",
+          "content_fingerprint": "e595479d06d5d53912c5dd4c45a2390e375211b05525f5f3b9a15c9c3afc040a",
+          "score": 0.02353266888150609,
+          "relevant": false
+        },
+        {
+          "rank": 22,
+          "pmid": "31018251",
+          "unit_id": "fc1f078bbdbfe12d3ac666c4d61640d4453416f31a23c20ff2c85641df17294f",
+          "content_fingerprint": "1ecfac1d5f4387ff17b2ca18b3e17deb028b7d6d5281e2f2027636a4813ea180",
+          "score": 0.023430301434776885,
+          "relevant": false
+        },
+        {
+          "rank": 23,
+          "pmid": "28371335",
+          "unit_id": "e423ca0bfce40e5ed2f9ea514a786b530c882da707e31539a50d625deec7219d",
+          "content_fingerprint": "25aaec2ddb93a1d5379154d8194927bac27218804b8ce895c24d236499c86d40",
+          "score": 0.02329652572044169,
+          "relevant": false
+        },
+        {
+          "rank": 24,
+          "pmid": "36774932",
+          "unit_id": "42454181e5db620a6fd3b3c80df987a226d9350fcd4f772f641e213ebd923526",
+          "content_fingerprint": "f3b12fa6fb0839bb4a50c779fb8871b7f8362c20d5bfcfdd474e3ac5a423d508",
+          "score": 0.023234683281412254,
+          "relevant": false
+        },
+        {
+          "rank": 25,
+          "pmid": "29669543",
+          "unit_id": "2742ab4e7d7b48ff2c77e70dfe05f6a4e20b6dada18befdc6bdd4a89ee58fdb4",
+          "content_fingerprint": "4ceb3d956b2a347ed834b00b9747f5081f289b948c560997bd82f2d54498dfef",
+          "score": 0.022888003086022887,
+          "relevant": false
+        },
+        {
+          "rank": 26,
+          "pmid": "33301246",
+          "unit_id": "70b6d754ccbe8f6ac5500f86622fd64c1e83629b58b812e9a5de332b7a441346",
+          "content_fingerprint": "64c84e01ca14176471b5daf0748a02c4ffc62a4ea3157c70db75dcc08d980a1b",
+          "score": 0.022888003086022887,
+          "relevant": false
+        },
+        {
+          "rank": 27,
+          "pmid": "33951360",
+          "unit_id": "d77b9cd775d531bcc8c425b4404abf8b96914a5a9473a91f32dea90827efb42d",
+          "content_fingerprint": "78de812a52810fa40bfc7e8ba1bfd1932391d6e51b139c032aa45a1b515a7878",
+          "score": 0.022753716871363933,
+          "relevant": false
+        },
+        {
+          "rank": 28,
+          "pmid": "38697182",
+          "unit_id": "ecc1d8123dcd9c53fb56de0a33ac9775c087a53484e52255bbf48031c62f4199",
+          "content_fingerprint": "3708a8164179889ada32bcba840a2630848fd673d70d3f3ba2b4d5b7050aaa64",
+          "score": 0.0227390180878553,
+          "relevant": false
+        },
+        {
+          "rank": 29,
+          "pmid": "33829619",
+          "unit_id": "47d0f94cb5af56e8e2ef2170734548ff168189edfa27554304dc3c89e0482182",
+          "content_fingerprint": "ce90551b9976e8e9fab3364002cf03e94b573877af91446b7121ffc2d4eddde9",
+          "score": 0.022591857000993046,
+          "relevant": false
+        },
+        {
+          "rank": 30,
+          "pmid": "35263517",
+          "unit_id": "4dac5faea6eed182f1086227ee2c4475c639dbada8d88b8b22655628f58a0c40",
+          "content_fingerprint": "c0f4973a7d8938289fc52b70aeea8e22a70416ce08634da2b599469149da57f8",
+          "score": 0.022504400301734978,
+          "relevant": false
+        },
+        {
+          "rank": 31,
+          "pmid": "27494630",
+          "unit_id": "cab5aaada12b679453120676f8e4b998d463129a136055c7ef44f5e016b763f5",
+          "content_fingerprint": "b1d0eacad5325e37ac2454a29310f52e568a50fe73f9bc4b53a805404abd7fdb",
+          "score": 0.022446689113355782,
+          "relevant": false
+        },
+        {
+          "rank": 32,
+          "pmid": "35988550",
+          "unit_id": "5c453d941b1c0f73e9f6df0d8792c3174689556c5fe12a746c33a29116828930",
+          "content_fingerprint": "0d37af25659cbbbe1020b76df31aa7264f22ac333704c9d59e958156b034da50",
+          "score": 0.022363818090954522,
+          "relevant": false
+        },
+        {
+          "rank": 33,
+          "pmid": "24356592",
+          "unit_id": "232a1531c4e4b44379486ca19a88c70b3668ed133d6a49eaafab8b6168611c57",
+          "content_fingerprint": "8415f5193289896681ec6ada7a72b86bea3100989ba0ff78c8ccfc8bd5265ae9",
+          "score": 0.022214040255277366,
+          "relevant": false
+        },
+        {
+          "rank": 34,
+          "pmid": "28460827",
+          "unit_id": "02f38bf5543a99e8f64431ff498aa03d1630ea35aed8fc3db0066405b571c86a",
+          "content_fingerprint": "2c66d2006372ca8909f263953b9ad34294e9568de588daaaef610d54bcdaa504",
+          "score": 0.022115384615384617,
+          "relevant": false
+        },
+        {
+          "rank": 35,
+          "pmid": "38184132",
+          "unit_id": "e5a1aacf824dfada803e96e78404432aa0f16e93fcfbcf0cd6f2caa820a06fe4",
+          "content_fingerprint": "dfe219115a9d562be7c9a77c687d814405155bf30794489eb9dab53870f32d0c",
+          "score": 0.021780303030303032,
+          "relevant": false
+        },
+        {
+          "rank": 36,
+          "pmid": "38763510",
+          "unit_id": "b549f7cac78251e6c8b6d96e2a976d7a0d1282d3963181ffb30f2d238b35719d",
+          "content_fingerprint": "5cbde62e4e0c0c5da947fee5e888465be812b656ce989fde4b6625da2b6cb40e",
+          "score": 0.021627308861351415,
+          "relevant": false
+        },
+        {
+          "rank": 37,
+          "pmid": "35636910",
+          "unit_id": "1ab6a630ef83ba9ee6686043d2371cf205d3f9a492bb79c1042a251271da4758",
+          "content_fingerprint": "22a641e9fc27f16850d80974c541fd2b3a9bd51f58575f37ade206b69419501b",
+          "score": 0.021212121212121213,
+          "relevant": false
+        },
+        {
+          "rank": 38,
+          "pmid": "27493136",
+          "unit_id": "7942ad2d033c9d415c0e49a10b6d2688c26e79cee82647baea8be8579d0d091a",
+          "content_fingerprint": "2a72790d0a1c68e09734101e397a236a99f4d08b563fb86e5458c198f215494d",
+          "score": 0.02092821513771416,
+          "relevant": false
+        },
+        {
+          "rank": 39,
+          "pmid": "27813430",
+          "unit_id": "5b4867036bce515d33bda6e35cae05436378e4647fd03ad509c65709e3381d63",
+          "content_fingerprint": "6da6b7c400f340a9d9f089c600407e9700c809d45fffa51a465f135969678b74",
+          "score": 0.02085561497326203,
+          "relevant": false
+        },
+        {
+          "rank": 40,
+          "pmid": "28467922",
+          "unit_id": "a0657a4394eb3ff8907237d9b1367d178264909857b94bf87355fa253c0acb5b",
+          "content_fingerprint": "de0ca3ae0dd811041ab322da54751736981c16855adcaea79c186ceb0cff884f",
+          "score": 0.02085133967156439,
+          "relevant": false
+        },
+        {
+          "rank": 41,
+          "pmid": "24315724",
+          "unit_id": "71e6f9b6eb556f3650c2347085c953f244496aaffefd9f85fe310407c9798602",
+          "content_fingerprint": "2d952af296f3b250d5fb5ddc6e486fdc01193e82d00fe26ec64beda188f56254",
+          "score": 0.020730397422126744,
+          "relevant": false
+        },
+        {
+          "rank": 42,
+          "pmid": "38141902",
+          "unit_id": "d1dda3e79432839dc985e1338346306fbeefff9fc6e53574f67eca2d9d1f5bf8",
+          "content_fingerprint": "a27885e0849ec96b73e206c90d97a1c8ba79216a6f601ecb9354a664dc9c33cf",
+          "score": 0.020330237358101133,
+          "relevant": false
+        },
+        {
+          "rank": 43,
+          "pmid": "36519436",
+          "unit_id": "a973a5f6273ca012cb313e27a768a5eccd8017c0e3d179a1205d179d1583724c",
+          "content_fingerprint": "61b54a500536079561e3ea1be2d2be030c9c89d2e524f54827d7b25756a9688c",
+          "score": 0.02,
+          "relevant": false
+        },
+        {
+          "rank": 44,
+          "pmid": "35896123",
+          "unit_id": "c73dfbda9bfae65cb7b28955252891dedae7093dfb11809f037831ce52b15bc4",
+          "content_fingerprint": "b4614b04366b6f4ffdbe9e8e0ea4528faa0e85c2b83693ec1901ec7cc7d50263",
+          "score": 0.01994047619047619,
+          "relevant": false
+        },
+        {
+          "rank": 45,
+          "pmid": "33650528",
+          "unit_id": "147295fdad5a9406bdc2af895008decebd915fe097342b9d794323b1e545ab77",
+          "content_fingerprint": "3907ce53664e18dcf56f552067f9d4148f96ceb3db66263cd599dc22fa1e66ff",
+          "score": 0.01991281949673073,
+          "relevant": false
+        },
+        {
+          "rank": 46,
+          "pmid": "35653320",
+          "unit_id": "a4cf2995ab3f891b6890d5ac9a6a4a45a631f2e735ab82d97e2ac4744afedb94",
+          "content_fingerprint": "6cbd8f0ed164d31c32a353fd9f9f125ed58821b0b386a58caad5ad5932381dad",
+          "score": 0.019327731092436976,
+          "relevant": false
+        },
+        {
+          "rank": 47,
+          "pmid": "37161520",
+          "unit_id": "cc7e13789a2c4614f9d28c0eda087cf1d13dc0f08e836a6e34229047959f9dc8",
+          "content_fingerprint": "a3011da776b91f858bd26e41800c742724d843a97772dee758735d07a8c4d6d8",
+          "score": 0.018883049790683174,
+          "relevant": false
+        },
+        {
+          "rank": 48,
+          "pmid": "29627041",
+          "unit_id": "c7dd37835680fdff95f876add24a6f7e595d3a8eeaaaad7c0b235d0f509a4993",
+          "content_fingerprint": "662b0ebb4f5dfa481d22bfc43afc53949bfd48be2e5a42ae346c774abae3cde6",
+          "score": 0.011363636363636364,
+          "relevant": false
+        },
+        {
+          "rank": 49,
+          "pmid": "33793326",
+          "unit_id": "99ca4d15c295638c2870f20deec1be1dec652e7bc7bcadf17e3c7d611decdeb1",
+          "content_fingerprint": "fa0fc6577bfbebc7a86bb1ffcee4d314d5cedb79d5265151983a209be06292c3",
+          "score": 0.010869565217391304,
+          "relevant": false
+        },
+        {
+          "rank": 50,
+          "pmid": "32430550",
+          "unit_id": "c09d8c61324e42b036137c235bda8354ee228f37d24031120bc576f889d181cd",
+          "content_fingerprint": "c3f025e08e1365ae186c83bf09dfcb8c1f8b09731ec1f3663fe0b2e513951dac",
+          "score": 0.009259259259259259,
+          "relevant": false
+        }
+      ]
+    },
+    {
+      "query_id": "q09",
+      "query": "antibiotic treatment outcomes in community-acquired pneumonia",
+      "metrics": {
+        "hit_rate@5": 1.0,
+        "recall@5": 1.0,
+        "precision@5": 0.6,
+        "reciprocal_rank": 1.0
+      },
+      "top_5": [
+        "35505000",
+        "35040920",
+        "33683325",
+        "33650528",
+        "38512301"
+      ],
+      "ranking": [
+        {
+          "rank": 1,
+          "pmid": "35505000",
+          "unit_id": "7df84b762fa7930546ad3ad1ccfbc608ea0caf0ef95174468008c5425e7ca04f",
+          "content_fingerprint": "a12e03daa33308ad6ecc4f2181fe3c262d01a3a029782cc377169f5008b25eff",
+          "score": 0.032266458495966696,
+          "relevant": true
+        },
+        {
+          "rank": 2,
+          "pmid": "35040920",
+          "unit_id": "93c9c8a4539c5c35547771ab64a315c40567bcbe390d18dfb71cfec7ae1e1797",
+          "content_fingerprint": "abb1cc6f63eff4fff6c1ded23eb078dd9fb9f2a46146b7d2b3ce378549b0bec2",
+          "score": 0.032266458495966696,
+          "relevant": true
+        },
+        {
+          "rank": 3,
+          "pmid": "33683325",
+          "unit_id": "a2cb2c51608e8adc4eba5dd670dc39dd92a49037ef4825bd504cc20b9853a67c",
+          "content_fingerprint": "e595479d06d5d53912c5dd4c45a2390e375211b05525f5f3b9a15c9c3afc040a",
+          "score": 0.03225806451612903,
+          "relevant": true
+        },
+        {
+          "rank": 4,
+          "pmid": "33650528",
+          "unit_id": "147295fdad5a9406bdc2af895008decebd915fe097342b9d794323b1e545ab77",
+          "content_fingerprint": "3907ce53664e18dcf56f552067f9d4148f96ceb3db66263cd599dc22fa1e66ff",
+          "score": 0.028958333333333336,
+          "relevant": false
+        },
+        {
+          "rank": 5,
+          "pmid": "38512301",
+          "unit_id": "021c8cc8951335927d0ad4bc932e11b891fb1724e37e51ddb471125728127cd0",
+          "content_fingerprint": "289131b11feabb5977a6182c331d992f35fa6a63281ffb75a3ca26c7723ff5e1",
+          "score": 0.028577260665441927,
+          "relevant": false
+        },
+        {
+          "rank": 6,
+          "pmid": "35263517",
+          "unit_id": "4dac5faea6eed182f1086227ee2c4475c639dbada8d88b8b22655628f58a0c40",
+          "content_fingerprint": "c0f4973a7d8938289fc52b70aeea8e22a70416ce08634da2b599469149da57f8",
+          "score": 0.028205128205128206,
+          "relevant": false
+        },
+        {
+          "rank": 7,
+          "pmid": "31018251",
+          "unit_id": "fc1f078bbdbfe12d3ac666c4d61640d4453416f31a23c20ff2c85641df17294f",
+          "content_fingerprint": "1ecfac1d5f4387ff17b2ca18b3e17deb028b7d6d5281e2f2027636a4813ea180",
+          "score": 0.02786377708978328,
+          "relevant": false
+        },
+        {
+          "rank": 8,
+          "pmid": "33050934",
+          "unit_id": "598e2d1081e35d9d8803e90fd95902896d3f7953fcbdcd03b661ef9c4456cc25",
+          "content_fingerprint": "ec276cc3119dc28b3f3b232dc92f48983b1c6778612f1e2a5c7cebf0f3d53cb2",
+          "score": 0.027799227799227798,
+          "relevant": false
+        },
+        {
+          "rank": 9,
+          "pmid": "35988550",
+          "unit_id": "5c453d941b1c0f73e9f6df0d8792c3174689556c5fe12a746c33a29116828930",
+          "content_fingerprint": "0d37af25659cbbbe1020b76df31aa7264f22ac333704c9d59e958156b034da50",
+          "score": 0.02749719416386083,
+          "relevant": false
+        },
+        {
+          "rank": 10,
+          "pmid": "37364283",
+          "unit_id": "e49e57f2abfc7c57849cf7e8f6dd6fd9367c0d12ad7ca33a575befedd7c2829b",
+          "content_fingerprint": "435fde88e01aaebd8db1022f8f08ca9db63630f6b3ee3268d88c34e6b600e08f",
+          "score": 0.026830135039090264,
+          "relevant": false
+        },
+        {
+          "rank": 11,
+          "pmid": "24315724",
+          "unit_id": "71e6f9b6eb556f3650c2347085c953f244496aaffefd9f85fe310407c9798602",
+          "content_fingerprint": "2d952af296f3b250d5fb5ddc6e486fdc01193e82d00fe26ec64beda188f56254",
+          "score": 0.02668564312399929,
+          "relevant": false
+        },
+        {
+          "rank": 12,
+          "pmid": "33951360",
+          "unit_id": "d77b9cd775d531bcc8c425b4404abf8b96914a5a9473a91f32dea90827efb42d",
+          "content_fingerprint": "78de812a52810fa40bfc7e8ba1bfd1932391d6e51b139c032aa45a1b515a7878",
+          "score": 0.02661401098901099,
+          "relevant": false
+        },
+        {
+          "rank": 13,
+          "pmid": "28460827",
+          "unit_id": "02f38bf5543a99e8f64431ff498aa03d1630ea35aed8fc3db0066405b571c86a",
+          "content_fingerprint": "2c66d2006372ca8909f263953b9ad34294e9568de588daaaef610d54bcdaa504",
+          "score": 0.0264957264957265,
+          "relevant": false
+        },
+        {
+          "rank": 14,
+          "pmid": "38924756",
+          "unit_id": "28082f8d2e9564a69e9972a2f4994ef5c57059e0aed2c8d78878eff3dc62f0fa",
+          "content_fingerprint": "ad8b0180f8a7f2dcd4f070e39aa8007cc7217d18c05a8783f5450291adba3725",
+          "score": 0.026387470207694927,
+          "relevant": false
+        },
+        {
+          "rank": 15,
+          "pmid": "33829619",
+          "unit_id": "47d0f94cb5af56e8e2ef2170734548ff168189edfa27554304dc3c89e0482182",
+          "content_fingerprint": "ce90551b9976e8e9fab3364002cf03e94b573877af91446b7121ffc2d4eddde9",
+          "score": 0.026356857985087564,
+          "relevant": false
+        },
+        {
+          "rank": 16,
+          "pmid": "36774932",
+          "unit_id": "42454181e5db620a6fd3b3c80df987a226d9350fcd4f772f641e213ebd923526",
+          "content_fingerprint": "f3b12fa6fb0839bb4a50c779fb8871b7f8362c20d5bfcfdd474e3ac5a423d508",
+          "score": 0.025856389986824768,
+          "relevant": false
+        },
+        {
+          "rank": 17,
+          "pmid": "29863955",
+          "unit_id": "81200f188ed546781b9968d828e8be43c99a40d80e025351f51423eb1e867e92",
+          "content_fingerprint": "3fd76151f8a6aab880d8e4750a94112770b1424f79c659f3861cf13779d21b60",
+          "score": 0.025232198142414862,
+          "relevant": false
+        },
+        {
+          "rank": 18,
+          "pmid": "38697182",
+          "unit_id": "ecc1d8123dcd9c53fb56de0a33ac9775c087a53484e52255bbf48031c62f4199",
+          "content_fingerprint": "3708a8164179889ada32bcba840a2630848fd673d70d3f3ba2b4d5b7050aaa64",
+          "score": 0.024827586206896554,
+          "relevant": false
+        },
+        {
+          "rank": 19,
+          "pmid": "33198517",
+          "unit_id": "072b7a00f7e3b8822dd2418b2c73a6ee98f4654452319d1ef21d4ad22adc9347",
+          "content_fingerprint": "5ec78335a600605c607cd3480d5bcb0818ae926c879a8fd64b5ec6b73bd1c184",
+          "score": 0.02472929470295581,
+          "relevant": false
+        },
+        {
+          "rank": 20,
+          "pmid": "33793326",
+          "unit_id": "99ca4d15c295638c2870f20deec1be1dec652e7bc7bcadf17e3c7d611decdeb1",
+          "content_fingerprint": "fa0fc6577bfbebc7a86bb1ffcee4d314d5cedb79d5265151983a209be06292c3",
+          "score": 0.02424331472230385,
+          "relevant": false
+        },
+        {
+          "rank": 21,
+          "pmid": "33301246",
+          "unit_id": "70b6d754ccbe8f6ac5500f86622fd64c1e83629b58b812e9a5de332b7a441346",
+          "content_fingerprint": "64c84e01ca14176471b5daf0748a02c4ffc62a4ea3157c70db75dcc08d980a1b",
+          "score": 0.0239010989010989,
+          "relevant": false
+        },
+        {
+          "rank": 22,
+          "pmid": "30552067",
+          "unit_id": "85127d7cd7661dd36a7e198331d1deca8fe60de41feb3e9994897adfae4b9e84",
+          "content_fingerprint": "fafb49e5c2aa55a1b0453b816f31fac6b85d41e6141d3b747a0e1e026d965779",
+          "score": 0.023769338959212377,
+          "relevant": false
+        },
+        {
+          "rank": 23,
+          "pmid": "36519436",
+          "unit_id": "a973a5f6273ca012cb313e27a768a5eccd8017c0e3d179a1205d179d1583724c",
+          "content_fingerprint": "61b54a500536079561e3ea1be2d2be030c9c89d2e524f54827d7b25756a9688c",
+          "score": 0.023717595146166573,
+          "relevant": false
+        },
+        {
+          "rank": 24,
+          "pmid": "35636910",
+          "unit_id": "1ab6a630ef83ba9ee6686043d2371cf205d3f9a492bb79c1042a251271da4758",
+          "content_fingerprint": "22a641e9fc27f16850d80974c541fd2b3a9bd51f58575f37ade206b69419501b",
+          "score": 0.02325881896885903,
+          "relevant": false
+        },
+        {
+          "rank": 25,
+          "pmid": "22000494",
+          "unit_id": "6f7633fc1833c15ce690dff1e576740430bf3ab98c36b7cdcb09085e111c418c",
+          "content_fingerprint": "f7c2a468c03288d587cb809ae622d16e10a89e40e45dab09a3a92e984616b149",
+          "score": 0.023252688172043012,
+          "relevant": false
+        },
+        {
+          "rank": 26,
+          "pmid": "37879444",
+          "unit_id": "ae4c0828013649d1f0acf673e5e676f239df541f69d552b28e9a2eca7499f77e",
+          "content_fingerprint": "7965c629c3428c50db60309506dd1831ce78d4756219b56dc92149c80818bbeb",
+          "score": 0.023234683281412254,
+          "relevant": false
+        },
+        {
+          "rank": 27,
+          "pmid": "29669543",
+          "unit_id": "2742ab4e7d7b48ff2c77e70dfe05f6a4e20b6dada18befdc6bdd4a89ee58fdb4",
+          "content_fingerprint": "4ceb3d956b2a347ed834b00b9747f5081f289b948c560997bd82f2d54498dfef",
+          "score": 0.023157894736842106,
+          "relevant": false
+        },
+        {
+          "rank": 28,
+          "pmid": "27813430",
+          "unit_id": "5b4867036bce515d33bda6e35cae05436378e4647fd03ad509c65709e3381d63",
+          "content_fingerprint": "6da6b7c400f340a9d9f089c600407e9700c809d45fffa51a465f135969678b74",
+          "score": 0.023129791171028286,
+          "relevant": false
+        },
+        {
+          "rank": 29,
+          "pmid": "28292619",
+          "unit_id": "9323f2e0371651ae3b19b5b3e102695f7a2538a1c073f50d991fac9ee3a43e35",
+          "content_fingerprint": "864f6902ed6b38d28339d8ce3bb372edd9f2cbda3164e0a84cdb9e925ee20299",
+          "score": 0.02297979797979798,
+          "relevant": false
+        },
+        {
+          "rank": 30,
+          "pmid": "27184418",
+          "unit_id": "707db7dd8235e3b2310a3e24f0412662445e0cfd20821ab511f0e67813fe9a2f",
+          "content_fingerprint": "2621f600560be2bda08cf59aac3e200522d714f71cadc11db0864624dd578111",
+          "score": 0.02286386203292396,
+          "relevant": false
+        },
+        {
+          "rank": 31,
+          "pmid": "38184132",
+          "unit_id": "e5a1aacf824dfada803e96e78404432aa0f16e93fcfbcf0cd6f2caa820a06fe4",
+          "content_fingerprint": "dfe219115a9d562be7c9a77c687d814405155bf30794489eb9dab53870f32d0c",
+          "score": 0.02254305977710233,
+          "relevant": false
+        },
+        {
+          "rank": 32,
+          "pmid": "31090575",
+          "unit_id": "457d49c267258cedb4ba5cc2e6e51a934ec608d6724f8b6399a4021af2363eb0",
+          "content_fingerprint": "533f12976ac165974236e5d92800e832ed3f87e18da19ff569fe81e58f5649ec",
+          "score": 0.022510822510822513,
+          "relevant": false
+        },
+        {
+          "rank": 33,
+          "pmid": "38763510",
+          "unit_id": "b549f7cac78251e6c8b6d96e2a976d7a0d1282d3963181ffb30f2d238b35719d",
+          "content_fingerprint": "5cbde62e4e0c0c5da947fee5e888465be812b656ce989fde4b6625da2b6cb40e",
+          "score": 0.022352647352647352,
+          "relevant": false
+        },
+        {
+          "rank": 34,
+          "pmid": "34767960",
+          "unit_id": "403ed6090e1e8e32d16ae2a674d092fd9d6d48330b405a9a6d68d7dbe0fe980d",
+          "content_fingerprint": "0b161bfdb00533d28e88a3b237ca79839e115811dab9c694b5bf0f142de40233",
+          "score": 0.02224666911135558,
+          "relevant": false
+        },
+        {
+          "rank": 35,
+          "pmid": "27494630",
+          "unit_id": "cab5aaada12b679453120676f8e4b998d463129a136055c7ef44f5e016b763f5",
+          "content_fingerprint": "b1d0eacad5325e37ac2454a29310f52e568a50fe73f9bc4b53a805404abd7fdb",
+          "score": 0.02220873786407767,
+          "relevant": false
+        },
+        {
+          "rank": 36,
+          "pmid": "32430550",
+          "unit_id": "c09d8c61324e42b036137c235bda8354ee228f37d24031120bc576f889d181cd",
+          "content_fingerprint": "c3f025e08e1365ae186c83bf09dfcb8c1f8b09731ec1f3663fe0b2e513951dac",
+          "score": 0.022149202872094438,
+          "relevant": false
+        },
+        {
+          "rank": 37,
+          "pmid": "36252154",
+          "unit_id": "37db80a3de2c4fcb8600ef2df6859616f772966c4b8569c99745af4e2d38dcf3",
+          "content_fingerprint": "a8c4ff55cb50997a0d3371d955e017e60a163eb33dbd12024d22371ef7bff38a",
+          "score": 0.0220205686630369,
+          "relevant": false
+        },
+        {
+          "rank": 38,
+          "pmid": "29627041",
+          "unit_id": "c7dd37835680fdff95f876add24a6f7e595d3a8eeaaaad7c0b235d0f509a4993",
+          "content_fingerprint": "662b0ebb4f5dfa481d22bfc43afc53949bfd48be2e5a42ae346c774abae3cde6",
+          "score": 0.021665695981362844,
+          "relevant": false
+        },
+        {
+          "rank": 39,
+          "pmid": "37425065",
+          "unit_id": "673d115eb699e8eef5898cb18cf92c6f5338f0fb3211112c63935e45312659b6",
+          "content_fingerprint": "e89de5a230a762770317103c9c223522b37fddf00177d663d7b143dd3094bc55",
+          "score": 0.021540916343742875,
+          "relevant": false
+        },
+        {
+          "rank": 40,
+          "pmid": "28371335",
+          "unit_id": "e423ca0bfce40e5ed2f9ea514a786b530c882da707e31539a50d625deec7219d",
+          "content_fingerprint": "25aaec2ddb93a1d5379154d8194927bac27218804b8ce895c24d236499c86d40",
+          "score": 0.021431828545371637,
+          "relevant": false
+        },
+        {
+          "rank": 41,
+          "pmid": "37161520",
+          "unit_id": "cc7e13789a2c4614f9d28c0eda087cf1d13dc0f08e836a6e34229047959f9dc8",
+          "content_fingerprint": "a3011da776b91f858bd26e41800c742724d843a97772dee758735d07a8c4d6d8",
+          "score": 0.021198668146503882,
+          "relevant": false
+        },
+        {
+          "rank": 42,
+          "pmid": "34353454",
+          "unit_id": "f895c8e16a0355fcc079ecc1dbd3145e3432f464242673085d79ae216ee3d97f",
+          "content_fingerprint": "4df0516b6823e911072368e44a99fe8a39dd44d8eb1373fc6a5ecb1f6ca7ea9e",
+          "score": 0.020869565217391306,
+          "relevant": false
+        },
+        {
+          "rank": 43,
+          "pmid": "38857504",
+          "unit_id": "bbb956bf6ee32e95f23c4b4446f188cb229bfed3eb75a82e56b58d189548fbb7",
+          "content_fingerprint": "59cd2f2f7d8c5441453598bbedd26800da04a9dbf8235ceeffd97950f6d4623f",
+          "score": 0.020853698273053112,
+          "relevant": false
+        },
+        {
+          "rank": 44,
+          "pmid": "35653320",
+          "unit_id": "a4cf2995ab3f891b6890d5ac9a6a4a45a631f2e735ab82d97e2ac4744afedb94",
+          "content_fingerprint": "6cbd8f0ed164d31c32a353fd9f9f125ed58821b0b386a58caad5ad5932381dad",
+          "score": 0.02004387714399681,
+          "relevant": false
+        },
+        {
+          "rank": 45,
+          "pmid": "35115765",
+          "unit_id": "3edfc2ee9167c1a667afbadadbae13333e46a32e51ad7f48360cb047f1216698",
+          "content_fingerprint": "6b80e3c1f18f06c82e7300de5cdbea19760cf28abe15c80537ab43c1c1348d95",
+          "score": 0.02003205128205128,
+          "relevant": false
+        },
+        {
+          "rank": 46,
+          "pmid": "27493136",
+          "unit_id": "7942ad2d033c9d415c0e49a10b6d2688c26e79cee82647baea8be8579d0d091a",
+          "content_fingerprint": "2a72790d0a1c68e09734101e397a236a99f4d08b563fb86e5458c198f215494d",
+          "score": 0.019897557131599686,
+          "relevant": false
+        },
+        {
+          "rank": 47,
+          "pmid": "24356592",
+          "unit_id": "232a1531c4e4b44379486ca19a88c70b3668ed133d6a49eaafab8b6168611c57",
+          "content_fingerprint": "8415f5193289896681ec6ada7a72b86bea3100989ba0ff78c8ccfc8bd5265ae9",
+          "score": 0.019833087874324987,
+          "relevant": false
+        },
+        {
+          "rank": 48,
+          "pmid": "28467922",
+          "unit_id": "a0657a4394eb3ff8907237d9b1367d178264909857b94bf87355fa253c0acb5b",
+          "content_fingerprint": "de0ca3ae0dd811041ab322da54751736981c16855adcaea79c186ceb0cff884f",
+          "score": 0.019463340891912317,
+          "relevant": false
+        },
+        {
+          "rank": 49,
+          "pmid": "35896123",
+          "unit_id": "c73dfbda9bfae65cb7b28955252891dedae7093dfb11809f037831ce52b15bc4",
+          "content_fingerprint": "b4614b04366b6f4ffdbe9e8e0ea4528faa0e85c2b83693ec1901ec7cc7d50263",
+          "score": 0.019142700128228614,
+          "relevant": false
+        },
+        {
+          "rank": 50,
+          "pmid": "38141902",
+          "unit_id": "d1dda3e79432839dc985e1338346306fbeefff9fc6e53574f67eca2d9d1f5bf8",
+          "content_fingerprint": "a27885e0849ec96b73e206c90d97a1c8ba79216a6f601ecb9354a664dc9c33cf",
+          "score": 0.010416666666666666,
+          "relevant": false
+        }
+      ]
+    },
+    {
+      "query_id": "q10",
+      "query": "effectiveness of influenza vaccination in older adults",
+      "metrics": {
+        "hit_rate@5": 1.0,
+        "recall@5": 1.0,
+        "precision@5": 0.4,
+        "reciprocal_rank": 1.0
+      },
+      "top_5": [
+        "33650528",
+        "27813430",
+        "27494630",
+        "33301246",
+        "35505000"
+      ],
+      "ranking": [
+        {
+          "rank": 1,
+          "pmid": "33650528",
+          "unit_id": "147295fdad5a9406bdc2af895008decebd915fe097342b9d794323b1e545ab77",
+          "content_fingerprint": "3907ce53664e18dcf56f552067f9d4148f96ceb3db66263cd599dc22fa1e66ff",
+          "score": 0.03252247488101534,
+          "relevant": true
+        },
+        {
+          "rank": 2,
+          "pmid": "27813430",
+          "unit_id": "5b4867036bce515d33bda6e35cae05436378e4647fd03ad509c65709e3381d63",
+          "content_fingerprint": "6da6b7c400f340a9d9f089c600407e9700c809d45fffa51a465f135969678b74",
+          "score": 0.03252247488101534,
+          "relevant": true
+        },
+        {
+          "rank": 3,
+          "pmid": "27494630",
+          "unit_id": "cab5aaada12b679453120676f8e4b998d463129a136055c7ef44f5e016b763f5",
+          "content_fingerprint": "b1d0eacad5325e37ac2454a29310f52e568a50fe73f9bc4b53a805404abd7fdb",
+          "score": 0.031746031746031744,
+          "relevant": false
+        },
+        {
+          "rank": 4,
+          "pmid": "33301246",
+          "unit_id": "70b6d754ccbe8f6ac5500f86622fd64c1e83629b58b812e9a5de332b7a441346",
+          "content_fingerprint": "64c84e01ca14176471b5daf0748a02c4ffc62a4ea3157c70db75dcc08d980a1b",
+          "score": 0.031009615384615385,
+          "relevant": false
+        },
+        {
+          "rank": 5,
+          "pmid": "35505000",
+          "unit_id": "7df84b762fa7930546ad3ad1ccfbc608ea0caf0ef95174468008c5425e7ca04f",
+          "content_fingerprint": "a12e03daa33308ad6ecc4f2181fe3c262d01a3a029782cc377169f5008b25eff",
+          "score": 0.02877846790890269,
+          "relevant": false
+        },
+        {
+          "rank": 6,
+          "pmid": "33050934",
+          "unit_id": "598e2d1081e35d9d8803e90fd95902896d3f7953fcbdcd03b661ef9c4456cc25",
+          "content_fingerprint": "ec276cc3119dc28b3f3b232dc92f48983b1c6778612f1e2a5c7cebf0f3d53cb2",
+          "score": 0.028594771241830064,
+          "relevant": false
+        },
+        {
+          "rank": 7,
+          "pmid": "33793326",
+          "unit_id": "99ca4d15c295638c2870f20deec1be1dec652e7bc7bcadf17e3c7d611decdeb1",
+          "content_fingerprint": "fa0fc6577bfbebc7a86bb1ffcee4d314d5cedb79d5265151983a209be06292c3",
+          "score": 0.028125,
+          "relevant": false
+        },
+        {
+          "rank": 8,
+          "pmid": "33951360",
+          "unit_id": "d77b9cd775d531bcc8c425b4404abf8b96914a5a9473a91f32dea90827efb42d",
+          "content_fingerprint": "78de812a52810fa40bfc7e8ba1bfd1932391d6e51b139c032aa45a1b515a7878",
+          "score": 0.027479766610201392,
+          "relevant": false
+        },
+        {
+          "rank": 9,
+          "pmid": "33683325",
+          "unit_id": "a2cb2c51608e8adc4eba5dd670dc39dd92a49037ef4825bd504cc20b9853a67c",
+          "content_fingerprint": "e595479d06d5d53912c5dd4c45a2390e375211b05525f5f3b9a15c9c3afc040a",
+          "score": 0.026973565905412694,
+          "relevant": false
+        },
+        {
+          "rank": 10,
+          "pmid": "35040920",
+          "unit_id": "93c9c8a4539c5c35547771ab64a315c40567bcbe390d18dfb71cfec7ae1e1797",
+          "content_fingerprint": "abb1cc6f63eff4fff6c1ded23eb078dd9fb9f2a46146b7d2b3ce378549b0bec2",
+          "score": 0.026878868258178604,
+          "relevant": false
+        },
+        {
+          "rank": 11,
+          "pmid": "29627041",
+          "unit_id": "c7dd37835680fdff95f876add24a6f7e595d3a8eeaaaad7c0b235d0f509a4993",
+          "content_fingerprint": "662b0ebb4f5dfa481d22bfc43afc53949bfd48be2e5a42ae346c774abae3cde6",
+          "score": 0.026161328190508135,
+          "relevant": false
+        },
+        {
+          "rank": 12,
+          "pmid": "37161520",
+          "unit_id": "cc7e13789a2c4614f9d28c0eda087cf1d13dc0f08e836a6e34229047959f9dc8",
+          "content_fingerprint": "a3011da776b91f858bd26e41800c742724d843a97772dee758735d07a8c4d6d8",
+          "score": 0.026021080368906456,
+          "relevant": false
+        },
+        {
+          "rank": 13,
+          "pmid": "30552067",
+          "unit_id": "85127d7cd7661dd36a7e198331d1deca8fe60de41feb3e9994897adfae4b9e84",
+          "content_fingerprint": "fafb49e5c2aa55a1b0453b816f31fac6b85d41e6141d3b747a0e1e026d965779",
+          "score": 0.025989268947015427,
+          "relevant": false
+        },
+        {
+          "rank": 14,
+          "pmid": "38924756",
+          "unit_id": "28082f8d2e9564a69e9972a2f4994ef5c57059e0aed2c8d78878eff3dc62f0fa",
+          "content_fingerprint": "ad8b0180f8a7f2dcd4f070e39aa8007cc7217d18c05a8783f5450291adba3725",
+          "score": 0.025833333333333333,
+          "relevant": false
+        },
+        {
+          "rank": 15,
+          "pmid": "28460827",
+          "unit_id": "02f38bf5543a99e8f64431ff498aa03d1630ea35aed8fc3db0066405b571c86a",
+          "content_fingerprint": "2c66d2006372ca8909f263953b9ad34294e9568de588daaaef610d54bcdaa504",
+          "score": 0.025793650793650792,
+          "relevant": false
+        },
+        {
+          "rank": 16,
+          "pmid": "38184132",
+          "unit_id": "e5a1aacf824dfada803e96e78404432aa0f16e93fcfbcf0cd6f2caa820a06fe4",
+          "content_fingerprint": "dfe219115a9d562be7c9a77c687d814405155bf30794489eb9dab53870f32d0c",
+          "score": 0.02571241401899771,
+          "relevant": false
+        },
+        {
+          "rank": 17,
+          "pmid": "32430550",
+          "unit_id": "c09d8c61324e42b036137c235bda8354ee228f37d24031120bc576f889d181cd",
+          "content_fingerprint": "c3f025e08e1365ae186c83bf09dfcb8c1f8b09731ec1f3663fe0b2e513951dac",
+          "score": 0.025332691999358666,
+          "relevant": false
+        },
+        {
+          "rank": 18,
+          "pmid": "24356592",
+          "unit_id": "232a1531c4e4b44379486ca19a88c70b3668ed133d6a49eaafab8b6168611c57",
+          "content_fingerprint": "8415f5193289896681ec6ada7a72b86bea3100989ba0ff78c8ccfc8bd5265ae9",
+          "score": 0.02492401215805471,
+          "relevant": false
+        },
+        {
+          "rank": 19,
+          "pmid": "35263517",
+          "unit_id": "4dac5faea6eed182f1086227ee2c4475c639dbada8d88b8b22655628f58a0c40",
+          "content_fingerprint": "c0f4973a7d8938289fc52b70aeea8e22a70416ce08634da2b599469149da57f8",
+          "score": 0.02490996398559424,
+          "relevant": false
+        },
+        {
+          "rank": 20,
+          "pmid": "38763510",
+          "unit_id": "b549f7cac78251e6c8b6d96e2a976d7a0d1282d3963181ffb30f2d238b35719d",
+          "content_fingerprint": "5cbde62e4e0c0c5da947fee5e888465be812b656ce989fde4b6625da2b6cb40e",
+          "score": 0.024624624624624628,
+          "relevant": false
+        },
+        {
+          "rank": 21,
+          "pmid": "29863955",
+          "unit_id": "81200f188ed546781b9968d828e8be43c99a40d80e025351f51423eb1e867e92",
+          "content_fingerprint": "3fd76151f8a6aab880d8e4750a94112770b1424f79c659f3861cf13779d21b60",
+          "score": 0.02452153110047847,
+          "relevant": false
+        },
+        {
+          "rank": 22,
+          "pmid": "35636910",
+          "unit_id": "1ab6a630ef83ba9ee6686043d2371cf205d3f9a492bb79c1042a251271da4758",
+          "content_fingerprint": "22a641e9fc27f16850d80974c541fd2b3a9bd51f58575f37ade206b69419501b",
+          "score": 0.024497309544038517,
+          "relevant": false
+        },
+        {
+          "rank": 23,
+          "pmid": "36774932",
+          "unit_id": "42454181e5db620a6fd3b3c80df987a226d9350fcd4f772f641e213ebd923526",
+          "content_fingerprint": "f3b12fa6fb0839bb4a50c779fb8871b7f8362c20d5bfcfdd474e3ac5a423d508",
+          "score": 0.024451318309029312,
+          "relevant": false
+        },
+        {
+          "rank": 24,
+          "pmid": "35988550",
+          "unit_id": "5c453d941b1c0f73e9f6df0d8792c3174689556c5fe12a746c33a29116828930",
+          "content_fingerprint": "0d37af25659cbbbe1020b76df31aa7264f22ac333704c9d59e958156b034da50",
+          "score": 0.024390243902439025,
+          "relevant": false
+        },
+        {
+          "rank": 25,
+          "pmid": "36519436",
+          "unit_id": "a973a5f6273ca012cb313e27a768a5eccd8017c0e3d179a1205d179d1583724c",
+          "content_fingerprint": "61b54a500536079561e3ea1be2d2be030c9c89d2e524f54827d7b25756a9688c",
+          "score": 0.02402186421173763,
+          "relevant": false
+        },
+        {
+          "rank": 26,
+          "pmid": "34353454",
+          "unit_id": "f895c8e16a0355fcc079ecc1dbd3145e3432f464242673085d79ae216ee3d97f",
+          "content_fingerprint": "4df0516b6823e911072368e44a99fe8a39dd44d8eb1373fc6a5ecb1f6ca7ea9e",
+          "score": 0.023973585989089864,
+          "relevant": false
+        },
+        {
+          "rank": 27,
+          "pmid": "33829619",
+          "unit_id": "47d0f94cb5af56e8e2ef2170734548ff168189edfa27554304dc3c89e0482182",
+          "content_fingerprint": "ce90551b9976e8e9fab3364002cf03e94b573877af91446b7121ffc2d4eddde9",
+          "score": 0.02381289865343728,
+          "relevant": false
+        },
+        {
+          "rank": 28,
+          "pmid": "37364283",
+          "unit_id": "e49e57f2abfc7c57849cf7e8f6dd6fd9367c0d12ad7ca33a575befedd7c2829b",
+          "content_fingerprint": "435fde88e01aaebd8db1022f8f08ca9db63630f6b3ee3268d88c34e6b600e08f",
+          "score": 0.023698630136986303,
+          "relevant": false
+        },
+        {
+          "rank": 29,
+          "pmid": "29669543",
+          "unit_id": "2742ab4e7d7b48ff2c77e70dfe05f6a4e20b6dada18befdc6bdd4a89ee58fdb4",
+          "content_fingerprint": "4ceb3d956b2a347ed834b00b9747f5081f289b948c560997bd82f2d54498dfef",
+          "score": 0.023467173087357567,
+          "relevant": false
+        },
+        {
+          "rank": 30,
+          "pmid": "31018251",
+          "unit_id": "fc1f078bbdbfe12d3ac666c4d61640d4453416f31a23c20ff2c85641df17294f",
+          "content_fingerprint": "1ecfac1d5f4387ff17b2ca18b3e17deb028b7d6d5281e2f2027636a4813ea180",
+          "score": 0.023458810692853244,
+          "relevant": false
+        },
+        {
+          "rank": 31,
+          "pmid": "38697182",
+          "unit_id": "ecc1d8123dcd9c53fb56de0a33ac9775c087a53484e52255bbf48031c62f4199",
+          "content_fingerprint": "3708a8164179889ada32bcba840a2630848fd673d70d3f3ba2b4d5b7050aaa64",
+          "score": 0.02307489451476793,
+          "relevant": false
+        },
+        {
+          "rank": 32,
+          "pmid": "38512301",
+          "unit_id": "021c8cc8951335927d0ad4bc932e11b891fb1724e37e51ddb471125728127cd0",
+          "content_fingerprint": "289131b11feabb5977a6182c331d992f35fa6a63281ffb75a3ca26c7723ff5e1",
+          "score": 0.022947475777664456,
+          "relevant": false
+        },
+        {
+          "rank": 33,
+          "pmid": "24315724",
+          "unit_id": "71e6f9b6eb556f3650c2347085c953f244496aaffefd9f85fe310407c9798602",
+          "content_fingerprint": "2d952af296f3b250d5fb5ddc6e486fdc01193e82d00fe26ec64beda188f56254",
+          "score": 0.022875816993464054,
+          "relevant": false
+        },
+        {
+          "rank": 34,
+          "pmid": "22000494",
+          "unit_id": "6f7633fc1833c15ce690dff1e576740430bf3ab98c36b7cdcb09085e111c418c",
+          "content_fingerprint": "f7c2a468c03288d587cb809ae622d16e10a89e40e45dab09a3a92e984616b149",
+          "score": 0.022730207929742993,
+          "relevant": false
+        },
+        {
+          "rank": 35,
+          "pmid": "38857504",
+          "unit_id": "bbb956bf6ee32e95f23c4b4446f188cb229bfed3eb75a82e56b58d189548fbb7",
+          "content_fingerprint": "59cd2f2f7d8c5441453598bbedd26800da04a9dbf8235ceeffd97950f6d4623f",
+          "score": 0.02262443438914027,
+          "relevant": false
+        },
+        {
+          "rank": 36,
+          "pmid": "35115765",
+          "unit_id": "3edfc2ee9167c1a667afbadadbae13333e46a32e51ad7f48360cb047f1216698",
+          "content_fingerprint": "6b80e3c1f18f06c82e7300de5cdbea19760cf28abe15c80537ab43c1c1348d95",
+          "score": 0.022592592592592595,
+          "relevant": false
+        },
+        {
+          "rank": 37,
+          "pmid": "35896123",
+          "unit_id": "c73dfbda9bfae65cb7b28955252891dedae7093dfb11809f037831ce52b15bc4",
+          "content_fingerprint": "b4614b04366b6f4ffdbe9e8e0ea4528faa0e85c2b83693ec1901ec7cc7d50263",
+          "score": 0.02072594501718213,
+          "relevant": false
+        },
+        {
+          "rank": 38,
+          "pmid": "27184418",
+          "unit_id": "707db7dd8235e3b2310a3e24f0412662445e0cfd20821ab511f0e67813fe9a2f",
+          "content_fingerprint": "2621f600560be2bda08cf59aac3e200522d714f71cadc11db0864624dd578111",
+          "score": 0.020697748853088657,
+          "relevant": false
+        },
+        {
+          "rank": 39,
+          "pmid": "37879444",
+          "unit_id": "ae4c0828013649d1f0acf673e5e676f239df541f69d552b28e9a2eca7499f77e",
+          "content_fingerprint": "7965c629c3428c50db60309506dd1831ce78d4756219b56dc92149c80818bbeb",
+          "score": 0.020697748853088657,
+          "relevant": false
+        },
+        {
+          "rank": 40,
+          "pmid": "28371335",
+          "unit_id": "e423ca0bfce40e5ed2f9ea514a786b530c882da707e31539a50d625deec7219d",
+          "content_fingerprint": "25aaec2ddb93a1d5379154d8194927bac27218804b8ce895c24d236499c86d40",
+          "score": 0.020526315789473684,
+          "relevant": false
+        },
+        {
+          "rank": 41,
+          "pmid": "28467922",
+          "unit_id": "a0657a4394eb3ff8907237d9b1367d178264909857b94bf87355fa253c0acb5b",
+          "content_fingerprint": "de0ca3ae0dd811041ab322da54751736981c16855adcaea79c186ceb0cff884f",
+          "score": 0.020276497695852536,
+          "relevant": false
+        },
+        {
+          "rank": 42,
+          "pmid": "27493136",
+          "unit_id": "7942ad2d033c9d415c0e49a10b6d2688c26e79cee82647baea8be8579d0d091a",
+          "content_fingerprint": "2a72790d0a1c68e09734101e397a236a99f4d08b563fb86e5458c198f215494d",
+          "score": 0.020141700404858298,
+          "relevant": false
+        },
+        {
+          "rank": 43,
+          "pmid": "28292619",
+          "unit_id": "9323f2e0371651ae3b19b5b3e102695f7a2538a1c073f50d991fac9ee3a43e35",
+          "content_fingerprint": "864f6902ed6b38d28339d8ce3bb372edd9f2cbda3164e0a84cdb9e925ee20299",
+          "score": 0.02004387714399681,
+          "relevant": false
+        },
+        {
+          "rank": 44,
+          "pmid": "31090575",
+          "unit_id": "457d49c267258cedb4ba5cc2e6e51a934ec608d6724f8b6399a4021af2363eb0",
+          "content_fingerprint": "533f12976ac165974236e5d92800e832ed3f87e18da19ff569fe81e58f5649ec",
+          "score": 0.019904931669637554,
+          "relevant": false
+        },
+        {
+          "rank": 45,
+          "pmid": "33198517",
+          "unit_id": "072b7a00f7e3b8822dd2418b2c73a6ee98f4654452319d1ef21d4ad22adc9347",
+          "content_fingerprint": "5ec78335a600605c607cd3480d5bcb0818ae926c879a8fd64b5ec6b73bd1c184",
+          "score": 0.01951637471439452,
+          "relevant": false
+        },
+        {
+          "rank": 46,
+          "pmid": "36252154",
+          "unit_id": "37db80a3de2c4fcb8600ef2df6859616f772966c4b8569c99745af4e2d38dcf3",
+          "content_fingerprint": "a8c4ff55cb50997a0d3371d955e017e60a163eb33dbd12024d22371ef7bff38a",
+          "score": 0.019463340891912317,
+          "relevant": false
+        },
+        {
+          "rank": 47,
+          "pmid": "37425065",
+          "unit_id": "673d115eb699e8eef5898cb18cf92c6f5338f0fb3211112c63935e45312659b6",
+          "content_fingerprint": "e89de5a230a762770317103c9c223522b37fddf00177d663d7b143dd3094bc55",
+          "score": 0.019446804493533466,
+          "relevant": false
+        },
+        {
+          "rank": 48,
+          "pmid": "38141902",
+          "unit_id": "d1dda3e79432839dc985e1338346306fbeefff9fc6e53574f67eca2d9d1f5bf8",
+          "content_fingerprint": "a27885e0849ec96b73e206c90d97a1c8ba79216a6f601ecb9354a664dc9c33cf",
+          "score": 0.01899189918991899,
+          "relevant": false
+        },
+        {
+          "rank": 49,
+          "pmid": "35653320",
+          "unit_id": "a4cf2995ab3f891b6890d5ac9a6a4a45a631f2e735ab82d97e2ac4744afedb94",
+          "content_fingerprint": "6cbd8f0ed164d31c32a353fd9f9f125ed58821b0b386a58caad5ad5932381dad",
+          "score": 0.018957771787960466,
+          "relevant": false
+        },
+        {
+          "rank": 50,
+          "pmid": "34767960",
+          "unit_id": "403ed6090e1e8e32d16ae2a674d092fd9d6d48330b405a9a6d68d7dbe0fe980d",
+          "content_fingerprint": "0b161bfdb00533d28e88a3b237ca79839e115811dab9c694b5bf0f142de40233",
+          "score": 0.018265221017514596,
+          "relevant": false
+        }
+      ]
+    }
+  ],
+  "aggregate": {
+    "hit_rate@5": 1.0,
+    "recall@5": 0.9416666666666667,
+    "precision@5": 0.48,
+    "mrr": 1.0,
+    "queries": 10,
+    "queries_with_relevants": 10
+  },
+  "finished_at_utc": "2026-10-26T09:23:33.133926+00:00"
+}

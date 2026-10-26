@@ -1,6 +1,8 @@
 """Use actual PostgreSQL/pgvector and M7 search with a deterministic encoder."""
 
 import json
+
+import pytest
 from unittest.mock import Mock
 
 from fastapi.testclient import TestClient
@@ -15,7 +17,8 @@ from evidenceops.retrieval import index_publication
 from test_retrieval import ControlledMedCPT, document, persist
 
 
-def test_api_database_retrieval_context_generation_and_filter(test_settings, migrated_database):
+@pytest.mark.parametrize("mode", ["semantic", "hybrid"])
+def test_api_database_retrieval_context_generation_and_filter(test_settings, migrated_database, mode):
     engine, sessions = create_database(test_settings)
     encoder = ControlledMedCPT()
     generator = Mock()
@@ -30,7 +33,7 @@ def test_api_database_retrieval_context_generation_and_filter(test_settings, mig
             index_publication(sessions, publication_id, encoder)
         with sessions() as session:
             before_questions = list(session.query(Question.id))
-        with TestClient(create_app(test_settings, generator=generator, encoder=encoder)) as client:
+        with TestClient(create_app(test_settings.model_copy(update={"retrieval_mode": mode}), generator=generator, encoder=encoder)) as client:
             response = client.post("/rag", json={"query": " diabetes ", "published_from": 2024})
             assert response.status_code == 200
             body = response.json()
@@ -40,7 +43,10 @@ def test_api_database_retrieval_context_generation_and_filter(test_settings, mig
             assert {s["unit"]["publication_id"] for s in body["sources"]} <= {
                 str(value) for value in publication_ids
             }
-            assert all(s["score"] == 1.0 for s in body["sources"])
+            if mode == "semantic":
+                assert all(s["score"] == 1.0 for s in body["sources"])
+            else:
+                assert [s["score"] for s in body["sources"]] == [2 / (60 + i) for i in range(1, 6)]
             evidence = json.loads(generator.generate.call_args.args[0])["evidence"]
             assert [e["text"] for e in evidence] == [s["unit"]["text"] for s in body["sources"]]
             assert encoder.query_calls == ["diabetes"]

@@ -33,6 +33,7 @@ en Git/issues. El estado de entrega vive en GitHub y el trabajo local en los pla
 | [D026](D026-rag-v1-contract-context-and-citations.md) | Contrato RAG v1, contexto y política de citas (#44) | Aplicada en #45/#46 |
 | [D027](D027-rag-http-errors-and-observability.md) | Integración HTTP, errores y observabilidad RAG (#46) | Aplicada en #46 |
 | [D028](D028-rag-evaluation.md) | Evaluación RAG end-to-end, revisión humana y baseline (#47) | Aplicada; baseline revisado/promocionado |
+| [D030](D030-hybrid-retrieval.md) | BM25 en memoria y fusión RRF con MedCPT (M9.1) | Implementación y experimento completados; semantic por defecto |
 
 Nueva decisión: siguiente ID, problema, alternativas, decisión, consecuencias
 y estado. Cambios de dirección enlazan a la decisión sustituida; no reescribas

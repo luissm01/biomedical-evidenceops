@@ -23,6 +23,7 @@ class _DatabaseSettings(BaseSettings):
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--query", required=True)
+    parser.add_argument("--mode", choices=("semantic", "hybrid"), default="semantic")
     parser.add_argument("--top-k", type=int, default=3)
     parser.add_argument("--published-from", type=int)
     parser.add_argument("--index-limit", type=int, default=5)
@@ -37,7 +38,7 @@ def main() -> None:
             ids = list(session.scalars(select(Publication.id).order_by(Publication.source, Publication.source_id).limit(args.index_limit)))
         for publication_id in ids:
             print(json.dumps({"publication_id": str(publication_id), "status": index_publication(sessions, publication_id, encoder)}))
-        results = search(sessions, encoder, query=args.query, top_k=args.top_k, published_from=args.published_from)
+        results = search(sessions, encoder, query=args.query, top_k=args.top_k, published_from=args.published_from, mode=args.mode)
         print(json.dumps([asdict(result) for result in results], default=str, ensure_ascii=False))
     finally:
         engine.dispose()

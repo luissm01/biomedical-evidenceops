@@ -1,0 +1,9 @@
+{
+  "experiment": "M9.1 — Hybrid Retrieval",
+  "sha256": {
+    "semantic.json": "fbc8b7ec68c2cf4beae318cdd0d49b79601a52306516ed0fc602a262a863afe0",
+    "hybrid.json": "08c04c71b9fc42ef50fcba6e4758a70aff3daa4452d8b155075f624b6255eae1",
+    "comparison.json": "c743c8bc394912af49e90277123beb92f24c47e6bfe9d334fa933198107ac568"
+  },
+  "baseline_sha256": "43d5c49a53dd3e50c1b85b579e8569f82dacf5d2fb43b3d694f9fbf8e630c9ab"
+}

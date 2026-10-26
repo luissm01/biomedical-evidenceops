@@ -133,4 +133,50 @@ los scores de sistemas distintos no son probabilidades comparables. Si la
 revisión cambia los juicios, crea una nueva versión y recalcula **ambos** runs
 contra ella: no reescribas v1 ni optimices etiquetas mirando el ranking.
 
-No hay RAG, generación, LLM-as-a-judge ni estrategias de M8/M9.
+No hay RAG, generación ni LLM-as-a-judge. M9.1 añade el modo híbrido descrito abajo.
+
+## Comparar semántico e híbrido (M9.1)
+
+Comandos para ejecución manual con PostgreSQL/pgvector y extra MedCPT preparados.
+Realizan inferencia local MedCPT, sin generar respuestas LLM. Cada destino debe
+ser nuevo; no recalcular ni sobrescribir `baseline-v1.json`.
+
+```bash
+OMP_NUM_THREADS=4 MKL_NUM_THREADS=4 uv run --locked --extra medcpt \
+  python -m evidenceops.retrieval_evaluation --live --mode semantic \
+  --output evaluation/runs/m9-semantic.json
+OMP_NUM_THREADS=4 MKL_NUM_THREADS=4 uv run --locked --extra medcpt \
+  python -m evidenceops.retrieval_evaluation --live --mode hybrid \
+  --output evaluation/runs/m9-hybrid.json
+uv run --locked python -m evidenceops.retrieval_comparison \
+  evaluation/runs/m9-semantic.json evaluation/runs/m9-hybrid.json
+```
+
+También puede compararse el baseline preservado sin volver a ejecutarlo:
+
+```bash
+uv run --locked python -m evidenceops.retrieval_comparison \
+  evaluation/retrieval/baseline-v1.json evaluation/runs/m9-hybrid.json
+```
+
+El comparador no infiere ni escribe artefactos. Los deltas son candidato menos
+referencia; inspeccionar valores positivos y negativos por query y qué PMIDs
+entran/salen de top-5. Conserva las configuraciones: los scores no son comparables
+entre modos. Se rechazan runs fallidos, entradas/juicios distintos o métricas
+incompatibles. Una comparación con fakes valida el mecanismo, no calidad IA.
+
+El runner usa todos los candidatos del corpus congelado en ambas búsquedas,
+con la misma profundidad para top-5 y ranking completo (MRR). En v1 son 50,
+igual al valor por defecto de búsqueda híbrida. BM25 solo aporta coincidencias
+positivas; la rama semántica permite completar el ranking. El run registra
+modo, tokenizador, constantes BM25/RRF y profundidad. Las entradas, juicios y
+baseline M7 permanecen intactos. [D030](../../docs/decisions/D030-hybrid-retrieval.md)
+detalla filtros, determinismo y coste de reconstruir BM25 en memoria.
+
+
+### Experimento M9.1 completado
+
+[Informe y decisión](REPORT-m9.1.md), [runs y comparación](experiments/m9.1/manifest.json).
+`semantic` se mantiene por defecto y como baseline para M9.2; `hybrid` conserva
+su carácter experimental. La comparación guardada se reproduce sin modelos
+con los comandos del informe. No se altera ni recalcula el baseline M7.
