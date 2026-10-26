@@ -12,6 +12,7 @@ conservan conceptos realmente trabajados y límites de comprensión, no manuales
 | M4 | [Dataset, rúbrica y revisión humana](m4.md) |
 | M5 | [Logging y correlación conceptual](m5.md) |
 | M7 | [Retrieval, embeddings y almacenamiento vectorial conceptual](m7.md) |
+| M9 | [Experimento híbrido y decisión basada en evaluación](m9.md) |
 
 No había registro suficiente de aprendizaje de M2 para crearlo por inferencia.
 Las decisiones técnicas de persistencia siguen documentadas en las ADRs.

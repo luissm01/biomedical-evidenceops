@@ -249,3 +249,63 @@ def test_missing_publication_before_encoding(sessions):
     with pytest.raises(ValueError, match="does not exist"):
         index_publication(sessions, uuid4(), encoder)
     assert encoder.article_calls == []
+
+
+@pytest.mark.parametrize("mode", ["semantic", "hybrid"])
+def test_modes_share_filters_current_content_and_compatibility(sessions, mode):
+    encoder = ControlledMedCPT()
+    docs = [document("1", 2024, title="alpha"), document("2", 2019, title="alpha"),
+            document("3", None, title="alpha"), document("4", 2020, title="beta")]
+    ids = [persist(sessions, doc) for doc in docs]
+    for identity in ids:
+        index_publication(sessions, identity, encoder)
+    results = search(sessions, encoder, query="alpha", top_k=10, published_from=2020, mode=mode)
+    assert {r.unit.source_id for r in results} == {"1", "4"}
+    persist(sessions, replace(docs[0], title="Changed alpha"))
+    assert [r.unit.source_id for r in search(sessions, encoder, query="alpha", top_k=10,
+                                           published_from=2020, mode=mode)] == ["4"]
+    assert search(sessions, encoder, query="alpha", top_k=10, published_from=2025, mode=mode) == []
+    encoder.config = replace(encoder.config, article_revision="new")
+    with pytest.raises(EmbeddingCompatibilityError):
+        search(sessions, encoder, query="alpha", top_k=1, mode=mode)
+
+
+def test_hybrid_fuses_independent_candidates_deduplicates_and_keeps_default(sessions):
+    encoder = ControlledMedCPT()
+    encoder.vectors = {"1": vector(3), "2": vector(2), "3": vector(1)}
+    for identity, title in [("1", "beta"), ("2", "alpha"), ("3", "alpha alpha alpha")]:
+        index_publication(sessions, persist(sessions, document(identity, title=title)), encoder)
+    default = search(sessions, encoder, query="alpha", top_k=3)
+    assert default == search(sessions, encoder, query="alpha", top_k=3, mode="semantic")
+    assert [r.score for r in default] == [3, 2, 1]
+    # Depth 1 puts distinct semantic and lexical winners into the union.
+    result = search(sessions, encoder, query="alpha", top_k=1, mode="hybrid", candidate_k=1)
+    assert len(result) == 1 and result[0].score == 1/61
+    full = search(sessions, encoder, query="alpha", top_k=10, mode="hybrid")
+    assert len(full) == len({r.unit.unit_id for r in full}) == 3
+    assert full == search(sessions, encoder, query="alpha", top_k=10, mode="hybrid")
+    assert full[0].unit.source_id in {"2", "3"}
+    no_lexical = search(sessions, encoder, query="!!!", top_k=3, mode="hybrid")
+    assert [r.unit for r in no_lexical] == [r.unit for r in default]
+    assert [r.score for r in no_lexical] == [1/61, 1/62, 1/63]
+
+
+@pytest.mark.parametrize("options", [{"mode": "bm25"}, {"candidate_k": 0}, {"candidate_k": True}])
+def test_invalid_hybrid_options_before_inference(options):
+    encoder = ControlledMedCPT()
+    with pytest.raises(ValueError):
+        search(None, encoder, query="x", top_k=1, **options)
+    assert not encoder.query_calls
+
+
+def test_hybrid_empty_unindexed_and_corrupt_units(sessions):
+    encoder = ControlledMedCPT()
+    assert search(sessions, encoder, query="alpha", top_k=5, mode="hybrid") == []
+    identity = persist(sessions, document(title="alpha"))
+    assert search(sessions, encoder, query="alpha", top_k=5, mode="hybrid") == []
+    index_publication(sessions, identity, encoder)
+    with sessions.begin() as session:
+        row = session.scalar(select(UnitEmbedding))
+        row.content_fingerprint = "0" * 64
+    with pytest.raises(EmbeddingCompatibilityError, match="differs from source"):
+        search(sessions, encoder, query="alpha", top_k=5, mode="hybrid")

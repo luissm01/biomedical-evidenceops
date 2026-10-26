@@ -2,6 +2,7 @@
 
 from dataclasses import dataclass
 from uuid import UUID
+from typing import Literal
 
 from sqlalchemy import delete, select
 from sqlalchemy.orm import Session, sessionmaker
@@ -11,6 +12,7 @@ from evidenceops.embeddings import (
     EmbeddingCompatibilityError, MedCPTConfig, MedCPTEncoder, article_inputs,
     validate_config, validate_vector,
 )
+from evidenceops.lexical import CANDIDATE_K, bm25, reciprocal_rank_fusion
 from evidenceops.models import Publication, UnitEmbedding
 from evidenceops.publications import as_biomedical_document
 
@@ -88,11 +90,14 @@ class RetrievalResult:
 def search(
     sessions: sessionmaker[Session], encoder: MedCPTEncoder, *, query: str,
     top_k: int, published_from: int | None = None,
+    mode: Literal["semantic", "hybrid"] = "semantic", candidate_k: int = CANDIDATE_K,
 ) -> list[RetrievalResult]:
-    """Exact dot-product ranking, descending; stable unit_id tie break.
+    """Semantic dot product or BM25/semantic RRF; stable unit_id tie break.
 
+    Hybrid fuses max(top_k, candidate_k) candidates per branch with RRF.
+    BM25 statistics use the same eligible corpus, without zero-match candidates.
     Empty/filtered corpus returns []. Unknown year fails a temporal filter.
-    Fewer candidates returns fewer results, without padding or score threshold.
+    Fewer candidates returns fewer results, without padding.
     """
     if not isinstance(query, str) or not query.strip():
         raise ValueError("Query must contain text")
@@ -100,6 +105,10 @@ def search(
         raise ValueError("top_k must be a positive integer")
     if published_from is not None and (type(published_from) is not int or published_from <= 0):
         raise ValueError("published_from must be a positive year")
+    if mode not in ("semantic", "hybrid"):
+        raise ValueError("mode must be semantic or hybrid")
+    if type(candidate_k) is not int or candidate_k <= 0:
+        raise ValueError("candidate_k must be a positive integer")
     validate_config(encoder.config)
     # Encode outside DB transaction. Empty corpus still validates the encoder output.
     vector = validate_vector(encoder.encode_query(query.strip()))
@@ -121,7 +130,9 @@ def search(
         )
         if published_from is not None:
             statement = statement.where(Publication.publication_year >= published_from)
-        rows = session.execute(statement.order_by(distance, UnitEmbedding.unit_id).limit(top_k)).all()
+        # One statement gives hybrid rankings a shared corpus snapshot.
+        ranked = statement.order_by(distance, UnitEmbedding.unit_id)
+        rows = session.execute(ranked.limit(top_k) if mode == "semantic" else ranked).all()
         results = []
         for publication, embedding, score in rows:
             unit = _unit(publication)
@@ -131,4 +142,10 @@ def search(
                     or unit.text != embedding.text):
                 raise EmbeddingCompatibilityError("Stored unit differs from source; reindex")
             results.append(RetrievalResult(unit=unit, score=float(score)))
+        if mode == "hybrid":
+            depth = max(top_k, candidate_k)
+            lexical = bm25([result.unit for result in results], query)[:depth]
+            semantic = [(result.unit, result.score) for result in results[:depth]]
+            return [RetrievalResult(unit, score) for unit, score in
+                    reciprocal_rank_fusion([semantic, lexical])[:top_k]]
         return results

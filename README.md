@@ -455,3 +455,18 @@ consultar el [diagnóstico seguro por motivo y localización](docs/subsystems/ob
 Los eventos nuevos distinguen referencias desconocidas, corchetes/formato,
 cobertura y abstención inválida sin registrar contenido. El contrato HTTP no
 incluye esos detalles de desarrollo.
+
+## Retrieval híbrido (M9.1)
+
+`search(..., mode="hybrid")` fusiona candidatos MedCPT y BM25 con RRF (`k=60`).
+El modo omitido o `mode="semantic"` conserva el ranking semántico y sus scores.
+Para RAG, configura `EVIDENCEOPS_RETRIEVAL_MODE=hybrid` antes de arrancar la API;
+por defecto sigue en `semantic`. La demo local admite `--mode hybrid`.
+
+BM25 tokeniza título y abstract completos mediante casefold y términos
+alfanuméricos Unicode; no aplica stemming ni stopwords. Usa las mismas unidades
+indexadas vigentes y filtros temporales que MedCPT. Lee el corpus elegible en
+memoria en cada consulta: adecuado para el corpus pequeño actual. Los 50
+candidatos por rama por defecto no limitan esa lectura. El score híbrido es RRF,
+no dot product. [Decisión, fórmula y límites](docs/decisions/D030-hybrid-retrieval.md).
+[Comandos de evaluación y comparación](evaluation/retrieval/README.md#comparar-semántico-e-híbrido-m91).

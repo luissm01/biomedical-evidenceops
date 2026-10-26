@@ -54,6 +54,7 @@ class GenerationSettings(BaseSettings):
 class Settings(GenerationSettings):
     database_url: PostgresDsn
     trace_console: bool = False
+    retrieval_mode: Literal["semantic", "hybrid"] = "semantic"
 
     @field_validator("database_url")
     @classmethod

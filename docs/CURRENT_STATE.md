@@ -1,8 +1,21 @@
 # Estado actual
 
-Actualizado: 2026-10-24. Distingue código versionado de trabajo local pendiente.
+Actualizado: 2026-10-26. Distingue código versionado de trabajo local pendiente.
 
 ## Presente
+
+- **M9.1 — Hybrid Retrieval**, [#52](https://github.com/luissm01/biomedical-evidenceops/issues/52):
+  implementación y experimento completados; integración mediante PR pendiente.
+  BM25 en Python + MedCPT con RRF (k=60), filtros compartidos, deduplicación y
+  selección explícita de modo. El experimento con 10 queries y 50 publicaciones
+  conserva Hit Rate@5/MRR en 1; Recall@5 pasa de 0.9750 a 0.9417 y Precision@5
+  de 0.5000 a 0.4800 al usar hybrid. Solo q07 empeora en métricas.
+  Se mantiene `semantic` por defecto y como baseline para M9.2; `hybrid` sigue
+  experimental, sin ajustar BM25/RRF al dataset. Runs, comparación reproducible
+  y límites en el [informe](../evaluation/retrieval/REPORT-m9.1.md);
+  decisión en [D030](decisions/D030-hybrid-retrieval.md). Baseline M7 intacto.
+  Validación determinista con PostgreSQL/pgvector y flujo HTTP RAG en ambos modos.
+  [Aprendizaje registrado](learning/m9.md) limitado a la interacción observada.
 
 - **M8 — RAG v1**, #44: diseño acordado del contrato, construcción
   de contexto y política de citas en [D026](decisions/D026-rag-v1-contract-context-and-citations.md).
@@ -108,8 +121,13 @@ pendiente. M8 reúne contrato, servicio, integración HTTP y baseline revisado.
 Git/GitHub conserva el estado de integración y cierre; no se considera entregado
 antes de integrar la PR y cerrar las issues correspondientes. La autorización excepcional
 ya se consumió: no repetir casos ni ejecutar nuevos candidatos sin encargo.
-M9 requiere alcance propio conforme al roadmap; el baseline preservado servirá
-para comparar estrategias sin reescribir etiquetas ni juicios de M8.
+La [milestone M9](https://github.com/luissm01/biomedical-evidenceops/milestone/9)
+y sus issues están creadas: M9.1 (#52) queda preparada para cierre mediante PR;
+[M9.2 — Reranking & Evaluation](https://github.com/luissm01/biomedical-evidenceops/issues/53)
+es el siguiente trabajo y está pendiente de implementación. Comparará MedCPT
+semántico frente a MedCPT + reranking, con calidad y latencia reproducibles y
+una decisión explícita sobre complejidad adicional. No se implementa M9.2 ni se
+repiten inferencias en este cierre. [Plan M9](plans/m9-advanced-rag-retrieval.md).
 El baseline RAG no resuelve el baseline independiente de generación M4 pendiente.
 Cuando exista cuota gratuita y se solicite, obtener/promover/revisar ese baseline M4.
 Los comandos y requisitos de pruebas viven en el [README](../README.md);

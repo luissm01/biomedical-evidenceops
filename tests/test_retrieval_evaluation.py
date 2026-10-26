@@ -89,7 +89,8 @@ class FakeEncoder:
         return [1.] + [0.] * 767
 
 
-def test_runner_isolated_schema_rankings_and_no_overwrite(tmp_path, test_settings, migrated_database):
+@pytest.mark.parametrize("mode", ["semantic", "hybrid"])
+def test_runner_isolated_schema_rankings_and_no_overwrite(mode, tmp_path, test_settings, migrated_database):
     from evidenceops.database import create_database
     engine, sessions = create_database(test_settings)
     with sessions() as session:
@@ -97,7 +98,11 @@ def test_runner_isolated_schema_rankings_and_no_overwrite(tmp_path, test_setting
     encoder = FakeEncoder()
     output = tmp_path / 'run.json'
     try:
-        run = run_baseline(DEFAULT_DIRECTORY, output, str(test_settings.database_url), encoder)
+        run = run_baseline(DEFAULT_DIRECTORY, output, str(test_settings.database_url), encoder, mode=mode)
+        assert run['configuration']['mode'] == mode
+        if mode == 'hybrid':
+            assert run['configuration']['hybrid']['rrf_k'] == 60
+            assert run['configuration']['hybrid']['candidate_k'] == 50
         assert run['status'] == 'complete'
         assert encoder.article_calls == 50 and encoder.query_calls == 10
         assert len(run['results']) == 10
@@ -187,3 +192,22 @@ def test_semantically_invalid_dataset_even_with_updated_hash(tmp_path, defect):
     freeze_path.write_text(json.dumps(freeze))
     with pytest.raises(ValueError):
         load_inputs(tmp_path)
+
+
+def test_compare_preserved_baseline_and_reject_incompatible_runs():
+    from copy import deepcopy
+    from evidenceops.retrieval_comparison import compare
+    baseline = json.loads((DEFAULT_DIRECTORY / 'baseline-v1.json').read_text())
+    result = compare(baseline, baseline)
+    assert all(value == 0 for value in result['aggregate_delta'].values())
+    assert len(result['queries']) == 10
+    assert all(not row['entered_top_5'] and not row['left_top_5'] for row in result['queries'])
+    for key, value in [('status', 'failed'), ('input_sha256', {}), ('results', [])]:
+        changed = deepcopy(baseline)
+        changed[key] = value
+        with pytest.raises(ValueError):
+            compare(baseline, changed)
+    changed = deepcopy(baseline)
+    changed['results'][0]['metrics']['precision@5'] = -1
+    with pytest.raises(ValueError):
+        compare(baseline, changed)

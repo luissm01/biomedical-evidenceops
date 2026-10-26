@@ -142,11 +142,17 @@ el top-5 operacional y el ranking completo alimentan métricas deterministas.
 Solo el comando explícito `--live` ejecuta MedCPT; los tests usan dobles.
 [Procedimiento y límites](../evaluation/retrieval/README.md).
 
+M9.1 añade BM25 en memoria sobre las mismas unidades indexadas vigentes y
+filtros; fusiona candidatos con MedCPT mediante RRF (k=60), deduplicando por
+unit_id. El modo semántico sigue siendo el predeterminado. La selección RAG
+se configura al arrancar mediante `EVIDENCEOPS_RETRIEVAL_MODE`. No cambia
+generación ni prompts. [Decisión y escalabilidad](decisions/D030-hybrid-retrieval.md).
+
 ## Servicio RAG v1 de M8
 
 [rag.py](../src/evidenceops/rag.py) implementa el contrato de
 [D026](decisions/D026-rag-v1-contract-context-and-citations.md):
-`query → retrieval M7 → contexto → Generator → validación → answer + limitations + sources`.
+`query → retrieval semántico o híbrido → contexto → Generator → validación → answer + limitations + sources`.
 `RagService` recibe un callable de búsqueda (M7 con sesiones y encoder ligados)
 y el `Generator` existente. Solicita top-5 con año inicial opcional. No posee
 recursos, accede a HTTP ni persiste respuestas.

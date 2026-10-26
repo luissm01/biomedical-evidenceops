@@ -249,7 +249,8 @@ def create_app(
                 configured_generator = owned_generator
             app.state.generator = configured_generator
             app.state.rag_service = RagService(
-                partial(search, session_factory, encoder if encoder is not None else LocalMedCPT()),
+                partial(search, session_factory, encoder if encoder is not None else LocalMedCPT(),
+                        mode=configured_settings.retrieval_mode),
                 configured_generator, app.state.metrics,
             )
             yield

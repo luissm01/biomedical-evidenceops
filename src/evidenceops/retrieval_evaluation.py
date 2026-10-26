@@ -18,6 +18,7 @@ from sqlalchemy.orm import sessionmaker
 from evidenceops.biomedical import BiomedicalDocument
 from evidenceops.config import Settings
 from evidenceops.embeddings import LocalMedCPT
+from evidenceops.lexical import BM25_K1, BM25_B, RRF_K, TOKENIZER
 from evidenceops.models import Base, Publication, UnitEmbedding
 from evidenceops.publications import upsert_publication
 from evidenceops.retrieval import index_publication, search
@@ -119,12 +120,12 @@ class CachedQueryEncoder:
         return self.queries[query]
 
 
-def evaluate(sessions, encoder, queries: list[Query], corpus_size: int, checkpoint=None) -> list[dict]:
+def evaluate(sessions, encoder, queries: list[Query], corpus_size: int, checkpoint=None, *, mode="semantic") -> list[dict]:
     cached = CachedQueryEncoder(encoder)
     results = []
     for query in queries:
-        top = search(sessions, cached, query=query.query, top_k=5)
-        full = search(sessions, cached, query=query.query, top_k=corpus_size)
+        top = search(sessions, cached, query=query.query, top_k=5, mode=mode, candidate_k=corpus_size)
+        full = search(sessions, cached, query=query.query, top_k=corpus_size, mode=mode, candidate_k=corpus_size)
         pmids = [r.unit.source_id for r in full]
         if len(full) != corpus_size or [r.unit.source_id for r in top] != pmids[:5]:
             raise ValueError('Retriever did not return the exact frozen corpus ranking')
@@ -197,14 +198,16 @@ def frozen_sessions(corpus: dict, database_url: str, encoder, environment: dict)
             admin.dispose()
 
 
-def run_baseline(directory: Path, output: Path, database_url: str, encoder) -> dict:
+def run_baseline(directory: Path, output: Path, database_url: str, encoder, *, mode="semantic") -> dict:
     corpus, dataset, queries = load_inputs(directory)  # Always before inference.
+    if mode not in ("semantic", "hybrid"):
+        raise ValueError("mode must be semantic or hybrid")
     run = {
         'run_version': '1', 'status': 'running', 'started_at_utc': datetime.now(timezone.utc).isoformat(),
         'corpus_version': corpus['version'], 'dataset_version': dataset['version'],
         'input_sha256': {name: sha256(directory / name) for name in ('corpus-v1.json', 'queries-v1.json', 'freeze-v1.json')},
         'configuration': {**encoder.config.metadata(), 'top_k': 5, 'published_from': None,
-                          'ranking': 'exact-pgvector', 'tie_break': 'unit_id ascending', 'mrr_depth': len(corpus['documents'])},
+                          'mode': mode, 'ranking': 'exact-pgvector' if mode == 'semantic' else 'bm25-pgvector-rrf', 'tie_break': 'unit_id ascending', 'mrr_depth': len(corpus['documents'])},
         'code': {
             'commit': subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip(),
             'working_tree_dirty': bool(subprocess.check_output(['git', 'status', '--porcelain'], cwd=ROOT, text=True)),
@@ -214,6 +217,13 @@ def run_baseline(directory: Path, output: Path, database_url: str, encoder) -> d
                         'packages': {name: package_version(name) for name in ('evidenceops', 'torch', 'transformers', 'pgvector', 'sqlalchemy', 'psycopg')}},
         'results': [],
     }
+    if mode == 'hybrid':
+        run['configuration']['hybrid'] = {
+            'bm25_k1': BM25_K1, 'bm25_b': BM25_B, 'tokenizer': TOKENIZER,
+            'query_terms': 'unique', 'statistics': 'eligible-corpus',
+            'lexical_candidates': 'positive-score-only', 'rrf_k': RRF_K,
+            'candidate_k': len(corpus['documents']),
+        }
     if isinstance(encoder, LocalMedCPT):
         import torch
         run['environment']['torch_threads'] = torch.get_num_threads()
@@ -228,7 +238,7 @@ def run_baseline(directory: Path, output: Path, database_url: str, encoder) -> d
             def checkpoint(results):
                 run['results'] = results
                 _write(output, run)
-            run['results'] = evaluate(sessions, encoder, queries, len(corpus['documents']), checkpoint)
+            run['results'] = evaluate(sessions, encoder, queries, len(corpus['documents']), checkpoint, mode=mode)
             run['aggregate'] = aggregate_metrics(run['results'])
             run['status'] = 'complete'
     except Exception as exc:
@@ -243,13 +253,14 @@ def run_baseline(directory: Path, output: Path, database_url: str, encoder) -> d
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--mode', choices=('semantic', 'hybrid'), default='semantic')
     parser.add_argument('--live', action='store_true', help='Authorize local MedCPT inference and model downloads')
     parser.add_argument('--dataset-dir', type=Path, default=DEFAULT_DIRECTORY)
     parser.add_argument('--output', type=Path, required=True, help='New JSON path; never overwrite')
     args = parser.parse_args()
     if not args.live:
         parser.error('--live is required; tests never perform model inference')
-    run = run_baseline(args.dataset_dir, args.output, str(Settings().database_url), LocalMedCPT())
+    run = run_baseline(args.dataset_dir, args.output, str(Settings().database_url), LocalMedCPT(), mode=args.mode)
     print(json.dumps(run['aggregate'], indent=2))
 
 

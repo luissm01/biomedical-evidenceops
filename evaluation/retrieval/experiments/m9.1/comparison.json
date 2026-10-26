@@ -1,0 +1,204 @@
+{
+  "reference_configuration": {
+    "article_model": "ncbi/MedCPT-Article-Encoder",
+    "article_revision": "d05a736da4bb84ee4057b7f7999485be6ed85465",
+    "query_model": "ncbi/MedCPT-Query-Encoder",
+    "query_revision": "d83a36cc6b8e3a5c5e9d9d6ba156808c1643dcbc",
+    "dimensions": 768,
+    "strategy": "whole-publication-v1",
+    "encoding": "medcpt-title-abstract-pair-cls-v1",
+    "article_max_tokens": 512,
+    "query_max_tokens": 64,
+    "overflow": "truncate-longest-first",
+    "normalization": "none",
+    "similarity": "inner-product",
+    "top_k": 5,
+    "published_from": null,
+    "mode": "semantic",
+    "ranking": "exact-pgvector",
+    "tie_break": "unit_id ascending",
+    "mrr_depth": 50
+  },
+  "candidate_configuration": {
+    "article_model": "ncbi/MedCPT-Article-Encoder",
+    "article_revision": "d05a736da4bb84ee4057b7f7999485be6ed85465",
+    "query_model": "ncbi/MedCPT-Query-Encoder",
+    "query_revision": "d83a36cc6b8e3a5c5e9d9d6ba156808c1643dcbc",
+    "dimensions": 768,
+    "strategy": "whole-publication-v1",
+    "encoding": "medcpt-title-abstract-pair-cls-v1",
+    "article_max_tokens": 512,
+    "query_max_tokens": 64,
+    "overflow": "truncate-longest-first",
+    "normalization": "none",
+    "similarity": "inner-product",
+    "top_k": 5,
+    "published_from": null,
+    "mode": "hybrid",
+    "ranking": "bm25-pgvector-rrf",
+    "tie_break": "unit_id ascending",
+    "mrr_depth": 50,
+    "hybrid": {
+      "bm25_k1": 1.2,
+      "bm25_b": 0.75,
+      "tokenizer": "unicode-alphanumeric-casefold-v1",
+      "query_terms": "unique",
+      "statistics": "eligible-corpus",
+      "lexical_candidates": "positive-score-only",
+      "rrf_k": 60,
+      "candidate_k": 50
+    }
+  },
+  "aggregate_delta": {
+    "hit_rate@5": 0.0,
+    "recall@5": -0.033333333333333326,
+    "precision@5": -0.020000000000000018,
+    "mrr": 0.0,
+    "queries": 0,
+    "queries_with_relevants": 0
+  },
+  "queries": [
+    {
+      "query_id": "q01",
+      "metric_delta": {
+        "hit_rate@5": 0.0,
+        "recall@5": 0.0,
+        "precision@5": 0.0,
+        "reciprocal_rank": 0.0
+      },
+      "entered_top_5": [],
+      "left_top_5": []
+    },
+    {
+      "query_id": "q02",
+      "metric_delta": {
+        "hit_rate@5": 0.0,
+        "recall@5": 0.0,
+        "precision@5": 0.0,
+        "reciprocal_rank": 0.0
+      },
+      "entered_top_5": [
+        "34353454"
+      ],
+      "left_top_5": [
+        "35988550"
+      ]
+    },
+    {
+      "query_id": "q03",
+      "metric_delta": {
+        "hit_rate@5": 0.0,
+        "recall@5": 0.0,
+        "precision@5": 0.0,
+        "reciprocal_rank": 0.0
+      },
+      "entered_top_5": [
+        "24356592"
+      ],
+      "left_top_5": [
+        "36774932"
+      ]
+    },
+    {
+      "query_id": "q04",
+      "metric_delta": {
+        "hit_rate@5": 0.0,
+        "recall@5": 0.0,
+        "precision@5": 0.0,
+        "reciprocal_rank": 0.0
+      },
+      "entered_top_5": [
+        "22000494"
+      ],
+      "left_top_5": [
+        "29627041"
+      ]
+    },
+    {
+      "query_id": "q05",
+      "metric_delta": {
+        "hit_rate@5": 0.0,
+        "recall@5": 0.0,
+        "precision@5": 0.0,
+        "reciprocal_rank": 0.0
+      },
+      "entered_top_5": [],
+      "left_top_5": []
+    },
+    {
+      "query_id": "q06",
+      "metric_delta": {
+        "hit_rate@5": 0.0,
+        "recall@5": 0.0,
+        "precision@5": 0.0,
+        "reciprocal_rank": 0.0
+      },
+      "entered_top_5": [],
+      "left_top_5": []
+    },
+    {
+      "query_id": "q07",
+      "metric_delta": {
+        "hit_rate@5": 0.0,
+        "recall@5": -0.33333333333333337,
+        "precision@5": -0.19999999999999996,
+        "reciprocal_rank": 0.0
+      },
+      "entered_top_5": [
+        "32430550"
+      ],
+      "left_top_5": [
+        "31018251"
+      ]
+    },
+    {
+      "query_id": "q08",
+      "metric_delta": {
+        "hit_rate@5": 0.0,
+        "recall@5": 0.0,
+        "precision@5": 0.0,
+        "reciprocal_rank": 0.0
+      },
+      "entered_top_5": [
+        "27184418",
+        "30552067"
+      ],
+      "left_top_5": [
+        "29863955",
+        "38924756"
+      ]
+    },
+    {
+      "query_id": "q09",
+      "metric_delta": {
+        "hit_rate@5": 0.0,
+        "recall@5": 0.0,
+        "precision@5": 0.0,
+        "reciprocal_rank": 0.0
+      },
+      "entered_top_5": [
+        "33650528",
+        "38512301"
+      ],
+      "left_top_5": [
+        "33951360",
+        "35263517"
+      ]
+    },
+    {
+      "query_id": "q10",
+      "metric_delta": {
+        "hit_rate@5": 0.0,
+        "recall@5": 0.0,
+        "precision@5": 0.0,
+        "reciprocal_rank": 0.0
+      },
+      "entered_top_5": [
+        "35505000"
+      ],
+      "left_top_5": [
+        "35040920"
+      ]
+    }
+  ]
+}
