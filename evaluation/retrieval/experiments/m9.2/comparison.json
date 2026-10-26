@@ -1,0 +1,323 @@
+{
+  "latency": {
+    "reference": {
+      "retrieval_seconds": {
+        "mean": 0.031783962499866904,
+        "median": 0.030491668499507796,
+        "p95": 0.03967719400043279
+      },
+      "reranker_seconds": {
+        "mean": 0.0,
+        "median": 0.0,
+        "p95": 0.0
+      },
+      "total_seconds": {
+        "mean": 0.03178448199996638,
+        "median": 0.030492228499952034,
+        "p95": 0.03967791600007331
+      }
+    },
+    "candidate": {
+      "retrieval_seconds": {
+        "mean": 0.038130529699901675,
+        "median": 0.033758946000034484,
+        "p95": 0.0663740689997212
+      },
+      "reranker_seconds": {
+        "mean": 7.06019012050001,
+        "median": 7.024782908999896,
+        "p95": 7.217062366999926
+      },
+      "total_seconds": {
+        "mean": 7.098320650199912,
+        "median": 7.0576813954999125,
+        "p95": 7.25451049899948
+      }
+    },
+    "delta_seconds": {
+      "retrieval_seconds": {
+        "mean": 0.006346567200034771,
+        "median": 0.0032672775005266885,
+        "p95": 0.02669687499928841
+      },
+      "reranker_seconds": {
+        "mean": 7.06019012050001,
+        "median": 7.024782908999896,
+        "p95": 7.217062366999926
+      },
+      "total_seconds": {
+        "mean": 7.066536168199946,
+        "median": 7.02718916699996,
+        "p95": 7.214832582999406
+      }
+    },
+    "same_protocol": true,
+    "same_environment": true
+  },
+  "reference_configuration": {
+    "article_model": "ncbi/MedCPT-Article-Encoder",
+    "article_revision": "d05a736da4bb84ee4057b7f7999485be6ed85465",
+    "query_model": "ncbi/MedCPT-Query-Encoder",
+    "query_revision": "d83a36cc6b8e3a5c5e9d9d6ba156808c1643dcbc",
+    "dimensions": 768,
+    "strategy": "whole-publication-v1",
+    "encoding": "medcpt-title-abstract-pair-cls-v1",
+    "article_max_tokens": 512,
+    "query_max_tokens": 64,
+    "overflow": "truncate-longest-first",
+    "normalization": "none",
+    "similarity": "inner-product",
+    "top_k": 5,
+    "published_from": null,
+    "mode": "semantic",
+    "ranking": "exact-pgvector",
+    "tie_break": "unit_id ascending",
+    "mrr_depth": 50,
+    "latency": {
+      "clock": "perf_counter",
+      "unit": "seconds",
+      "warmup_queries": 1,
+      "retrieval": "query-encoding-and-sql-and-unit-validation",
+      "reranker": "tokenization-forward-scoring-and-ordering; lazy-load-if-cold",
+      "total": "serving-path; excludes indexing, warmup, diagnostic ranking and metrics",
+      "query_vector_cache": "empty for each measured query; diagnostic reads reuse vector"
+    }
+  },
+  "candidate_configuration": {
+    "article_model": "ncbi/MedCPT-Article-Encoder",
+    "article_revision": "d05a736da4bb84ee4057b7f7999485be6ed85465",
+    "query_model": "ncbi/MedCPT-Query-Encoder",
+    "query_revision": "d83a36cc6b8e3a5c5e9d9d6ba156808c1643dcbc",
+    "dimensions": 768,
+    "strategy": "whole-publication-v1",
+    "encoding": "medcpt-title-abstract-pair-cls-v1",
+    "article_max_tokens": 512,
+    "query_max_tokens": 64,
+    "overflow": "truncate-longest-first",
+    "normalization": "none",
+    "similarity": "inner-product",
+    "top_k": 5,
+    "published_from": null,
+    "mode": "reranking",
+    "ranking": "semantic-top20-cross-encoder-then-semantic-tail",
+    "tie_break": "unit_id ascending",
+    "mrr_depth": 50,
+    "latency": {
+      "clock": "perf_counter",
+      "unit": "seconds",
+      "warmup_queries": 1,
+      "retrieval": "query-encoding-and-sql-and-unit-validation",
+      "reranker": "tokenization-forward-scoring-and-ordering; lazy-load-if-cold",
+      "total": "serving-path; excludes indexing, warmup, diagnostic ranking and metrics",
+      "query_vector_cache": "empty for each measured query; diagnostic reads reuse vector"
+    },
+    "reranker": {
+      "model": "ncbi/MedCPT-Cross-Encoder",
+      "revision": "71caf65d4927987813984f54c284405a13fcca49",
+      "max_tokens": 512,
+      "text": "whole-publication-v1-title-blank-line-abstract",
+      "truncation": "longest_first",
+      "score": "raw-logit-descending",
+      "device": "cpu",
+      "dtype": "float32",
+      "batch_size": 20,
+      "candidate_k": 20
+    }
+  },
+  "aggregate_delta": {
+    "hit_rate@5": 0.0,
+    "recall@5": -0.025000000000000022,
+    "precision@5": -0.020000000000000018,
+    "mrr": 0.0,
+    "queries": 0,
+    "queries_with_relevants": 0
+  },
+  "queries": [
+    {
+      "query_id": "q01",
+      "metric_delta": {
+        "hit_rate@5": 0.0,
+        "recall@5": 0.0,
+        "precision@5": 0.0,
+        "reciprocal_rank": 0.0
+      },
+      "entered_top_5": [],
+      "left_top_5": [],
+      "latency_delta_seconds": {
+        "retrieval_seconds": 0.002208167000389949,
+        "reranker_seconds": 7.198448699000437,
+        "total_seconds": 7.2006561210000655
+      }
+    },
+    {
+      "query_id": "q02",
+      "metric_delta": {
+        "hit_rate@5": 0.0,
+        "recall@5": 0.0,
+        "precision@5": 0.0,
+        "reciprocal_rank": 0.0
+      },
+      "entered_top_5": [],
+      "left_top_5": [],
+      "latency_delta_seconds": {
+        "retrieval_seconds": 0.03160534399921744,
+        "reranker_seconds": 7.17226749800011,
+        "total_seconds": 7.203872523999053
+      }
+    },
+    {
+      "query_id": "q03",
+      "metric_delta": {
+        "hit_rate@5": 0.0,
+        "recall@5": 0.0,
+        "precision@5": 0.0,
+        "reciprocal_rank": 0.0
+      },
+      "entered_top_5": [
+        "34767960"
+      ],
+      "left_top_5": [
+        "29669543"
+      ],
+      "latency_delta_seconds": {
+        "retrieval_seconds": 0.006976958999985072,
+        "reranker_seconds": 7.217062366999926,
+        "total_seconds": 7.224038950999784
+      }
+    },
+    {
+      "query_id": "q04",
+      "metric_delta": {
+        "hit_rate@5": 0.0,
+        "recall@5": 0.0,
+        "precision@5": 0.0,
+        "reciprocal_rank": 0.0
+      },
+      "entered_top_5": [
+        "37161520"
+      ],
+      "left_top_5": [
+        "29627041"
+      ],
+      "latency_delta_seconds": {
+        "retrieval_seconds": 0.018913251000412856,
+        "reranker_seconds": 6.919438590000027,
+        "total_seconds": 6.93835133399989
+      }
+    },
+    {
+      "query_id": "q05",
+      "metric_delta": {
+        "hit_rate@5": 0.0,
+        "recall@5": -0.25,
+        "precision@5": -0.19999999999999996,
+        "reciprocal_rank": 0.0
+      },
+      "entered_top_5": [
+        "35896123"
+      ],
+      "left_top_5": [
+        "37161520"
+      ],
+      "latency_delta_seconds": {
+        "retrieval_seconds": 0.001361480999548803,
+        "reranker_seconds": 7.004716584000562,
+        "total_seconds": 7.006077611000364
+      }
+    },
+    {
+      "query_id": "q06",
+      "metric_delta": {
+        "hit_rate@5": 0.0,
+        "recall@5": 0.0,
+        "precision@5": 0.0,
+        "reciprocal_rank": 0.0
+      },
+      "entered_top_5": [
+        "29669543"
+      ],
+      "left_top_5": [
+        "36519436"
+      ],
+      "latency_delta_seconds": {
+        "retrieval_seconds": -0.0016866489986568922,
+        "reranker_seconds": 6.9642755859995304,
+        "total_seconds": 6.962588339000831
+      }
+    },
+    {
+      "query_id": "q07",
+      "metric_delta": {
+        "hit_rate@5": 0.0,
+        "recall@5": 0.0,
+        "precision@5": 0.0,
+        "reciprocal_rank": 0.0
+      },
+      "entered_top_5": [],
+      "left_top_5": [],
+      "latency_delta_seconds": {
+        "retrieval_seconds": -0.006328853000923118,
+        "reranker_seconds": 6.993850775000283,
+        "total_seconds": 6.987521199999719
+      }
+    },
+    {
+      "query_id": "q08",
+      "metric_delta": {
+        "hit_rate@5": 0.0,
+        "recall@5": 0.0,
+        "precision@5": 0.0,
+        "reciprocal_rank": 0.0
+      },
+      "entered_top_5": [
+        "27184418",
+        "35040920"
+      ],
+      "left_top_5": [
+        "29863955",
+        "38924756"
+      ],
+      "latency_delta_seconds": {
+        "retrieval_seconds": 0.006227510999451624,
+        "reranker_seconds": 7.037194241999714,
+        "total_seconds": 7.043421025999123
+      }
+    },
+    {
+      "query_id": "q09",
+      "metric_delta": {
+        "hit_rate@5": 0.0,
+        "recall@5": 0.0,
+        "precision@5": 0.0,
+        "reciprocal_rank": 0.0
+      },
+      "entered_top_5": [],
+      "left_top_5": [],
+      "latency_delta_seconds": {
+        "retrieval_seconds": 0.0008368550006707665,
+        "reranker_seconds": 7.082275287999437,
+        "total_seconds": 7.083111717000065
+      }
+    },
+    {
+      "query_id": "q10",
+      "metric_delta": {
+        "hit_rate@5": 0.0,
+        "recall@5": 0.0,
+        "precision@5": 0.0,
+        "reciprocal_rank": 0.0
+      },
+      "entered_top_5": [
+        "35636910"
+      ],
+      "left_top_5": [
+        "35040920"
+      ],
+      "latency_delta_seconds": {
+        "retrieval_seconds": 0.003351606000251195,
+        "reranker_seconds": 7.012371576000078,
+        "total_seconds": 7.015722859000562
+      }
+    }
+  ]
+}

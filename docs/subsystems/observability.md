@@ -41,6 +41,16 @@ evento final `outcome: error` y causa segura. No se añaden métricas ni spans d
 ingestión. Operación y semántica en el
 [README](../../README.md#ingestión-pubmed-m6).
 
+## Reranking local (M9.2)
+
+`retrieval.reranked` registra `reranker_model`, `reranker_revision` y
+`candidate_count` tras completar la segunda etapa. En HTTP conserva correlación
+con la petición/span RAG. No incluye consulta, título, abstract ni scores.
+El modo semántico y un conjunto vacío no emiten este evento. La configuración
+completa y los tiempos separados viven en los runs offline de retrieval;
+no se añaden métricas Prometheus ni cambian los spans RAG existentes.
+[Contrato y protocolo](../decisions/D031-medcpt-reranking.md).
+
 ## Métricas agregadas
 
 `GET /metrics` devuelve formato Prometheus mediante `prometheus-client`. El

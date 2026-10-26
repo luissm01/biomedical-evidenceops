@@ -24,6 +24,7 @@ from evidenceops.embeddings import LocalMedCPT, MedCPTEncoder
 from evidenceops.rag import RagService
 from evidenceops.rag_errors import InvalidCitationsError, RagRetrievalError
 from evidenceops.retrieval import search
+from evidenceops.reranking import LocalMedCPTReranker, MedCPTReranker
 from evidenceops.models import Question
 from evidenceops.metrics import GenerationMetrics
 from evidenceops.observability import CorrelatedFastAPI, configure_logging
@@ -228,6 +229,7 @@ def generate_answer(
 def create_app(
     settings: Settings | None = None, generator: Generator | None = None,
     encoder: MedCPTEncoder | None = None,
+    reranker: MedCPTReranker | None = None,
 ) -> FastAPI:
     @asynccontextmanager
     async def lifespan(app: FastAPI) -> AsyncIterator[None]:
@@ -250,7 +252,9 @@ def create_app(
             app.state.generator = configured_generator
             app.state.rag_service = RagService(
                 partial(search, session_factory, encoder if encoder is not None else LocalMedCPT(),
-                        mode=configured_settings.retrieval_mode),
+                        mode=configured_settings.retrieval_mode,
+                        reranker=(reranker if reranker is not None else LocalMedCPTReranker())
+                        if configured_settings.retrieval_mode == "reranking" else None),
                 configured_generator, app.state.metrics,
             )
             yield

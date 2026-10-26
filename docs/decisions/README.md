@@ -34,6 +34,7 @@ en Git/issues. El estado de entrega vive en GitHub y el trabajo local en los pla
 | [D027](D027-rag-http-errors-and-observability.md) | Integración HTTP, errores y observabilidad RAG (#46) | Aplicada en #46 |
 | [D028](D028-rag-evaluation.md) | Evaluación RAG end-to-end, revisión humana y baseline (#47) | Aplicada; baseline revisado/promocionado |
 | [D030](D030-hybrid-retrieval.md) | BM25 en memoria y fusión RRF con MedCPT (M9.1) | Implementación y experimento completados; semantic por defecto |
+| [D031](D031-medcpt-reranking.md) | MedCPT Cross-Encoder top20 → top5 y evaluación de calidad/latencia (M9.2) | Aceptada: semantic por defecto; reranking experimental |
 
 Nueva decisión: siguiente ID, problema, alternativas, decisión, consecuencias
 y estado. Cambios de dirección enlazan a la decisión sustituida; no reescribas

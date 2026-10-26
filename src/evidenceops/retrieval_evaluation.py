@@ -9,6 +9,8 @@ import json
 from pathlib import Path
 import platform
 import subprocess
+from statistics import mean, median
+from math import ceil
 from uuid import uuid4
 
 from pydantic import BaseModel, ConfigDict, Field, StrictStr
@@ -22,6 +24,7 @@ from evidenceops.lexical import BM25_K1, BM25_B, RRF_K, TOKENIZER
 from evidenceops.models import Base, Publication, UnitEmbedding
 from evidenceops.publications import upsert_publication
 from evidenceops.retrieval import index_publication, search
+from evidenceops.reranking import LocalMedCPTReranker, RERANK_CANDIDATES
 
 ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_DIRECTORY = ROOT / 'evaluation' / 'retrieval'
@@ -120,20 +123,43 @@ class CachedQueryEncoder:
         return self.queries[query]
 
 
-def evaluate(sessions, encoder, queries: list[Query], corpus_size: int, checkpoint=None, *, mode="semantic") -> list[dict]:
-    cached = CachedQueryEncoder(encoder)
+def aggregate_latency(results: list[dict]) -> dict:
+    """Descriptive seconds, nearest-rank p95; a small sample is not a benchmark."""
+    return {stage: {
+        'mean': mean(values), 'median': median(values),
+        'p95': sorted(values)[ceil(.95 * len(values)) - 1],
+    } for stage in ('retrieval_seconds', 'reranker_seconds', 'total_seconds')
+       for values in [[row['latency'][stage] for row in results]]}
+
+
+def evaluate(sessions, encoder, queries: list[Query], corpus_size: int, checkpoint=None, *,
+             mode="semantic", reranker=None, warmup=False) -> list[dict]:
+    if warmup:
+        search(sessions, encoder, query=queries[0].query, top_k=5, mode=mode, reranker=reranker)
     results = []
     for query in queries:
-        top = search(sessions, cached, query=query.query, top_k=5, mode=mode, candidate_k=corpus_size)
-        full = search(sessions, cached, query=query.query, top_k=corpus_size, mode=mode, candidate_k=corpus_size)
+        cached = CachedQueryEncoder(encoder)
+        latency = {}
+        top = search(sessions, cached, query=query.query,
+                     top_k=RERANK_CANDIDATES if mode == 'reranking' else 5,
+                     mode=mode, candidate_k=corpus_size, reranker=reranker, timings=latency)
+        # Diagnostic query is outside measured serving latency, reuses query vector.
+        full = search(sessions, cached, query=query.query, top_k=corpus_size,
+                      mode='semantic' if mode == 'reranking' else mode, candidate_k=corpus_size)
+        candidates = []
+        if mode == 'reranking':
+            candidates = full[:RERANK_CANDIDATES]
+            if {r.unit.unit_id for r in top} != {r.unit.unit_id for r in candidates}:
+                raise ValueError('Reranked candidates differ from semantic top 20')
+            full = top + full[RERANK_CANDIDATES:]
         pmids = [r.unit.source_id for r in full]
-        if len(full) != corpus_size or [r.unit.source_id for r in top] != pmids[:5]:
+        if len(full) != corpus_size or [r.unit.source_id for r in top[:5]] != pmids[:5]:
             raise ValueError('Retriever did not return the exact frozen corpus ranking')
         relevant = {item.pmid for item in query.relevant}
         results.append({
             'query_id': query.id, 'query': query.query,
             'metrics': publication_metrics(pmids, relevant),
-            'top_5': pmids[:5],
+            'top_5': pmids[:5], 'latency': latency,
             'ranking': [
                 {'rank': i, 'pmid': r.unit.source_id, 'unit_id': r.unit.unit_id,
                  'content_fingerprint': r.unit.content_fingerprint,
@@ -141,6 +167,19 @@ def evaluate(sessions, encoder, queries: list[Query], corpus_size: int, checkpoi
                 for i, r in enumerate(full, 1)
             ],
         })
+        if mode == 'reranking':
+            for record, result in zip(results[-1]['ranking'], full, strict=True):
+                original_score = getattr(result, 'retrieval_score', None)
+                record.update(
+                    retrieval_score=result.score if original_score is None else original_score,
+                    reranker_score=None if original_score is None else result.score,
+                    score_type='semantic-dot-product' if original_score is None else 'cross-encoder-logit',
+                )
+            results[-1]['candidates'] = [
+                {'rank': i, 'pmid': r.unit.source_id, 'unit_id': r.unit.unit_id,
+                 'content_fingerprint': r.unit.content_fingerprint, 'score': r.score}
+                for i, r in enumerate(candidates, 1)
+            ]
         if checkpoint:
             checkpoint(results)
     return results
@@ -198,22 +237,27 @@ def frozen_sessions(corpus: dict, database_url: str, encoder, environment: dict)
             admin.dispose()
 
 
-def run_baseline(directory: Path, output: Path, database_url: str, encoder, *, mode="semantic") -> dict:
+def run_baseline(directory: Path, output: Path, database_url: str, encoder, *,
+                 mode="semantic", reranker=None, warmup=False) -> dict:
     corpus, dataset, queries = load_inputs(directory)  # Always before inference.
-    if mode not in ("semantic", "hybrid"):
-        raise ValueError("mode must be semantic or hybrid")
+    if mode not in ("semantic", "hybrid", "reranking"):
+        raise ValueError("mode must be semantic, hybrid or reranking")
+    if mode == "reranking" and reranker is None:
+        raise ValueError("reranking requires a MedCPT reranker")
     run = {
         'run_version': '1', 'status': 'running', 'started_at_utc': datetime.now(timezone.utc).isoformat(),
         'corpus_version': corpus['version'], 'dataset_version': dataset['version'],
         'input_sha256': {name: sha256(directory / name) for name in ('corpus-v1.json', 'queries-v1.json', 'freeze-v1.json')},
         'configuration': {**encoder.config.metadata(), 'top_k': 5, 'published_from': None,
-                          'mode': mode, 'ranking': 'exact-pgvector' if mode == 'semantic' else 'bm25-pgvector-rrf', 'tie_break': 'unit_id ascending', 'mrr_depth': len(corpus['documents'])},
+                          'mode': mode, 'ranking': {'semantic': 'exact-pgvector', 'hybrid': 'bm25-pgvector-rrf',
+                                                    'reranking': 'semantic-top20-cross-encoder-then-semantic-tail'}[mode], 'tie_break': 'unit_id ascending', 'mrr_depth': len(corpus['documents'])},
         'code': {
             'commit': subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip(),
             'working_tree_dirty': bool(subprocess.check_output(['git', 'status', '--porcelain'], cwd=ROOT, text=True)),
             'source_sha256': {str(path.relative_to(ROOT)): sha256(path) for path in (ROOT / 'src' / 'evidenceops').glob('*.py')},
         },
         'environment': {'python': platform.python_version(), 'platform': platform.platform(),
+                        'machine': platform.machine(), 'processor': platform.processor(),
                         'packages': {name: package_version(name) for name in ('evidenceops', 'torch', 'transformers', 'pgvector', 'sqlalchemy', 'psycopg')}},
         'results': [],
     }
@@ -224,6 +268,15 @@ def run_baseline(directory: Path, output: Path, database_url: str, encoder, *, m
             'lexical_candidates': 'positive-score-only', 'rrf_k': RRF_K,
             'candidate_k': len(corpus['documents']),
         }
+    run['configuration']['latency'] = {
+        'clock': 'perf_counter', 'unit': 'seconds', 'warmup_queries': int(warmup),
+        'retrieval': 'query-encoding-and-sql-and-unit-validation',
+        'reranker': 'tokenization-forward-scoring-and-ordering; lazy-load-if-cold',
+        'total': 'serving-path; excludes indexing, warmup, diagnostic ranking and metrics',
+        'query_vector_cache': 'empty for each measured query; diagnostic reads reuse vector',
+    }
+    if mode == 'reranking':
+        run['configuration']['reranker'] = {**reranker.config.metadata(), 'candidate_k': RERANK_CANDIDATES}
     if isinstance(encoder, LocalMedCPT):
         import torch
         run['environment']['torch_threads'] = torch.get_num_threads()
@@ -238,8 +291,9 @@ def run_baseline(directory: Path, output: Path, database_url: str, encoder, *, m
             def checkpoint(results):
                 run['results'] = results
                 _write(output, run)
-            run['results'] = evaluate(sessions, encoder, queries, len(corpus['documents']), checkpoint, mode=mode)
+            run['results'] = evaluate(sessions, encoder, queries, len(corpus['documents']), checkpoint, mode=mode, reranker=reranker, warmup=warmup)
             run['aggregate'] = aggregate_metrics(run['results'])
+            run['latency'] = aggregate_latency(run['results'])
             run['status'] = 'complete'
     except Exception as exc:
         run['status'] = 'failed'
@@ -253,14 +307,16 @@ def run_baseline(directory: Path, output: Path, database_url: str, encoder, *, m
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--mode', choices=('semantic', 'hybrid'), default='semantic')
+    parser.add_argument('--mode', choices=('semantic', 'hybrid', 'reranking'), default='semantic')
     parser.add_argument('--live', action='store_true', help='Authorize local MedCPT inference and model downloads')
+    parser.add_argument('--warmup', action='store_true', help='One unmeasured query to warm model/tokenizer/DB caches')
     parser.add_argument('--dataset-dir', type=Path, default=DEFAULT_DIRECTORY)
     parser.add_argument('--output', type=Path, required=True, help='New JSON path; never overwrite')
     args = parser.parse_args()
     if not args.live:
         parser.error('--live is required; tests never perform model inference')
-    run = run_baseline(args.dataset_dir, args.output, str(Settings().database_url), LocalMedCPT(), mode=args.mode)
+    run = run_baseline(args.dataset_dir, args.output, str(Settings().database_url), LocalMedCPT(), mode=args.mode,
+                       reranker=LocalMedCPTReranker() if args.mode == 'reranking' else None, warmup=args.warmup)
     print(json.dumps(run['aggregate'], indent=2))
 
 

@@ -1,0 +1,38 @@
+{
+  "experiment": "M9.2 — Reranking & Evaluation",
+  "date": "2026-10-26",
+  "execution": "Codex; real local inference explicitly requested by developer",
+  "commands": [
+    "OMP_NUM_THREADS=4 MKL_NUM_THREADS=4 UV_CACHE_DIR=/tmp/evidenceops-uv-cache uv run --locked --extra medcpt python -m evidenceops.retrieval_evaluation --live --mode semantic --warmup --output evaluation/runs/m9.2-semantic-01.json",
+    "OMP_NUM_THREADS=4 MKL_NUM_THREADS=4 UV_CACHE_DIR=/tmp/evidenceops-uv-cache uv run --locked --extra medcpt python -m evidenceops.retrieval_evaluation --live --mode reranking --warmup --output evaluation/runs/m9.2-reranking-01.json",
+    "UV_CACHE_DIR=/tmp/evidenceops-uv-cache uv run --locked --extra medcpt python -m evidenceops.retrieval_comparison evaluation/retrieval/experiments/m9.2/semantic.json evaluation/retrieval/experiments/m9.2/reranking.json > /tmp/evidenceops-m92-comparison.json"
+  ],
+  "exit_codes": {
+    "semantic": 0,
+    "reranking": 0,
+    "comparison": 0
+  },
+  "conditions": {
+    "order": [
+      "semantic",
+      "reranking"
+    ],
+    "warmup_queries_per_run": 1,
+    "measured_queries_per_run": 10,
+    "repetitions": 1,
+    "cpu_model": "12th Gen Intel(R) Core(TM) i5-12400F",
+    "concurrent_model_runs": false,
+    "external_machine_load": "not controlled or measured; no assertion of an idle host"
+  },
+  "sha256": {
+    "comparison.json": "ceb42d84418dc262894b681791fe6fc622bb1028f6dc3a35e84e9687a46c4890",
+    "inputs-and-code.tar.gz": "7ff08bdaa9379900731ecb01c0e73f9b8c983be51401a95bf7be4af8bc68f542",
+    "reranking.json": "a7986738e5d3040adc0e09480efc6913a5dc7dec8ed7375e6a8b307e0b86cf94",
+    "semantic.json": "37c667134a566163038f8c43ff72d3bf8c468df7d5c6b1d146c042c7b73751ec"
+  },
+  "baseline_sha256": "43d5c49a53dd3e50c1b85b579e8569f82dacf5d2fb43b3d694f9fbf8e630c9ab",
+  "m9.1_manifest_sha256": "8d3ea2a52adfde5602928e9f6ad0c2ee47d49098ee277279649bc45e8f5bb773",
+  "baseline_promoted": false,
+  "default_mode": "semantic; unchanged; developer approved",
+  "decision": "retain reranking as experimental; no default adoption in evaluated conditions"
+}

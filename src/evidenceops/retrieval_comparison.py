@@ -4,7 +4,7 @@ import argparse
 import json
 from pathlib import Path
 
-from evidenceops.retrieval_evaluation import aggregate_metrics, publication_metrics
+from evidenceops.retrieval_evaluation import aggregate_metrics, publication_metrics, aggregate_latency
 
 
 def compare(reference: dict, candidate: dict) -> dict:
@@ -32,6 +32,11 @@ def compare(reference: dict, candidate: dict) -> dict:
                     or row['top_5'] != pmids[:k]
                     or row['metrics'] != publication_metrics(pmids, positives, k=k)):
                 raise ValueError('Inconsistent ranking or metrics')
+        measured = ['latency' in row for row in mapping.values()]
+        if any(measured) and not all(measured):
+            raise ValueError('Incomplete latency measurements')
+        if all(measured) and run.get('latency') != aggregate_latency(run['results']):
+            raise ValueError('Inconsistent latency aggregate')
         if run['aggregate'] != aggregate_metrics(run['results'], k=k):
             raise ValueError('Inconsistent aggregate')
         indexed.append(mapping)
@@ -51,7 +56,22 @@ def compare(reference: dict, candidate: dict) -> dict:
             'entered_top_5': [p for p in new['top_5'] if p not in old['top_5']],
             'left_top_5': [p for p in old['top_5'] if p not in new['top_5']],
         })
+        if 'latency' in old and 'latency' in new:
+            rows[-1]['latency_delta_seconds'] = {
+                key: new['latency'][key] - value for key, value in old['latency'].items()
+            }
+    latency = None
+    if 'latency' in reference and 'latency' in candidate:
+        latency = {
+            'reference': reference['latency'], 'candidate': candidate['latency'],
+            'delta_seconds': {stage: {stat: candidate['latency'][stage][stat] - value
+                                      for stat, value in stats.items()}
+                              for stage, stats in reference['latency'].items()},
+            'same_protocol': reference['configuration'].get('latency') == candidate['configuration'].get('latency'),
+            'same_environment': reference.get('environment') == candidate.get('environment'),
+        }
     return {
+        'latency': latency,
         'reference_configuration': reference['configuration'],
         'candidate_configuration': candidate['configuration'],
         'aggregate_delta': {key: candidate['aggregate'][key] - value if value is not None else None
