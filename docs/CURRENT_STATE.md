@@ -4,8 +4,25 @@ Actualizado: 2026-10-26. Distingue código versionado de trabajo local pendiente
 
 ## Presente
 
+- **M9.2 — Reranking & Evaluation**, [#53](https://github.com/luissm01/biomedical-evidenceops/issues/53):
+  completada en implementación, evaluación y decisión técnica; lista para integración. Modo `reranking`: MedCPT top20 →
+  `ncbi/MedCPT-Cross-Encoder` con revisión fija → top5; `semantic` por defecto.
+  Pares consulta/texto de publicación, 512 tokens, logits y desempate por unit_id;
+  filtros y trazabilidad preservados. Extra opcional `medcpt`, carga diferida.
+  Evaluación ampliada con candidatos, ambos scores, ranking compuesto para MRR,
+  tiempos separados y comparación agregada/por query. Pruebas deterministas y
+  de integración sin inferencias reales. [Decisión](decisions/D031-medcpt-reranking.md)
+  y [comandos manuales](../evaluation/retrieval/README.md#comparar-semántico-y-reranking-m92).
+  Experimento real ejecutado por encargo explícito: Recall@5 0,9750 → 0,9500,
+  Precision@5 0,5000 → 0,4800, Hit Rate@5/MRR permanecen en 1. Ninguna query
+  mejora métricas; q05 empeora. Latencia total media CPU 0,0318 → 7,0983 s,
+  una pareja de runs con calentamiento. [Informe y artefactos](../evaluation/retrieval/REPORT-m9.2.md).
+  Decisión aprobada: mantener `semantic` por defecto y `reranking` experimental.
+  No se justifica el coste en las condiciones evaluadas. M9 queda lista para
+  cierre tras integrar #53. Sin promoción de baseline; M7 y M9.1 intactos.
+
 - **M9.1 — Hybrid Retrieval**, [#52](https://github.com/luissm01/biomedical-evidenceops/issues/52):
-  implementación y experimento completados; integración mediante PR pendiente.
+  implementación y experimento integrados mediante PR #54; issue cerrada.
   BM25 en Python + MedCPT con RRF (k=60), filtros compartidos, deduplicación y
   selección explícita de modo. El experimento con 10 queries y 50 publicaciones
   conserva Hit Rate@5/MRR en 1; Recall@5 pasa de 0.9750 a 0.9417 y Precision@5
@@ -122,12 +139,14 @@ Git/GitHub conserva el estado de integración y cierre; no se considera entregad
 antes de integrar la PR y cerrar las issues correspondientes. La autorización excepcional
 ya se consumió: no repetir casos ni ejecutar nuevos candidatos sin encargo.
 La [milestone M9](https://github.com/luissm01/biomedical-evidenceops/milestone/9)
-y sus issues están creadas: M9.1 (#52) queda preparada para cierre mediante PR;
-[M9.2 — Reranking & Evaluation](https://github.com/luissm01/biomedical-evidenceops/issues/53)
-es el siguiente trabajo y está pendiente de implementación. Comparará MedCPT
-semántico frente a MedCPT + reranking, con calidad y latencia reproducibles y
-una decisión explícita sobre complejidad adicional. No se implementa M9.2 ni se
-repiten inferencias en este cierre. [Plan M9](plans/m9-advanced-rag-retrieval.md).
+queda lista para cierre tras integrar M9.2 (#53). M9.1 (#52) ya está integrada
+mediante PR #54. M9.2 completa implementación, evaluación real y decisión:
+`semantic` por defecto, `hybrid` y `reranking` como alternativas experimentales.
+[Informe M9.2](../evaluation/retrieval/REPORT-m9.2.md) y
+[plan M9](plans/m9-advanced-rag-retrieval.md). Git/GitHub conserva el estado de
+integración y cierre. No quedan funcionalidades o experimentos pendientes para
+M9; no repetir inferencias ni ajustar parámetros/juicios para mejorar resultados.
+La siguiente fase se rige por el roadmap y requiere su propio encargo.
 El baseline RAG no resuelve el baseline independiente de generación M4 pendiente.
 Cuando exista cuota gratuita y se solicite, obtener/promover/revisar ese baseline M4.
 Los comandos y requisitos de pruebas viven en el [README](../README.md);

@@ -470,3 +470,17 @@ memoria en cada consulta: adecuado para el corpus pequeño actual. Los 50
 candidatos por rama por defecto no limitan esa lectura. El score híbrido es RRF,
 no dot product. [Decisión, fórmula y límites](docs/decisions/D030-hybrid-retrieval.md).
 [Comandos de evaluación y comparación](evaluation/retrieval/README.md#comparar-semántico-e-híbrido-m91).
+
+## Reranking MedCPT (M9.2 / #53)
+
+`semantic` sigue por defecto. `EVIDENCEOPS_RETRIEVAL_MODE=reranking` activa en RAG
+MedCPT top20 → `ncbi/MedCPT-Cross-Encoder` → top5. Reutiliza el extra opcional
+`medcpt`; pesos y tokenizer se cargan al primer uso, CPU/float32 y revisión fija.
+La demo acepta `--mode reranking --top-k 5` (preparar e indexar el corpus antes).
+Filtros por año y trazabilidad se conservan. Los scores son logits, no probabilidades;
+el modo semántico mantiene su dot product. No hay fallback silencioso.
+
+[Contrato, revisión, desempates y límites](docs/decisions/D031-medcpt-reranking.md).
+[Comandos de comparación manual y protocolo de latencia](evaluation/retrieval/README.md#comparar-semántico-y-reranking-m92).
+El [experimento real](evaluation/retrieval/REPORT-m9.2.md) no muestra mejora y añade
+latencia CPU; la decisión aprobada mantiene `semantic` por defecto y `reranking` experimental. Tests/CI usan dobles sin descargas.

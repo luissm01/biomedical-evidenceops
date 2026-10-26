@@ -309,3 +309,30 @@ def test_hybrid_empty_unindexed_and_corrupt_units(sessions):
         row.content_fingerprint = "0" * 64
     with pytest.raises(EmbeddingCompatibilityError, match="differs from source"):
         search(sessions, encoder, query="alpha", top_k=5, mode="hybrid")
+
+
+def test_reranking_real_sql_candidate_boundary_and_filters(sessions):
+    from test_reranking import FakeReranker
+    encoder, reranker = ControlledMedCPT(), FakeReranker()
+    for number in range(25):
+        identity = str(number)
+        encoder.vectors[identity] = vector(100 - number)
+        index_publication(sessions, persist(sessions, document(identity, year=2010 if number == 0 else 2024)), encoder)
+    semantic = search(sessions, encoder, query='q', top_k=25, published_from=2024)
+    found = search(sessions, encoder, query='q', top_k=5, published_from=2024,
+                   mode='reranking', reranker=reranker)
+    assert [unit.source_id for unit in reranker.calls[0][1]] == [str(i) for i in range(1, 21)]
+    assert [r.unit.source_id for r in found] == ['20', '19', '18', '17', '16']
+    assert [r.unit for r in found] == [r.unit for r in reversed(semantic[15:20])]
+    assert [r.retrieval_score for r in found] == [r.score for r in reversed(semantic[15:20])]
+    # Stale source removed before LIMIT; next eligible candidate fills its place.
+    persist(sessions, document('1', title='Changed'))
+    search(sessions, encoder, query='q', top_k=5, published_from=2024, mode='reranking', reranker=reranker)
+    assert [u.source_id for u in reranker.calls[-1][1]] == [str(i) for i in range(2, 22)]
+    assert search(sessions, encoder, query='q', top_k=5, published_from=2025,
+                  mode='reranking', reranker=reranker) == []
+    assert len(reranker.calls) == 2
+    encoder.config = replace(encoder.config, article_revision='changed')
+    with pytest.raises(EmbeddingCompatibilityError):
+        search(sessions, encoder, query='q', top_k=5, mode='reranking', reranker=reranker)
+    assert len(reranker.calls) == 2

@@ -15,12 +15,14 @@ from evidenceops.models import Publication, Question
 from evidenceops.rag import ABSTENTION_ANSWER
 from evidenceops.retrieval import index_publication
 from test_retrieval import ControlledMedCPT, document, persist
+from test_reranking import FakeReranker
 
 
-@pytest.mark.parametrize("mode", ["semantic", "hybrid"])
+@pytest.mark.parametrize("mode", ["semantic", "hybrid", "reranking"])
 def test_api_database_retrieval_context_generation_and_filter(test_settings, migrated_database, mode):
     engine, sessions = create_database(test_settings)
     encoder = ControlledMedCPT()
+    reranker = FakeReranker()
     generator = Mock()
     generator.generate.return_value = GeneratedContent(answer="Síntesis [S1].", limitations=[])
     # Own only these test publications; preserve any other fixtures' data.
@@ -33,7 +35,7 @@ def test_api_database_retrieval_context_generation_and_filter(test_settings, mig
             index_publication(sessions, publication_id, encoder)
         with sessions() as session:
             before_questions = list(session.query(Question.id))
-        with TestClient(create_app(test_settings.model_copy(update={"retrieval_mode": mode}), generator=generator, encoder=encoder)) as client:
+        with TestClient(create_app(test_settings.model_copy(update={"retrieval_mode": mode}), generator=generator, encoder=encoder, reranker=reranker)) as client:
             response = client.post("/rag", json={"query": " diabetes ", "published_from": 2024})
             assert response.status_code == 200
             body = response.json()
@@ -45,6 +47,8 @@ def test_api_database_retrieval_context_generation_and_filter(test_settings, mig
             }
             if mode == "semantic":
                 assert all(s["score"] == 1.0 for s in body["sources"])
+            elif mode == "reranking":
+                assert [s["score"] for s in body["sources"]] == [-25., -26., -27., -28., -29.]
             else:
                 assert [s["score"] for s in body["sources"]] == [2 / (60 + i) for i in range(1, 6)]
             evidence = json.loads(generator.generate.call_args.args[0])["evidence"]
@@ -56,6 +60,13 @@ def test_api_database_retrieval_context_generation_and_filter(test_settings, mig
             assert abstention.json()["answer"] == ABSTENTION_ANSWER
             assert abstention.json()["sources"] == []
             generator.generate.assert_called_once()
+            if mode == "reranking":
+                reranker.score = Mock(side_effect=RuntimeError("sensitive model failure"))
+                failed = client.post("/rag", json={"query": "diabetes", "published_from": 2024})
+                assert failed.status_code == 503
+                assert failed.json()["detail"]["code"] == "retrieval_unavailable"
+                assert "sensitive" not in failed.text
+                generator.generate.assert_called_once()
             metrics = client.get("/metrics").text
             assert 'evidenceops_rag_operations_total{outcome="success",stage="operation"} 1.0' in metrics
             assert 'evidenceops_rag_operations_total{outcome="abstention",stage="operation"} 1.0' in metrics

@@ -89,7 +89,7 @@ class FakeEncoder:
         return [1.] + [0.] * 767
 
 
-@pytest.mark.parametrize("mode", ["semantic", "hybrid"])
+@pytest.mark.parametrize("mode", ["semantic", "hybrid", "reranking"])
 def test_runner_isolated_schema_rankings_and_no_overwrite(mode, tmp_path, test_settings, migrated_database):
     from evidenceops.database import create_database
     engine, sessions = create_database(test_settings)
@@ -98,7 +98,9 @@ def test_runner_isolated_schema_rankings_and_no_overwrite(mode, tmp_path, test_s
     encoder = FakeEncoder()
     output = tmp_path / 'run.json'
     try:
-        run = run_baseline(DEFAULT_DIRECTORY, output, str(test_settings.database_url), encoder, mode=mode)
+        from test_reranking import FakeReranker
+        run = run_baseline(DEFAULT_DIRECTORY, output, str(test_settings.database_url), encoder,
+                           mode=mode, reranker=FakeReranker() if mode == 'reranking' else None)
         assert run['configuration']['mode'] == mode
         if mode == 'hybrid':
             assert run['configuration']['hybrid']['rrf_k'] == 60
@@ -211,3 +213,57 @@ def test_compare_preserved_baseline_and_reject_incompatible_runs():
     changed['results'][0]['metrics']['precision@5'] = -1
     with pytest.raises(ValueError):
         compare(baseline, changed)
+
+
+def test_reranking_comparison_trace_latency_and_warmup(tmp_path, test_settings, migrated_database):
+    from evidenceops.retrieval_comparison import compare
+    from test_reranking import FakeReranker
+    from copy import deepcopy
+    encoder, reranker = FakeEncoder(), FakeReranker()
+    semantic = run_baseline(DEFAULT_DIRECTORY, tmp_path / 'semantic.json', str(test_settings.database_url),
+                            encoder, warmup=True)
+    candidate = run_baseline(DEFAULT_DIRECTORY, tmp_path / 'reranking.json', str(test_settings.database_url),
+                             encoder, mode='reranking', reranker=reranker, warmup=True)
+    assert encoder.query_calls == 22  # One warmup + ten measured queries per run.
+    assert len(reranker.calls) == 11
+    assert all(len(units) == 20 for _, units in reranker.calls)
+    assert candidate['configuration']['reranker']['revision'] == reranker.config.revision
+    for before, after in zip(semantic['results'], candidate['results'], strict=True):
+        assert [r['pmid'] for r in after['candidates']] == [r['pmid'] for r in before['ranking'][:20]]
+        assert after['top_5'] == [r['pmid'] for r in reversed(before['ranking'][15:20])]
+        assert after['ranking'][20:] == [dict(r, retrieval_score=r['score'], reranker_score=None,
+                                             score_type='semantic-dot-product') for r in before['ranking'][20:]]
+        assert all(r['reranker_score'] == r['score'] for r in after['ranking'][:20])
+        assert after['latency']['total_seconds'] >= after['latency']['retrieval_seconds'] >= 0
+        assert after['latency']['reranker_seconds'] > 0
+        assert before['latency']['reranker_seconds'] == 0
+    compared = compare(semantic, candidate)
+    assert all(len(row['entered_top_5']) == len(row['left_top_5']) == 5 for row in compared['queries'])
+    assert compared['latency']['same_protocol']
+    assert compared['latency']['same_environment']
+    changed = deepcopy(candidate)
+    changed['latency']['total_seconds']['mean'] += 1
+    with pytest.raises(ValueError, match='latency'):
+        compare(semantic, changed)
+
+
+def test_failed_reranker_preserves_safe_checkpoint_and_cleans_schema(tmp_path, test_settings, migrated_database):
+    from unittest.mock import Mock
+    from evidenceops.reranking import RerankerConfig
+    reranker = Mock(config=RerankerConfig())
+    reranker.score.side_effect = [[float(i) for i in range(20)], RuntimeError('sensitive failure')]
+    output = tmp_path / 'failed-reranking.json'
+    with pytest.raises(RuntimeError):
+        run_baseline(DEFAULT_DIRECTORY, output, str(test_settings.database_url),
+                     FakeEncoder(), mode='reranking', reranker=reranker)
+    run = json.loads(output.read_text())
+    assert run['status'] == 'failed' and len(run['results']) == 1
+    assert 'aggregate' not in run and 'latency' not in run
+    assert run['error_type'] == 'RuntimeError' and 'sensitive' not in output.read_text()
+    from evidenceops.database import create_database
+    engine, sessions = create_database(test_settings)
+    try:
+        with sessions() as session:
+            assert session.scalar(text("SELECT count(*) FROM pg_namespace WHERE nspname LIKE 'retrieval_eval_%'")) == 0
+    finally:
+        engine.dispose()

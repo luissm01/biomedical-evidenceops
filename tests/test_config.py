@@ -55,8 +55,9 @@ def test_retrieval_mode_defaults_and_environment(monkeypatch):
     monkeypatch.delenv("EVIDENCEOPS_RETRIEVAL_MODE", raising=False)
     url = "postgresql+psycopg://user:password@localhost/evidenceops"
     assert Settings(_env_file=None, database_url=url).retrieval_mode == "semantic"
-    monkeypatch.setenv("EVIDENCEOPS_RETRIEVAL_MODE", "hybrid")
-    assert Settings(_env_file=None, database_url=url).retrieval_mode == "hybrid"
+    for mode in ("hybrid", "reranking"):
+        monkeypatch.setenv("EVIDENCEOPS_RETRIEVAL_MODE", mode)
+        assert Settings(_env_file=None, database_url=url).retrieval_mode == mode
     monkeypatch.setenv("EVIDENCEOPS_RETRIEVAL_MODE", "unknown")
     with pytest.raises(ValidationError):
         Settings(_env_file=None, database_url=url)

@@ -180,3 +180,67 @@ detalla filtros, determinismo y coste de reconstruir BM25 en memoria.
 `semantic` se mantiene por defecto y como baseline para M9.2; `hybrid` conserva
 su carácter experimental. La comparación guardada se reproduce sin modelos
 con los comandos del informe. No se altera ni recalcula el baseline M7.
+
+## Comparar semántico y reranking (M9.2)
+
+Implementación y experimento real completados: [resultados y límites](REPORT-m9.2.md).
+Los comandos siguientes documentan el procedimiento; no repetir el experimento
+sin nuevo encargo.
+Estos comandos realizan inferencia local y pueden descargar pesos. Requieren la
+DB PostgreSQL/pgvector configurada y el extra opcional existente `medcpt`.
+No invocan generación ni modifican baseline M7 o resultados M9.1. Usar rutas
+nuevas: el runner rechaza sobrescribir cualquier destino existente.
+
+```bash
+OMP_NUM_THREADS=4 MKL_NUM_THREADS=4 uv run --locked --extra medcpt \
+  python -m evidenceops.retrieval_evaluation --live --mode semantic --warmup \
+  --output evaluation/runs/m9.2-semantic-01.json
+OMP_NUM_THREADS=4 MKL_NUM_THREADS=4 uv run --locked --extra medcpt \
+  python -m evidenceops.retrieval_evaluation --live --mode reranking --warmup \
+  --output evaluation/runs/m9.2-reranking-01.json
+uv run --locked python -m evidenceops.retrieval_comparison \
+  evaluation/runs/m9.2-semantic-01.json evaluation/runs/m9.2-reranking-01.json
+```
+
+Usar el mismo entorno, máquina e hilos y evitar carga concurrente. `--warmup`
+ejecuta la primera query una vez sin medir antes de las diez consultas medidas.
+La indexación queda fuera de tiempos. Alternar el orden entre repeticiones con
+nombres nuevos (`02`, `03`, etc.) permite observar variabilidad; la muestra pequeña
+no permite afirmar una mejora general de latencia. Registrar condiciones externas
+(p. ej. otra carga del equipo) junto al informe manual. El comparador indica si
+coinciden protocolo y entorno registrados, sin garantizar igualdad de carga.
+
+Se guardan Hit Rate@5, Recall@5, Precision@5 y MRR como antes. El reranker recibe
+solo los 20 primeros semánticos y devuelve top5. Para diagnóstico/MRR se conserva
+el orden rerankeado de esos 20 seguido de la cola semántica sin cambios. No se
+reordena toda la colección ni se comparan numéricamente logits con dot products.
+`candidates` conserva orden, score semántico, unidad y fingerprint de entrada;
+`ranking` registra los dos scores y `score_type` (logit o dot product de la cola).
+El top5 es el prefijo de ese ranking. Se mantienen corpus y juicios congelados.
+
+`results[].latency` mide segundos por query: `retrieval_seconds` (consulta MedCPT,
+SQL y validación), `reranker_seconds` (tokenización, forward y ordenación),
+`total_seconds` (ruta de búsqueda completa). Para obtener el ranking completo de
+los candidatos la evaluación solicita top20, con la misma selección e inferencia
+que top5; esa petición medida se recorta a 5 para las métricas. El ranking
+semántico completo de diagnóstico se consulta después y queda fuera del tiempo.
+No se reutiliza el vector de una query medida en otra. Sin `--warmup`, la primera
+query puede incluir carga/descarga diferida: el artefacto conserva esta condición.
+En modo semántico el tiempo de reranker es cero.
+
+`latency` agregado incluye media, mediana y p95 nearest-rank por etapa. El
+comparador devuelve valores y deltas temporales agregados y por consulta, junto
+con deltas de calidad y PMIDs que entran/salen del top5. Runs antiguos sin tiempos
+siguen siendo comparables en calidad; su comparación temporal devuelve `null`.
+Las revisiones de los tres modelos, truncación, profundidad, configuración,
+versiones, hashes y entorno quedan registrados. Los fallos conservan checkpoint
+seguro y no producen agregado completo.
+
+Tests sin modelos (integración requiere DB de pruebas):
+
+```bash
+uv run --locked pytest tests/test_reranking.py tests/test_retrieval.py \
+  tests/test_retrieval_evaluation.py tests/test_rag_integration.py
+```
+
+Son evidencia del mecanismo, no de calidad. [Decisión y límites](../../docs/decisions/D031-medcpt-reranking.md).

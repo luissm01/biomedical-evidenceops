@@ -1,6 +1,8 @@
 """Index and search a small exact pgvector corpus; no HTTP or generation."""
 
 from dataclasses import dataclass
+import logging
+from time import perf_counter
 from uuid import UUID
 from typing import Literal
 
@@ -15,6 +17,7 @@ from evidenceops.embeddings import (
 from evidenceops.lexical import CANDIDATE_K, bm25, reciprocal_rank_fusion
 from evidenceops.models import Publication, UnitEmbedding
 from evidenceops.publications import as_biomedical_document
+from evidenceops.reranking import MedCPTReranker, RERANK_CANDIDATES, validate_scores
 
 
 def _unit(publication: Publication) -> RetrievableUnit | None:
@@ -87,7 +90,13 @@ class RetrievalResult:
     score: float
 
 
-def search(
+@dataclass(frozen=True, slots=True)
+class RerankedResult(RetrievalResult):
+    # Keep the base schema stable: archived RAG runs use its canonical digest.
+    retrieval_score: float
+
+
+def _search_first_stage(
     sessions: sessionmaker[Session], encoder: MedCPTEncoder, *, query: str,
     top_k: int, published_from: int | None = None,
     mode: Literal["semantic", "hybrid"] = "semantic", candidate_k: int = CANDIDATE_K,
@@ -149,3 +158,50 @@ def search(
             return [RetrievalResult(unit, score) for unit, score in
                     reciprocal_rank_fusion([semantic, lexical])[:top_k]]
         return results
+
+
+def search(
+    sessions: sessionmaker[Session], encoder: MedCPTEncoder, *, query: str,
+    top_k: int, published_from: int | None = None,
+    mode: Literal["semantic", "hybrid", "reranking"] = "semantic",
+    candidate_k: int = CANDIDATE_K, reranker: MedCPTReranker | None = None,
+    timings: dict | None = None,
+) -> list[RetrievalResult]:
+    """Search with an optional fixed top-20 semantic → Cross-Encoder stage.
+
+    Reranking accepts top_k <= 20 (RAG requests 5). Filters and compatibility
+    checks precede candidate selection. Ties use unit_id, never input order.
+    Timings include encoding/SQL and scoring (tokenization + forward + any lazy
+    load), respectively; total includes orchestration. No silent fallback.
+    """
+    if mode not in ("semantic", "hybrid", "reranking"):
+        raise ValueError("mode must be semantic, hybrid or reranking")
+    if mode == "reranking":
+        if type(top_k) is not int or not 0 < top_k <= RERANK_CANDIDATES:
+            raise ValueError("reranking top_k must be between 1 and 20")
+        if reranker is None:
+            raise ValueError("reranking requires a MedCPT reranker")
+    started = perf_counter()
+    results = _search_first_stage(
+        sessions, encoder, query=query,
+        top_k=RERANK_CANDIDATES if mode == "reranking" else top_k,
+        published_from=published_from, mode="semantic" if mode == "reranking" else mode,
+        candidate_k=candidate_k,
+    )
+    retrieved = perf_counter()
+    if mode == "reranking" and results:
+        scores = validate_scores(reranker.score(query.strip(), [r.unit for r in results]), len(results))
+        results = sorted(
+            [RerankedResult(r.unit, score, r.score) for r, score in zip(results, scores, strict=True)],
+            key=lambda r: (-r.score, r.unit.unit_id),
+        )[:top_k]
+        logging.getLogger(__name__).info("retrieval.reranked", extra={
+            "reranker_model": reranker.config.model, "reranker_revision": reranker.config.revision,
+            "candidate_count": len(scores),
+        })
+    finished = perf_counter()
+    if timings is not None:
+        timings.update(retrieval_seconds=retrieved - started,
+                       reranker_seconds=finished - retrieved if mode == "reranking" and results else 0.0,
+                       total_seconds=finished - started)
+    return results

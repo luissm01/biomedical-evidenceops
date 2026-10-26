@@ -148,11 +148,20 @@ unit_id. El modo semántico sigue siendo el predeterminado. La selección RAG
 se configura al arrancar mediante `EVIDENCEOPS_RETRIEVAL_MODE`. No cambia
 generación ni prompts. [Decisión y escalabilidad](decisions/D030-hybrid-retrieval.md).
 
+M9.2 incorpora el modo `reranking` sobre los primeros 20 candidatos semánticos:
+Cross-Encoder MedCPT local con revisión fija, pares consulta/texto y límite de 512
+tokens, logits descendentes y desempates por unidad. RAG consume top5 sin cambiar
+prompts/generación; el adaptador se carga al primer uso y mantiene las dependencias
+opcionales. Errores se propagan por la política RAG existente. La evaluación
+preserva los 20 candidatos y la cola semántica para MRR completo, además de calidad
+y tiempos por etapa/consulta. [Experimento real y límites](../evaluation/retrieval/REPORT-m9.2.md).
+[Decisión, protocolo y límites](decisions/D031-medcpt-reranking.md).
+
 ## Servicio RAG v1 de M8
 
 [rag.py](../src/evidenceops/rag.py) implementa el contrato de
 [D026](decisions/D026-rag-v1-contract-context-and-citations.md):
-`query → retrieval semántico o híbrido → contexto → Generator → validación → answer + limitations + sources`.
+`query → retrieval seleccionado → contexto → Generator → validación → answer + limitations + sources`.
 `RagService` recibe un callable de búsqueda (M7 con sesiones y encoder ligados)
 y el `Generator` existente. Solicita top-5 con año inicial opcional. No posee
 recursos, accede a HTTP ni persiste respuestas.
