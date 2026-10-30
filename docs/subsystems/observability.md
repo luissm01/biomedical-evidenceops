@@ -27,6 +27,16 @@ Mide la llamada al generador, incluida su validación de salida y posibles
 esperas/retries del SDK, excluyendo la consulta previa a PostgreSQL y la
 serialización HTTP. No es la duración completa de la petición.
 
+## Tool calling de una ronda
+
+`tool_calling.started` y `tool_calling.finished` observan M10.1: operation,
+proposal, validation, execution, result y finalization. Conservan `operation_id`,
+`call_id`, `tool`, `duration_ms`, `outcome` y causa segura. Los spans
+`tool_calling.*` anidan los dos posibles spans `llm.deepseek`; el ID nativo
+acompaña ejecución, resultado y finalización. Herramientas desconocidas usan
+`tool=unregistered`. No se registra contenido. La demo activa eventos con
+`--logs`. [Contratos, métricas y límites](tools.md).
+
 ## Ingestión biomédica por CLI
 
 `evidenceops ingest` configura el mismo logger JSON. `ingestion.started` incluye

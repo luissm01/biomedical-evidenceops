@@ -1,6 +1,6 @@
 """Ephemeral RAG orchestration and deterministic context/citation policy (D026)."""
 
-from collections.abc import Callable, Iterator
+from collections.abc import Callable, Collection, Iterator
 from dataclasses import dataclass
 import json
 import re
@@ -132,6 +132,10 @@ def _citation_failure(
 
 
 def validate_citations(content: GeneratedContent, sources: tuple[RagSource, ...]) -> None:
+    validate_citation_ids(content, [source.citation_id for source in sources])
+
+
+def validate_citation_ids(content: GeneratedContent, citation_ids: Collection[str]) -> None:
     """Preserve D026 acceptance; report the first failure with content-free location.
 
     Precedence: exact abstention, unknown citation, leftover brackets, coverage.
@@ -141,7 +145,7 @@ def validate_citations(content: GeneratedContent, sources: tuple[RagSource, ...]
         if content.limitations:
             raise InvalidCitationsError("invalid_abstention", "limitations", limitation_index=0)
         return
-    allowed = {f"[{source.citation_id}]" for source in sources}
+    allowed = {f"[{citation_id}]" for citation_id in citation_ids}
     fields = [("answer", None, content.answer)] + [
         ("limitations", index, text) for index, text in enumerate(content.limitations)
     ]

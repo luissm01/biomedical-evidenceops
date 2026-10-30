@@ -20,6 +20,7 @@ destinos en cascada.
 | Corpus, métricas y baseline de retrieval | [Retrieval evaluation](../evaluation/retrieval/README.md) | Evaluar retrieval de M7 |
 | Evaluar RAG end-to-end | [RAG evaluation](../evaluation/rag/README.md) | Casos, rúbrica, runs y baseline de M8 |
 | Eventos y diagnóstico | [Observabilidad](subsystems/observability.md) | Cambiar/usar logs |
+| Tool calling de lectura | [Herramientas](subsystems/tools.md) | Contratos, composición, límites, demo y pruebas de M10.1 |
 | Workflow de evaluación asistida | [Skill evaluation](../.codex/skills/evidenceops-evaluation/SKILL.md) | Ejecutar, revisar o comparar evaluaciones |
 
 ## Fuentes automáticas
