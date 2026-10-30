@@ -10,6 +10,12 @@ from evidenceops.biomedical import BiomedicalDocument
 from evidenceops.models import Publication
 
 
+def get_publication(session: Session, publication_id: UUID) -> BiomedicalDocument | None:
+    """Read a detached bibliographic snapshot; caller owns the session."""
+    publication = session.get(Publication, publication_id)
+    return None if publication is None else as_biomedical_document(publication)
+
+
 def as_biomedical_document(publication: Publication) -> BiomedicalDocument:
     """Copy persisted bibliographic fields back into the domain contract."""
     return BiomedicalDocument(

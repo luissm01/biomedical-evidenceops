@@ -108,6 +108,30 @@ y el [plan M5 completado](plans/completed/m5-observability.md).
 No hay capa Repository, framework de agentes ni orquestación anticipada.
 Consulta el [índice ADR](decisions/README.md) antes de cambiar estos límites.
 
+## Tool calling controlado de M10.1
+
+[tools.py](../src/evidenceops/tools.py) declara contratos estrictos y ejecuta
+solo dos herramientas registradas. `search_evidence` proyecta metadata compacta
+del `search` semántico existente; `get_publication` consulta por UUID y copia la
+bibliografía/abstract sin acceso a PubMed. La composición aplica transacciones
+de solo lectura y timeout SQL, sin retener sesión durante el LLM.
+
+[tool_calling.py](../src/evidenceops/tool_calling.py) implementa una propuesta,
+como máximo una herramienta y una finalización. Su `ToolCallingModel` es una
+capacidad separada de `Generator`; no cambia el RAG. El único adaptador inicial,
+[deepseek_tools.py](../src/evidenceops/deepseek_tools.py), usa DeepSeek Flash sin
+razonamiento, conserva la llamada y correlaciona su resultado mediante el ID
+nativo. La finalización deshabilita herramientas y valida `GeneratedContent`.
+No hay loop de agente, HTTP nuevo, memoria persistente ni MCP.
+
+Las fuentes las construye la aplicación a partir de lo entregado al modelo. Se
+reutiliza la política de citas RAG mediante un helper por IDs; las referencias
+directas URL/DOI/PMID se rechazan en esta capacidad. Las reglas estructurales no
+acreditan apoyo semántico, especialmente cuando solo se ha recibido metadata.
+Límites, propiedad de recursos, demo offline y pruebas en
+[herramientas](subsystems/tools.md); alternativas y excepción de coste puntual
+aprobada en [D032](decisions/D032-controlled-tool-calling.md).
+
 ## Indexación y búsqueda vectorial local
 
 `Publication → chunking → LocalMedCPT Article Encoder → UnitEmbedding → pgvector`.

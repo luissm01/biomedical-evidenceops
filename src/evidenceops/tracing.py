@@ -10,7 +10,7 @@ from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.trace.export import ConsoleSpanExporter, SimpleSpanProcessor
 from opentelemetry.trace import Span, Status, StatusCode
 
-from evidenceops.generation import GenerationError, GeneratedContent
+from evidenceops.generation import GenerationError
 
 
 provider = TracerProvider(resource=Resource({SERVICE_NAME: "evidenceops"}))
@@ -40,7 +40,7 @@ def finish_success(span: Span) -> None:
 
 
 P = ParamSpec("P")
-T = TypeVar("T", bound=GeneratedContent)
+T = TypeVar("T")
 
 
 def traced_provider(name: str) -> Callable[[Callable[P, T]], Callable[P, T]]:

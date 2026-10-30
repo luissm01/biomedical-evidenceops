@@ -1,8 +1,23 @@
 # Estado actual
 
-Actualizado: 2026-10-26. Distingue código versionado de trabajo local pendiente.
+Actualizado: 2026-10-30. Distingue código versionado de trabajo local pendiente.
 
 ## Presente
+
+- **M10.1 — Tool Calling & Tool Contracts**, [#56](https://github.com/luissm01/biomedical-evidenceops/issues/56):
+  arquitectura e implementación aceptadas por el desarrollador. Dos herramientas
+  de solo lectura: búsqueda semántica compacta y consulta bibliográfica/abstract
+  por UUID. Una propuesta, como máximo una herramienta y una finalización;
+  DeepSeek Flash sin razonamiento como único adaptador inicial de esta capacidad.
+  El desarrollador acepta el uso puntual de su API de pago, pero no autoriza
+  inferencias reales con este encargo. Dobles y demo siempre offline, sin claves
+  reales ni descargas. Reutilización de servicios y reglas de citas, límites y
+  errores explícitos, SQL de solo lectura y observabilidad M5.
+  [D032](decisions/D032-controlled-tool-calling.md) y
+  [contratos, demo y límites](subsystems/tools.md). No cambia selección de proveedores
+  de generación ni flujo RAG; baselines intactos. Commit, PR, merge y cierre
+  autorizados expresamente; Git/GitHub conserva el estado de entrega. El repaso
+  práctico de aprendizaje no se acredita por la aceptación de la implementación.
 
 - **M9.2 — Reranking & Evaluation**, [#53](https://github.com/luissm01/biomedical-evidenceops/issues/53):
   completada en implementación, evaluación y decisión técnica; lista para integración. Modo `reranking`: MedCPT top20 →
@@ -132,6 +147,11 @@ Actualizado: 2026-10-26. Distingue código versionado de trabajo local pendiente
   Windows. Es una limitación de ese entorno, no un requisito del proyecto.
 
 ## Siguiente trabajo
+
+M10.1 aceptada; entrega y cierre de #56 según Git/GitHub. #57/#58 requieren
+su propio encargo. El repaso práctico queda pendiente de interacción, sin
+atribuir aprendizaje por el código generado. No ejecutar inferencias reales
+sin autorización específica.
 
 La evaluación y promoción RAG v1 de #47 están terminadas; no queda otra corrida
 pendiente. M8 reúne contrato, servicio, integración HTTP y baseline revisado.

@@ -138,6 +138,21 @@ Flujo y recursos en [arquitectura](docs/ARCHITECTURE.md).
 
 ## Diagnóstico y evaluación
 
+Tool calling de una ronda (M10.1, #56): dos herramientas de lectura sobre el
+corpus local, búsqueda compacta y consulta detallada por UUID. Servicio separado
+del RAG y DeepSeek sin razonamiento; el selector de generación existente no cambia.
+Demo sin DB, claves reales, red ni descargas:
+
+```bash
+uv run --locked python -m evidenceops.tool_calling_demo --scenario search
+uv run --locked python -m evidenceops.tool_calling_demo --scenario publication
+uv run --locked python -m evidenceops.tool_calling_demo --scenario second-round --logs
+```
+
+[Contratos, composición, errores, límites y pruebas](docs/subsystems/tools.md).
+El adaptador real es de pago; su uso puntual está aceptado, pero cada ejecución
+real necesita autorización específica. Estos comandos usan siempre dobles.
+
 - [Observabilidad](docs/subsystems/observability.md): eventos JSON, X-Request-ID,
   `GET /metrics`, diagnóstico y límites; estado de entrega en el plan M5.
 - [Evaluación](evaluation/README.md): dataset, runs, promoción, revisión humana
