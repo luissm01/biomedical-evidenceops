@@ -137,7 +137,7 @@ aprobada en [D032](decisions/D032-controlled-tool-calling.md).
 [agent.py](../src/evidenceops/agent.py) añade un único `StateGraph` independiente:
 `decide → execute → decide → close`. El modelo propone; la aplicación valida,
 ejecuta y limita. Historial único, registro de fuentes con etiquetas estables,
-contadores y motivo terminal; sin persistencia ni MCP. Comparte el adaptador
+contadores y motivo terminal; sin persistencia. Comparte el adaptador
 DeepSeek y el ejecutor de M10.1, conservando su servicio de una ronda.
 
 Cuatro solicitudes LLM, tres herramientas, ocho nodos y 120 s cooperativos;
@@ -146,6 +146,19 @@ fallos y excesos devuelven contenido null, distintos de respuesta/abstención
 validadas. Fuentes desde el registro de la aplicación, validación de citas
 existente y observabilidad M5. Sin cambios al RAG ni sus baselines.
 [Operación y demo offline](subsystems/agent.md); [D033](decisions/D033-bounded-langgraph-agent.md).
+
+## Integración MCP local de M10.3
+
+[mcp_server.py](../src/evidenceops/mcp_server.py) publica el catálogo Pydantic y
+adapta llamadas stdio a `ToolExecutor`, sin duplicar búsqueda ni lectura. Solo
+herramientas; sin recursos/prompts, autenticación ni transporte remoto.
+[mcp_client.py](../src/evidenceops/mcp_client.py) descubre/comprueba contratos y
+entrega resultados estructurados validados mediante `AgentToolExecutor`. Un
+portal AnyIO adapta el SDK asíncrono al grafo síncrono; el ejecutor directo sigue
+siendo compatible. El contexto cliente posee proceso/cliente/portal y el servidor
+su Engine. Presupuestos y reglas de fuentes/citas del grafo permanecen iguales.
+[Decisión D034](decisions/D034-local-mcp-integration.md),
+[operación y demos sin LLM](subsystems/mcp.md).
 
 ## Indexación y búsqueda vectorial local
 

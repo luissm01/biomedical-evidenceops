@@ -142,3 +142,8 @@ transacción de solo lectura y liberación de conexión antes de la finalizació
 Las pruebas de transporte verifican serialización, IDs, límites, errores y
 configuración de timeout; el ReadTimeout HTTP se inyecta, no mide una red viva.
 Contrato externo de referencia y límites de la evidencia: [D032](../decisions/D032-controlled-tool-calling.md#evidencia-y-verificación).
+
+
+M10.3 expone estos mismos contratos/ejecutor por stdio mediante el SDK oficial
+MCP v2. [Servidor, cliente del agente y demos](mcp.md). La ejecución directa
+permanece disponible; no se duplican búsqueda ni lectura.

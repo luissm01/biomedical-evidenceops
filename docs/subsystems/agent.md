@@ -160,3 +160,12 @@ y comparar `budget` con `exhausted`: usar el último turno para finalizar no sig
 exceder presupuesto. Revisar `repeat`, los límites cooperativos y la diferencia
 entre cita existente y apoyo semántico. Sin otra inferencia real ni cuestionario
 rutinario. Registrar solo comprensión observada y dudas, no atribuirla a estos tests.
+
+
+## Ejecutor MCP opcional (M10.3)
+
+`AgentService` acepta el contrato `AgentToolExecutor` (`validate`, `execute`).
+Además del ejecutor directo, `connect_mcp_tools()` proporciona uno respaldado
+por el SDK MCP v2 y un servidor stdio local durante todo el run. No cambia el
+modelo, grafo, presupuestos, historial ni citas. [Composición, límites de transporte
+y demo con DB sin LLM](mcp.md); [D034](../decisions/D034-local-mcp-integration.md).

@@ -5,7 +5,7 @@ from contextlib import contextmanager
 from dataclasses import dataclass
 import json
 from time import monotonic
-from typing import Annotated, Literal
+from typing import Annotated, Literal, Protocol
 from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field, StringConstraints, ValidationError, field_validator, model_validator
@@ -143,6 +143,7 @@ type ToolErrorCode = Literal[
     "unknown_tool", "invalid_arguments", "invalid_call", "call_limit_exceeded",
     "round_limit_exceeded", "sql_timeout", "tool_timeout", "tool_budget_exceeded",
     "backend_error", "result_too_large", "invalid_references",
+    "mcp_connection_error", "mcp_contract_error",
 ]
 
 
@@ -151,6 +152,25 @@ class ToolCallingError(RuntimeError):
         # Fixed message, never include model arguments or dependency exception text.
         super().__init__(f"Tool calling failed: {code}")
         self.code = code
+
+
+def validate_tool_call(call: ToolCall) -> SearchEvidenceArgs | GetPublicationArgs:
+    registry = {definition.name: definition for definition in TOOL_DEFINITIONS}
+    if call.name not in registry:
+        raise ToolCallingError("unknown_tool")
+    if len(call.arguments) > ARGUMENT_CHARACTER_LIMIT:
+        raise ToolCallingError("invalid_arguments")
+    try:
+        # Reject duplicate keys rather than silently using the last value.
+        arguments = json.loads(call.arguments, object_pairs_hook=_unique_object)
+        return registry[call.name].arguments.model_validate(arguments)
+    except (ValueError, TypeError, RecursionError, ValidationError) as exc:
+        raise ToolCallingError("invalid_arguments") from exc
+
+
+class AgentToolExecutor(Protocol):
+    def validate(self, call: ToolCall) -> SearchEvidenceArgs | GetPublicationArgs: ...
+    def execute(self, call: ToolCall) -> ToolResult: ...
 
 
 class ToolExecutor:
@@ -166,19 +186,9 @@ class ToolExecutor:
         self._retrieve = retrieve
         self._lookup = lookup
         self._clock = clock
-        self._registry = {definition.name: definition for definition in TOOL_DEFINITIONS}
 
     def validate(self, call: ToolCall) -> SearchEvidenceArgs | GetPublicationArgs:
-        if call.name not in self._registry:
-            raise ToolCallingError("unknown_tool")
-        if len(call.arguments) > ARGUMENT_CHARACTER_LIMIT:
-            raise ToolCallingError("invalid_arguments")
-        try:
-            # Reject duplicate keys rather than silently using the last value.
-            arguments = json.loads(call.arguments, object_pairs_hook=_unique_object)
-            return self._registry[call.name].arguments.model_validate(arguments)
-        except (ValueError, TypeError, RecursionError, ValidationError) as exc:
-            raise ToolCallingError("invalid_arguments") from exc
+        return validate_tool_call(call)
 
     def execute(self, call: ToolCall) -> ToolResult:
         arguments = self.validate(call)

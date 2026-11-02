@@ -17,7 +17,7 @@ from evidenceops.rag_errors import InvalidCitationsError
 from evidenceops.tool_calling import ToolProposal, validate_tool_answer
 from evidenceops.tools import (
     TOOL_DEFINITIONS, PublicationDetails, PublicationMetadata, SearchEvidenceArgs,
-    SearchEvidenceData, ToolCallingError, ToolDefinition, ToolExecutor, ToolResult, compact_json,
+    SearchEvidenceData, ToolCallingError, ToolDefinition, AgentToolExecutor, ToolResult, compact_json,
 )
 from evidenceops.tracing import finish_error, finish_success, tracer
 
@@ -115,7 +115,7 @@ def register_sources(result: ToolResult, sources: dict[UUID, PublicationMetadata
 
 
 class AgentService:
-    def __init__(self, model: AgentModel, executor: ToolExecutor, *,
+    def __init__(self, model: AgentModel, executor: AgentToolExecutor, *,
                  clock: Callable[[], float] = monotonic, recursion_limit: int = RECURSION_LIMIT):
         if recursion_limit < 1:
             raise ValueError("recursion_limit must be positive")

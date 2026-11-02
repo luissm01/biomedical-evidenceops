@@ -4,6 +4,18 @@ Actualizado: 2026-11-02. Distingue código versionado de trabajo local pendiente
 
 ## Presente
 
+- **M10.3 — MCP Integration**: implementación y demo local validadas y aceptadas por el
+  desarrollador. SDK oficial Python v2, servidor stdio de las dos herramientas
+  existentes y cliente opcional del agente; contratos compartidos, resultados
+  estructurados y errores controlados. Conserva ejecución directa y presupuestos
+  del grafo. Tests deterministas SDK/stdio y PostgreSQL; demo sintética y modo
+  de lectura de corpus/índice local sin LLM. Demo con PostgreSQL y encoder MedCPT
+  reales verificada tras instalar el extra opcional; no acredita relevancia ni
+  calidad biomédica. Sin herramientas nuevas,
+  recursos/prompts MCP, despliegue remoto ni autenticación.
+  [D034](decisions/D034-local-mcp-integration.md) y
+  [operación/demos](subsystems/mcp.md). Commit, push, PR, merge y cierre de #58 autorizados; entrega en Git/GitHub.
+
 - **M10.2 — Agent Fundamentals with LangGraph**, [#57](https://github.com/luissm01/biomedical-evidenceops/issues/57):
   arquitectura, presupuestos e implementación aceptados por el desarrollador.
   Un agente con tres nodos sobre contratos/ejecutor de M10.1 y
@@ -161,10 +173,12 @@ Actualizado: 2026-11-02. Distingue código versionado de trabajo local pendiente
 
 ## Siguiente trabajo
 
-M10.2 aceptada; commit, push, PR, merge y cierre de #57 autorizados. Git/GitHub
-conserva el estado de entrega. El repaso práctico requiere interacción, sin
-atribuir aprendizaje por el código generado. #58 requiere su propio encargo.
-No ejecutar inferencias reales sin autorización específica.
+M10.3 aceptada y validada; commit, push, PR, merge y cierre de #58 autorizados.
+M10.1 y M10.2 ya integradas; Git/GitHub conserva el estado de entrega. El repaso
+práctico requiere interacción, sin atribuir aprendizaje por el código generado.
+La demo acredita el recorrido técnico y conserva las decisiones prefijadas;
+no prueba relevancia ni calidad biomédica. El siguiente milestone requiere su
+propio encargo. No ejecutar inferencias reales sin autorización específica.
 
 La evaluación y promoción RAG v1 de #47 están terminadas; no queda otra corrida
 pendiente. M8 reúne contrato, servicio, integración HTTP y baseline revisado.
