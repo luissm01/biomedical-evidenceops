@@ -165,6 +165,24 @@ uv run --locked python -m evidenceops.agent_demo --scenario exhausted
 `budget` finaliza dentro de 4 solicitudes LLM / 3 herramientas / 8 nodos;
 `exhausted` solicita otra herramienta y devuelve límite con contenido null.
 [Composición, estados, límites, escenarios y pruebas](docs/subsystems/agent.md).
+
+MCP local de M10.3: las mismas herramientas se exponen con el SDK oficial Python
+v2 por stdio; el agente puede usar un cliente MCP conservando sus límites.
+Demo con subproceso real, datos sintéticos y decisiones prefijadas (sin LLM/DB):
+
+```bash
+uv run --locked python -m evidenceops.mcp_demo
+```
+
+Demo con PostgreSQL e índice MedCPT locales ya preparados, sin llamadas al LLM:
+
+```bash
+uv sync --locked --dev --extra medcpt
+uv run --locked --extra medcpt python -m evidenceops.mcp_demo --local-db --query 'type 2 diabetes treatment'
+```
+
+[Preparación, servidor, composición, errores y pruebas MCP](docs/subsystems/mcp.md).
+
 No modifica el RAG ni habilita inferencias reales.
 
 - [Observabilidad](docs/subsystems/observability.md): eventos JSON, X-Request-ID,

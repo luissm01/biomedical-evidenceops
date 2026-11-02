@@ -22,6 +22,7 @@ destinos en cascada.
 | Eventos y diagnóstico | [Observabilidad](subsystems/observability.md) | Cambiar/usar logs |
 | Tool calling de lectura | [Herramientas](subsystems/tools.md) | Contratos, composición, límites, demo y pruebas de M10.1 |
 | Agente acotado con LangGraph | [Agente](subsystems/agent.md) | Ciclo, fuentes, presupuestos, demo y pruebas de M10.2 |
+| MCP local y cliente del agente | [MCP](subsystems/mcp.md) | Catálogo, stdio, errores, composición y demos de M10.3 |
 | Workflow de evaluación asistida | [Skill evaluation](../.codex/skills/evidenceops-evaluation/SKILL.md) | Ejecutar, revisar o comparar evaluaciones |
 
 ## Fuentes automáticas

@@ -37,6 +37,7 @@ en Git/issues. El estado de entrega vive en GitHub y el trabajo local en los pla
 | [D031](D031-medcpt-reranking.md) | MedCPT Cross-Encoder top20 → top5 y evaluación de calidad/latencia (M9.2) | Aceptada: semantic por defecto; reranking experimental |
 | [D032](D032-controlled-tool-calling.md) | Dos herramientas de lectura, una ronda y DeepSeek sin razonamiento (M10.1) | Arquitectura e implementación aceptadas |
 | [D033](D033-bounded-langgraph-agent.md) | Agente único LangGraph sobre M10.1, fuentes estables y presupuestos explícitos | Arquitectura e implementación aceptadas |
+| [D034](D034-local-mcp-integration.md) | MCP local v2/stdio sobre herramientas y agente existentes | Validada; entrega autorizada |
 
 Nueva decisión: siguiente ID, problema, alternativas, decisión, consecuencias
 y estado. Cambios de dirección enlazan a la decisión sustituida; no reescribas
