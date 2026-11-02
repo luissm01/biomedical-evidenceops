@@ -386,3 +386,17 @@ Un rechazo estructural no prueba falta de apoyo científico, igual que una cita
 aceptada no demuestra apoyo semántico. La segmentación de bloques sigue siendo
 la existente: párrafos separados por línea en blanco y listas con `-`, `+`, `*`
 o numeración `1.`/`1)`. Un salto de línea simple puede ser continuación de párrafo.
+
+## Agente LangGraph de M10.2
+
+`agent.finished` registra operación y cada nodo (`decide`, `execute`, `close`):
+`stage`, `transition`, `operation_id`, `call_id`/`tool` cuando corresponda,
+`steps`, `llm_calls`, `tool_calls`, duración, `outcome` y `cause` terminal.
+Spans `agent.operation` → `agent.*` → `llm.deepseek`, con usage observado mediante
+las métricas existentes del proveedor. Respuesta, abstención, error y límite
+quedan diferenciados; un resultado con error/límite nunca contiene respuesta.
+
+No exportar automáticamente el estado de LangGraph: incluye pregunta, argumentos
+y resultados. Los eventos propios solo contienen metadata operacional permitida;
+no se requiere LangSmith ni se configura otro exportador. Fuente de operación,
+presupuestos y demo: [agente](agent.md).

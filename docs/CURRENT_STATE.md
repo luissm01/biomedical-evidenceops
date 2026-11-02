@@ -1,8 +1,21 @@
 # Estado actual
 
-Actualizado: 2026-10-30. Distingue código versionado de trabajo local pendiente.
+Actualizado: 2026-11-02. Distingue código versionado de trabajo local pendiente.
 
 ## Presente
+
+- **M10.2 — Agent Fundamentals with LangGraph**, [#57](https://github.com/luissm01/biomedical-evidenceops/issues/57):
+  arquitectura, presupuestos e implementación aceptados por el desarrollador.
+  Un agente con tres nodos sobre contratos/ejecutor de M10.1 y
+  adaptador DeepSeek compartido; búsqueda → lectura → respuesta, fuentes estables
+  desde registro de aplicación y validación existente de citas/abstención.
+  Máximo 4 solicitudes LLM, 3 herramientas, 8 entradas en nodos, 120 s cooperativos
+  y cero reintentos. Finalización reservada dentro del presupuesto; errores/límites
+  con contenido null, diferenciados de respuesta y abstención. Sin persistencia,
+  multiagente, MCP, inferencias reales ni cambios a RAG/baselines. Demo offline y
+  pruebas deterministas. Commit, push, PR, merge y cierre autorizados; estado de
+  entrega en Git/GitHub. Repaso práctico pendiente de interacción. [D033](decisions/D033-bounded-langgraph-agent.md)
+  y [operación](subsystems/agent.md).
 
 - **M10.1 — Tool Calling & Tool Contracts**, [#56](https://github.com/luissm01/biomedical-evidenceops/issues/56):
   arquitectura e implementación aceptadas por el desarrollador. Dos herramientas
@@ -148,10 +161,10 @@ Actualizado: 2026-10-30. Distingue código versionado de trabajo local pendiente
 
 ## Siguiente trabajo
 
-M10.1 aceptada; entrega y cierre de #56 según Git/GitHub. #57/#58 requieren
-su propio encargo. El repaso práctico queda pendiente de interacción, sin
-atribuir aprendizaje por el código generado. No ejecutar inferencias reales
-sin autorización específica.
+M10.2 aceptada; commit, push, PR, merge y cierre de #57 autorizados. Git/GitHub
+conserva el estado de entrega. El repaso práctico requiere interacción, sin
+atribuir aprendizaje por el código generado. #58 requiere su propio encargo.
+No ejecutar inferencias reales sin autorización específica.
 
 La evaluación y promoción RAG v1 de #47 están terminadas; no queda otra corrida
 pendiente. M8 reúne contrato, servicio, integración HTTP y baseline revisado.

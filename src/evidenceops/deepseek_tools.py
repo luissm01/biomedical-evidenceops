@@ -28,13 +28,15 @@ class DeepSeekToolCaller:
         self._model = model
         self._max_output_tokens = max_output_tokens
         self._metrics = metrics
+        self._timeout_seconds = timeout_seconds
         self._client = httpx.Client(timeout=timeout_seconds, transport=transport,
                                     headers={"Authorization": f"Bearer {api_key}"})
 
     def close(self) -> None:
         self._client.close()
 
-    def _request(self, messages: list[dict], *, tools: list[dict] | None = None) -> dict:
+    def _request(self, messages: list[dict], *, tools: list[dict] | None = None,
+                 timeout_seconds: float | None = None) -> dict:
         logger.info("llm.generation.started", extra={"provider": "deepseek", "model": self._model})
         body = {"model": self._model, "messages": messages, "stream": False,
                 "max_tokens": self._max_output_tokens, "thinking": {"type": "disabled"}}
@@ -43,7 +45,9 @@ class DeepSeekToolCaller:
         else:
             body.update(tool_choice="none", response_format={"type": "json_object"})
         try:
-            response = self._client.post(_ENDPOINT, json=body)
+            options = {} if timeout_seconds is None else {
+                "timeout": min(self._timeout_seconds, timeout_seconds)}
+            response = self._client.post(_ENDPOINT, json=body, **options)
             response.raise_for_status()
         except Exception as exc:
             cause = DeepSeekGenerator._classify_error(exc)
@@ -74,15 +78,22 @@ class DeepSeekToolCaller:
         return [{"role": "system", "content": TOOL_SYSTEM_INSTRUCTION},
                 {"role": "user", "content": question}]
 
-    @traced_provider("deepseek")
     def propose(self, question: str, tools: tuple[ToolDefinition, ...]) -> ToolProposal | GeneratedContent:
+        return self.decide(self._messages(question), tools)
+
+    @traced_provider("deepseek")
+    def decide(self, messages: list[dict], tools: tuple[ToolDefinition, ...] | None, *,
+               timeout_seconds: float | None = None) -> ToolProposal | GeneratedContent:
+        """One native turn; caller owns the ephemeral history and execution policy."""
         definitions = [{"type": "function", "function": {"name": tool.name,
             "description": tool.description, "parameters": tool.arguments.model_json_schema()}}
-            for tool in tools]
-        message = self._request(self._messages(question), tools=definitions)
+            for tool in tools] if tools is not None else None
+        message = self._request(messages, tools=definitions, timeout_seconds=timeout_seconds)
         calls = message.get("tool_calls")
         if not calls:
             return _content(message)
+        if tools is None:
+            raise ToolCallingError("round_limit_exceeded")
         if not isinstance(calls, list):
             raise _invalid_output()
         if len(calls) > 1:
@@ -100,20 +111,21 @@ class DeepSeekToolCaller:
         except (ValueError, KeyError, TypeError, ValidationError) as exc:
             raise _invalid_output() from exc
 
-    @traced_provider("deepseek")
     def finalize(self, question: str, proposal: ToolProposal, result: ToolResult) -> GeneratedContent:
-        call = proposal.call
-        if result.call_id != call.id or result.tool != call.name:
-            raise ToolCallingError("invalid_call")
-        messages = [*self._messages(question),
-            {"role": "assistant", "content": proposal.assistant_text, "tool_calls": [
-                {"id": call.id, "type": "function", "function": {
-                    "name": call.name, "arguments": call.arguments}}]},
-            {"role": "tool", "tool_call_id": call.id, "content": compact_json(result.payload())}]
-        message = self._request(messages)
-        if message.get("tool_calls"):
-            raise ToolCallingError("round_limit_exceeded")
-        return _content(message)
+        return self.decide([*self._messages(question), *tool_messages(proposal, result)], None)
+
+
+def tool_messages(proposal: ToolProposal, result: ToolResult) -> list[dict]:
+    """Correlate one validated result with its native assistant call."""
+    call = proposal.call
+    if result.call_id != call.id or result.tool != call.name:
+        raise ToolCallingError("invalid_call")
+    return [
+        {"role": "assistant", "content": proposal.assistant_text, "tool_calls": [
+            {"id": call.id, "type": "function", "function": {
+                "name": call.name, "arguments": call.arguments}}]},
+        {"role": "tool", "tool_call_id": call.id, "content": compact_json(result.payload())}]
+
 
 
 def _invalid_output() -> GenerationError:

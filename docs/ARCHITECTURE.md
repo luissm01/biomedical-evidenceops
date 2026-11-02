@@ -105,7 +105,7 @@ sin cambiar contratos de negocio.
 Sus límites y diagnóstico se conservan en el [subsistema](subsystems/observability.md)
 y el [plan M5 completado](plans/completed/m5-observability.md).
 
-No hay capa Repository, framework de agentes ni orquestación anticipada.
+No hay capa Repository; el agente acotado de M10.2 se compone fuera del flujo HTTP/RAG.
 Consulta el [índice ADR](decisions/README.md) antes de cambiar estos límites.
 
 ## Tool calling controlado de M10.1
@@ -131,6 +131,21 @@ acreditan apoyo semántico, especialmente cuando solo se ha recibido metadata.
 Límites, propiedad de recursos, demo offline y pruebas en
 [herramientas](subsystems/tools.md); alternativas y excepción de coste puntual
 aprobada en [D032](decisions/D032-controlled-tool-calling.md).
+
+## Agente acotado de M10.2
+
+[agent.py](../src/evidenceops/agent.py) añade un único `StateGraph` independiente:
+`decide → execute → decide → close`. El modelo propone; la aplicación valida,
+ejecuta y limita. Historial único, registro de fuentes con etiquetas estables,
+contadores y motivo terminal; sin persistencia ni MCP. Comparte el adaptador
+DeepSeek y el ejecutor de M10.1, conservando su servicio de una ronda.
+
+Cuatro solicitudes LLM, tres herramientas, ocho nodos y 120 s cooperativos;
+cero retries. La última decisión puede finalizar con la evidencia acumulada;
+fallos y excesos devuelven contenido null, distintos de respuesta/abstención
+validadas. Fuentes desde el registro de la aplicación, validación de citas
+existente y observabilidad M5. Sin cambios al RAG ni sus baselines.
+[Operación y demo offline](subsystems/agent.md); [D033](decisions/D033-bounded-langgraph-agent.md).
 
 ## Indexación y búsqueda vectorial local
 

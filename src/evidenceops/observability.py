@@ -35,6 +35,7 @@ class JsonFormatter(logging.Formatter):
                       "block_index", "character_offset",
                       "reranker_model", "reranker_revision", "candidate_count",
                       "operation_id", "call_id", "tool",
+                      "transition", "steps", "llm_calls", "tool_calls",
                       "source", "run_id", "requested", "unique", "batches",
                       "updated", "omitted", "failed", "unidentified_invalid"):
             if hasattr(record, field):

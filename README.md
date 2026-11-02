@@ -153,6 +153,20 @@ uv run --locked python -m evidenceops.tool_calling_demo --scenario second-round 
 El adaptador real es de pago; su uso puntual está aceptado, pero cada ejecución
 real necesita autorización específica. Estos comandos usan siempre dobles.
 
+Agente de M10.2 (#57): un ciclo LangGraph sobre las mismas herramientas, con
+fuentes estables y presupuestos explícitos. Demo totalmente offline:
+
+```bash
+uv run --locked python -m evidenceops.agent_demo --scenario evidence --logs
+uv run --locked python -m evidenceops.agent_demo --scenario budget
+uv run --locked python -m evidenceops.agent_demo --scenario exhausted
+```
+
+`budget` finaliza dentro de 4 solicitudes LLM / 3 herramientas / 8 nodos;
+`exhausted` solicita otra herramienta y devuelve límite con contenido null.
+[Composición, estados, límites, escenarios y pruebas](docs/subsystems/agent.md).
+No modifica el RAG ni habilita inferencias reales.
+
 - [Observabilidad](docs/subsystems/observability.md): eventos JSON, X-Request-ID,
   `GET /metrics`, diagnóstico y límites; estado de entrega en el plan M5.
 - [Evaluación](evaluation/README.md): dataset, runs, promoción, revisión humana

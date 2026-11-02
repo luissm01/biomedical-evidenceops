@@ -17,6 +17,7 @@ dependencies = [
     "sqlalchemy>=2.0.52",
     "uvicorn>=0.52.4",
     "pgvector>=0.4.2",
+    "langgraph>=1,<2",
 ]
 
 [project.scripts]
