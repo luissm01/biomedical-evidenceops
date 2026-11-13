@@ -11,7 +11,7 @@ destinos en cascada.
 | Propósito permanente | [Visión](PROJECT_CONTEXT.md) | Producto, objetivos profesionales |
 | Responsabilidades y límites | [Arquitectura](ARCHITECTURE.md) | Cambios que cruzan componentes |
 | Presente y próximo paso | [Estado](CURRENT_STATE.md) | Cuando la tarea dependa del estado, milestone o trabajo en curso |
-| Orden y alcance M0–M19 | [Roadmap](ROADMAP.md) | Sección del milestone afectado |
+| Orden y alcance M0–M14 | [Roadmap](ROADMAP.md) | Sección del milestone afectado |
 | Por qué una elección | [ADRs](decisions/README.md) | Índice y decisión del área |
 | Trabajo completado | [Archivo M5](plans/completed/m5-observability.md) | Consultar secuencia y cierre de observabilidad |
 | Trabajo histórico útil | [Planes completados](plans/completed/README.md) | Investigación histórica |
