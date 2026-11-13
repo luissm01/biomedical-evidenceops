@@ -174,8 +174,10 @@ Actualizado: 2026-11-02. Distingue código versionado de trabajo local pendiente
 ## Siguiente trabajo
 
 M10.3 aceptada y validada; commit, push, PR, merge y cierre de #58 autorizados.
-M10.1 y M10.2 ya integradas; Git/GitHub conserva el estado de entrega. El repaso
-práctico requiere interacción, sin atribuir aprendizaje por el código generado.
+M10.1 y M10.2 ya integradas; Git/GitHub conserva el estado de entrega. Las
+milestones se cierran con el trabajo técnico aceptado; los repasos de M9 y M10
+quedan diferidos al repaso final consolidado ([D035](decisions/D035-consolidated-final-learning-review.md)),
+sin atribuir aprendizaje por el código generado.
 La demo acredita el recorrido técnico y conserva las decisiones prefijadas;
 no prueba relevancia ni calidad biomédica. El siguiente milestone requiere su
 propio encargo. No ejecutar inferencias reales sin autorización específica.

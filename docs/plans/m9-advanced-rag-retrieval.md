@@ -54,6 +54,7 @@ Sin agentes, tools/MCP, colas, nuevos despliegues o adaptación de modelos.
 
 El [registro M9](../learning/m9.md) conserva las decisiones e interpretación
 expresadas por el desarrollador; el código generado no acredita comprensión.
-El repaso de cierre de M9 usará evidencias existentes y registrará solo
+El repaso de M9 queda diferido al repaso final consolidado
+([D035](../decisions/D035-consolidated-final-learning-review.md)) y registrará solo
 aprendizaje demostrado. Las dos issues tienen implementación, evaluación y decisión completas;
 la integración de #53 es el último paso de entrega de M9.
