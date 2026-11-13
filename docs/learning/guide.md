@@ -42,16 +42,20 @@ debe comprender el sistema sin escribir todas sus líneas. Los registros de
 [aprendizaje](README.md) distinguen interacción confirmada de código generado;
 no acreditar dominio por haber usado automáticamente una tecnología.
 
-## Cierre de milestone
+## Repaso final consolidado
 
-Reservar un breve repaso conceptual y práctico al cierre de cada milestone:
-explicar el problema resuelto, la decisión principal, una alternativa y sus
-trade-offs; recorrer un caso representativo y un fallo o resultado de evaluación.
+Una milestone se cierra cuando su trabajo técnico está aceptado; el repaso de
+aprendizaje no es requisito de cierre ([D035](../decisions/D035-consolidated-final-learning-review.md)).
+Al terminar el proyecto se realiza un repaso consolidado de las milestones con
+repaso pendiente: para cada una, explicar el problema resuelto, la decisión
+principal, una alternativa y sus trade-offs; recorrer un caso representativo y
+un fallo o resultado de evaluación, relacionando competencias entre milestones.
 Usar el sistema y las evidencias existentes, sin exigir otra implementación ni
 una nueva inferencia real. Concentrarse en lagunas observadas, sin cuestionarios
-rutinarios ni convertir el repaso en una fase adicional.
+rutinarios.
 
 Registrar solo comprensión demostrada en la interacción y dudas pendientes en
-el registro correspondiente. Una entrega de código o este cambio de planificación
-no acredita aprendizaje. Este cierre se aplica en adelante; no reconstruye
-retrospectivamente repasos ni modifica registros históricos de M0–M8.
+el registro correspondiente; también puede registrarse comprensión demostrada
+antes, sin convertirla en requisito. Una entrega de código o un cierre de
+milestone no acredita aprendizaje. No reconstruye retrospectivamente repasos
+ni modifica registros históricos de M0–M8.

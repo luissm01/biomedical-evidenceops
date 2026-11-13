@@ -21,8 +21,10 @@ secuencia; crear M11–M14 requiere un encargo posterior.
 - Profundizar especialmente en RAG, evaluación, agentes y herramientas.
 - Acotar cloud, Kubernetes y sistemas distribuidos a prácticas útiles y medibles.
 - Reservar tiempo para comprender y explicar decisiones, alternativas y trade-offs.
-- Cerrar cada milestone con un breve repaso conceptual y práctico según la
-  [guía de aprendizaje](learning/guide.md#cierre-de-milestone).
+- Cerrar cada milestone cuando su trabajo técnico esté aceptado; el aprendizaje
+  se consolida en un repaso final al terminar el proyecto según la
+  [guía de aprendizaje](learning/guide.md#repaso-final-consolidado) y
+  [D035](decisions/D035-consolidated-final-learning-review.md).
 - Introducir arquitectura solo cuando el problema actual la necesite.
 - Mantener EvidenceOps como proyecto educativo y de portfolio, no comercial.
 
