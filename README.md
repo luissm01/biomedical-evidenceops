@@ -55,11 +55,19 @@ curl -i http://127.0.0.1:8000/health
 
 Respuesta esperada: `200 OK`, contenido JSON y cuerpo `{"status":"ok"}`.
 Este endpoint comprueba que la aplicación responde; no verifica servicios externos.
+`GET /ready` sí comprueba PostgreSQL y que las migraciones están en head; ver
+[operación y seguridad](#operación-y-seguridad-m112).
+
+La API exige `EVIDENCEOPS_API_KEYS` (una o varias claves de ≥16 caracteres,
+separadas por comas) y no arranca sin ella. Los POST que escriben datos o
+generan coste LLM requieren la cabecera `X-API-Key`; los ejemplos usan
+`export EVIDENCEOPS_API_KEY=<una de tus claves>`.
 
 ## Registrar y consultar preguntas
 
 ```bash
 curl -i http://127.0.0.1:8000/questions \
+  -H "X-API-Key: $EVIDENCEOPS_API_KEY" \
   -H 'Content-Type: application/json' \
   -d '{"text": "¿Qué evidencia existe sobre la intervención X?"}'
 ```
@@ -282,6 +290,35 @@ at-least-once en [jobs](docs/subsystems/jobs.md) y
 [D036](docs/decisions/D036-postgresql-job-queue.md). `evidenceops ingest` sigue
 siendo síncrono y no usa la cola.
 
+## Operación y seguridad (M11.2)
+
+| Endpoint | Protección |
+| --- | --- |
+| `GET /health` (liveness), `GET /ready` (readiness), `GET /metrics`, `GET /questions/{id}`, `GET /ingestion-jobs/{id}` | Abiertos |
+| `POST /questions`, `POST /ingestion-jobs` | `X-API-Key` |
+| `POST /questions/{id}/generate`, `POST /rag` | `X-API-Key` + rate limit por clave |
+
+- **Liveness** (`/health`) no comprueba dependencias; **readiness** (`/ready`)
+  devuelve 503 con `{"status":"not_ready","checks":{...}}` si PostgreSQL no
+  responde o el esquema no está en el head de Alembic.
+- **PostgreSQL caído tras el arranque:** las peticiones que lo necesitan
+  responden 503 `{"detail":{"code":"database_unavailable",...}}` y la API se
+  recupera sola al volver la BD (`pool_pre_ping`). Timeouts:
+  `EVIDENCEOPS_DATABASE_CONNECT_TIMEOUT_SECONDS` (5) y
+  `EVIDENCEOPS_DATABASE_STATEMENT_TIMEOUT_MS` (30 000). El worker espera con
+  backoff exponencial hasta `EVIDENCEOPS_JOBS_POLL_BACKOFF_MAX_SECONDS` (60).
+- **Límite total LLM:** `EVIDENCEOPS_LLM_TOTAL_TIMEOUT_SECONDS` (90) acota cada
+  llamada al proveedor, reintentos del SDK incluidos → 504
+  `generation_deadline_exceeded`. La llamada se abandona, no se cancela.
+- **Autenticación:** clave inválida o ausente → 401 `unauthorized`.
+- **Rate limit:** token bucket por clave, `EVIDENCEOPS_RATE_LIMIT_CAPACITY` (5)
+  y `EVIDENCEOPS_RATE_LIMIT_REFILL_PER_SECOND` (0,1 = 6/min), compartido por
+  generate y RAG → 429 `rate_limited` con `Retry-After`. En memoria: con N
+  instancias el límite efectivo es N veces el configurado.
+
+Motivos, alternativas descartadas y límites en
+[D037](docs/decisions/D037-operational-readiness.md).
+
 ## Pruebas y CI
 
 La suite completa usa PostgreSQL local; las fixtures exigen `evidenceops_test`,
@@ -447,6 +484,7 @@ utilizables; puede consumir cuota:
 
 ```bash
 curl -sS -i -X POST http://127.0.0.1:8000/rag \
+  -H "X-API-Key: $EVIDENCEOPS_API_KEY" \
   -H 'Content-Type: application/json' \
   -d '{"query":"association between childhood obesity and asthma risk","published_from":2020}'
 ```

@@ -4,6 +4,18 @@ Actualizado: 2026-11-13. Distingue código versionado de trabajo local pendiente
 
 ## Presente
 
+- **M11.2 — Operational readiness**, [#67](https://github.com/luissm01/biomedical-evidenceops/issues/67):
+  implementada en rama/PR apilada sobre M11.1, pendiente de aceptación. Liveness
+  `/health` sin dependencias y readiness `/ready` (PostgreSQL + head de Alembic);
+  caída de PostgreSQL → 503 `database_unavailable` y recuperación sin reinicio
+  (`pool_pre_ping`, timeouts de conexión/sentencia); backoff con tope en el polling
+  del worker; límite total por llamada LLM (504 `generation_deadline_exceeded`);
+  `X-API-Key` obligatoria en escrituras y endpoints LLM (la API no arranca sin
+  claves); token bucket en memoria por clave en generate/RAG (429 + `Retry-After`);
+  URL de BD tipada como secreto. Tests con proxy TCP conmutable, sin red ni
+  inferencias. Demo local de parada/arranque de PostgreSQL verificada.
+  [D037](decisions/D037-operational-readiness.md).
+
 - **M11.1 — Async ingestion queue**, [#65](https://github.com/luissm01/biomedical-evidenceops/issues/65):
   implementada en rama/PR, pendiente de aceptación del desarrollador. Cola propia
   en PostgreSQL (`ingestion_jobs`, `FOR UPDATE SKIP LOCKED`), estados
@@ -173,10 +185,10 @@ Actualizado: 2026-11-13. Distingue código versionado de trabajo local pendiente
 - Servicio RAG local disponible con fuentes y citas verificadas estructuralmente;
   el endpoint RAG reutiliza retrieval y la generación HTTP previa conserva su
   contrato. La revisión humana aplica una rúbrica limitada; no hay validación factual automática.
-- Timeout de transporte sin deadline total; un retry puede duplicar consumo.
-  [Política y motivos](decisions/D011-gemini.md).
-- Una caída de PostgreSQL tras startup aún produce errores no controlados en
-  endpoints de datos (el worker sigue haciendo polling). Readiness y recuperación quedan para M11.2.
+- El límite total LLM abandona la llamada, no la cancela: el proveedor puede
+  completarla y cobrarla. Un retry del SDK puede duplicar consumo.
+  [D011](decisions/D011-gemini.md), [D037](decisions/D037-operational-readiness.md).
+- Rate limit en memoria por proceso: con N instancias el límite efectivo es N×.
 - El lease de la cola no tiene heartbeat: un job más lento que el lease puede
   ejecutarse dos veces (fencing + upsert evitan corrupción y duplicados).
 - Dos DeprecationWarning conocidos de dependencias: Starlette usa
@@ -188,10 +200,9 @@ Actualizado: 2026-11-13. Distingue código versionado de trabajo local pendiente
 
 ## Siguiente trabajo
 
-M11.1 en revisión (#65): merge y cierre requieren autorización del desarrollador.
-Después, M11.2 (health/readiness, caídas de dependencias, seguridad proporcionada)
-requiere su propio encargo; LISTEN/NOTIFY, prioridades, cancelación y aplicar la
-cola a otros flujos quedan fuera de M11.1.
+M11.1 (#65, PR #66) y M11.2 (#67, PR apilada) en revisión: merge y cierre
+requieren autorización del desarrollador; integrar primero #66. M12 requiere su
+propio encargo (TLS, probes de Kubernetes y límites de cuerpo en el ingress).
 
 M10.3 aceptada y validada; commit, push, PR, merge y cierre de #58 autorizados.
 M10.1 y M10.2 ya integradas; Git/GitHub conserva el estado de entrega. Las

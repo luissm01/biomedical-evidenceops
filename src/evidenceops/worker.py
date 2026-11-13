@@ -110,18 +110,34 @@ class IngestionWorker:
         self._attempt = attempt
 
     def run(self) -> None:
-        """Poll until asked to stop; a stop request lets the current job finish."""
+        """Poll until asked to stop; a stop request lets the current job finish.
+
+        Consecutive polling failures (database down, statement timeout) wait
+        ``poll_seconds · 2^(n-1)`` up to ``poll_backoff_max_seconds``, so a
+        fleet of workers does not hammer a recovering database. The first
+        successful poll resets the wait.
+        """
         logger.info("worker.started", extra={"worker_id": self.worker_id})
+        failures = 0
         try:
             while not self.stop.is_set():
                 try:
                     processed = self.run_once()
                 except SQLAlchemyError:
-                    # Database unavailable: keep polling. Recovery policy is M11.2.
+                    failures += 1
+                    delay = min(self.settings.poll_seconds * 2 ** (failures - 1),
+                                self.settings.poll_backoff_max_seconds)
                     logger.warning("worker.poll_failed", extra={
                         "worker_id": self.worker_id, "cause": "database_error",
+                        "attempt": failures, "delay_seconds": delay,
                     })
-                    processed = False
+                    self.stop.wait(delay)
+                    continue
+                if failures:
+                    logger.info("worker.poll_recovered", extra={
+                        "worker_id": self.worker_id, "attempt": failures,
+                    })
+                    failures = 0
                 if not processed:
                     self.stop.wait(self.settings.poll_seconds)
         finally:

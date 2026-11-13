@@ -47,6 +47,9 @@ la reclamación solo recorre filas reclamables.
   fallo de persistencia de un documento no son errores del job: aparecen en
   `result.failed`/`result.failures`, como en el CLI.
 - **Backoff:** `min(base · 2^(n-1), max)` tras el intento `n` (10 s, 20 s, 40 s…).
+- **Polling con BD caída:** espera `poll_seconds · 2^(n-1)` tras `n` fallos
+  consecutivos, con tope `poll_backoff_max_seconds`; el primer polling correcto
+  la reinicia (M11.2).
 - **Parada ordenada:** la primera SIGINT/SIGTERM termina el job en curso y sale.
   Una segunda interrumpe el job y lo libera (`queued`, `released_on_shutdown`)
   sin esperar al lease. Un `kill -9` deja el job en `running` hasta que caduque.
@@ -91,6 +94,7 @@ Con `.env`, PostgreSQL y `uv run --locked alembic upgrade head`:
 uv run uvicorn evidenceops.main:app --reload            # API
 uv run --locked evidenceops worker --metrics-port 9101  # worker (otra terminal)
 curl -si -X POST localhost:8000/ingestion-jobs -H 'Content-Type: application/json' \
+  -H "X-API-Key: $EVIDENCEOPS_API_KEY" \
   -H 'Idempotency-Key: demo-1' -d '{"query": "asthma[Title]", "limit": 10}'
 curl -s localhost:8000/ingestion-jobs/<job_id>
 ```

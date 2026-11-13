@@ -99,7 +99,7 @@ def test_runner_isolated_schema_rankings_and_no_overwrite(mode, tmp_path, test_s
     output = tmp_path / 'run.json'
     try:
         from test_reranking import FakeReranker
-        run = run_baseline(DEFAULT_DIRECTORY, output, str(test_settings.database_url), encoder,
+        run = run_baseline(DEFAULT_DIRECTORY, output, test_settings.database_dsn, encoder,
                            mode=mode, reranker=FakeReranker() if mode == 'reranking' else None)
         assert run['configuration']['mode'] == mode
         if mode == 'hybrid':
@@ -114,7 +114,7 @@ def test_runner_isolated_schema_rankings_and_no_overwrite(mode, tmp_path, test_s
             assert session.scalars(select(Publication.id)).all() == before
             assert session.scalar(text("SELECT count(*) FROM pg_namespace WHERE nspname LIKE 'retrieval_eval_%'")) == 0
         with pytest.raises(FileExistsError):
-            run_baseline(DEFAULT_DIRECTORY, output, str(test_settings.database_url), encoder)
+            run_baseline(DEFAULT_DIRECTORY, output, test_settings.database_dsn, encoder)
         assert encoder.article_calls == 50
     finally:
         engine.dispose()
@@ -127,7 +127,7 @@ def test_runner_failed_inference_preserves_failure_and_cleans_schema(tmp_path, t
     encoder.encode_article = fail
     output = tmp_path / 'failed.json'
     with pytest.raises(RuntimeError):
-        run_baseline(DEFAULT_DIRECTORY, output, str(test_settings.database_url), encoder)
+        run_baseline(DEFAULT_DIRECTORY, output, test_settings.database_dsn, encoder)
     run = json.loads(output.read_text())
     assert run['status'] == 'failed' and run['error_type'] == 'RuntimeError'
     assert 'sensitive' not in output.read_text() and 'aggregate' not in run
@@ -220,9 +220,9 @@ def test_reranking_comparison_trace_latency_and_warmup(tmp_path, test_settings, 
     from test_reranking import FakeReranker
     from copy import deepcopy
     encoder, reranker = FakeEncoder(), FakeReranker()
-    semantic = run_baseline(DEFAULT_DIRECTORY, tmp_path / 'semantic.json', str(test_settings.database_url),
+    semantic = run_baseline(DEFAULT_DIRECTORY, tmp_path / 'semantic.json', test_settings.database_dsn,
                             encoder, warmup=True)
-    candidate = run_baseline(DEFAULT_DIRECTORY, tmp_path / 'reranking.json', str(test_settings.database_url),
+    candidate = run_baseline(DEFAULT_DIRECTORY, tmp_path / 'reranking.json', test_settings.database_dsn,
                              encoder, mode='reranking', reranker=reranker, warmup=True)
     assert encoder.query_calls == 22  # One warmup + ten measured queries per run.
     assert len(reranker.calls) == 11
@@ -254,7 +254,7 @@ def test_failed_reranker_preserves_safe_checkpoint_and_cleans_schema(tmp_path, t
     reranker.score.side_effect = [[float(i) for i in range(20)], RuntimeError('sensitive failure')]
     output = tmp_path / 'failed-reranking.json'
     with pytest.raises(RuntimeError):
-        run_baseline(DEFAULT_DIRECTORY, output, str(test_settings.database_url),
+        run_baseline(DEFAULT_DIRECTORY, output, test_settings.database_dsn,
                      FakeEncoder(), mode='reranking', reranker=reranker)
     run = json.loads(output.read_text())
     assert run['status'] == 'failed' and len(run['results']) == 1

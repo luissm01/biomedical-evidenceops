@@ -12,6 +12,7 @@ from opentelemetry.sdk.trace.export import SimpleSpanProcessor
 from opentelemetry.sdk.trace.export.in_memory_span_exporter import InMemorySpanExporter
 from opentelemetry.trace import StatusCode
 
+from conftest import allow_protected_endpoints
 from evidenceops.deepseek import DeepSeekGenerator
 from evidenceops.gemini import GeminiGenerator
 from evidenceops.main import create_app, get_generator, get_question_text
@@ -47,6 +48,7 @@ def test_gemini_trace_hierarchy_outcome_and_privacy(
     app = create_app()
     app.dependency_overrides[get_question_text] = lambda: "private-question"
     app.dependency_overrides[get_generator] = lambda: generator
+    allow_protected_endpoints(app)
     try:
         response = TestClient(app, raise_server_exceptions=False).post(
             f"/questions/{uuid4()}/generate"

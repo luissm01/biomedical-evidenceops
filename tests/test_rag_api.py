@@ -15,6 +15,7 @@ from opentelemetry.sdk.trace.export.in_memory_span_exporter import InMemorySpanE
 from opentelemetry.trace import StatusCode
 from sqlalchemy.exc import OperationalError
 
+from conftest import allow_protected_endpoints
 from evidenceops.deepseek import DeepSeekGenerator
 from evidenceops.embeddings import EmbeddingCompatibilityError
 from evidenceops.gemini import GeminiGenerator
@@ -42,6 +43,7 @@ def flow(exporter):
     generator.generate.return_value = GeneratedContent(answer="private-answer [S1].", limitations=[])
     service = RagService(retrieve, generator, app.state.metrics)
     app.dependency_overrides[get_rag_service] = lambda: service
+    allow_protected_endpoints(app)
     stream = io.StringIO()
     handler = logging.StreamHandler(stream)
     handler.setFormatter(JsonFormatter())

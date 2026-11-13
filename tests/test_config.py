@@ -12,7 +12,8 @@ def test_accepts_psycopg_database_url() -> None:
         database_url="postgresql+psycopg://user:password@localhost/evidenceops"
     )
 
-    assert settings.database_url.scheme == "postgresql+psycopg"
+    assert settings.database_dsn.startswith("postgresql+psycopg://")
+    assert "password" not in repr(settings) and "password" not in str(settings.database_url)
 
 
 @pytest.mark.parametrize(

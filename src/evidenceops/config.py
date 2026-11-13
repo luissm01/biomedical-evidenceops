@@ -1,7 +1,9 @@
-from typing import Literal
+from typing import Annotated, Literal
 
-from pydantic import Field, PostgresDsn, SecretStr, field_validator
-from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic import Field, PostgresDsn, SecretStr, TypeAdapter, ValidationError, field_validator
+from pydantic_settings import BaseSettings, NoDecode, SettingsConfigDict
+
+_POSTGRES_DSN = TypeAdapter(PostgresDsn)
 
 
 class GenerationSettings(BaseSettings):
@@ -23,6 +25,9 @@ class GenerationSettings(BaseSettings):
     deepseek_model: str = Field(default="deepseek-flash", min_length=1)
     deepseek_max_output_tokens: int = Field(default=2048, gt=0)
     deepseek_timeout_seconds: float = Field(default=60.0, gt=0, allow_inf_nan=False)
+    # Wall-clock budget for one generate() call, SDK retries included (D037).
+    # The transport timeout above applies per HTTP operation, not in total.
+    llm_total_timeout_seconds: float = Field(default=90.0, gt=0, allow_inf_nan=False)
 
     @property
     def selected_model(self) -> str:
@@ -52,16 +57,47 @@ class GenerationSettings(BaseSettings):
 
 
 class Settings(GenerationSettings):
-    database_url: PostgresDsn
+    # Secret: the URL usually embeds the database password (D037).
+    database_url: SecretStr
+    database_connect_timeout_seconds: int = Field(default=5, ge=2, le=60)
+    database_statement_timeout_ms: int = Field(default=30_000, ge=100, le=600_000)
     trace_console: bool = False
     retrieval_mode: Literal["semantic", "hybrid", "reranking"] = "semantic"
+    # Comma-separated in the environment; required by the API at startup.
+    api_keys: Annotated[tuple[SecretStr, ...], NoDecode] = ()
+    rate_limit_capacity: int = Field(default=5, ge=1, le=1000)
+    rate_limit_refill_per_second: float = Field(default=0.1, gt=0, le=100, allow_inf_nan=False)
 
     @field_validator("database_url")
     @classmethod
-    def require_psycopg_driver(cls, database_url: PostgresDsn) -> PostgresDsn:
-        if database_url.scheme != "postgresql+psycopg":
+    def require_psycopg_driver(cls, database_url: SecretStr) -> SecretStr:
+        try:
+            dsn = _POSTGRES_DSN.validate_python(database_url.get_secret_value())
+        except ValidationError:
+            # Never chain or echo the original error: it would contain the URL.
+            raise ValueError("database URL must be a valid PostgreSQL URL") from None
+        if dsn.scheme != "postgresql+psycopg":
             raise ValueError("database URL must use the postgresql+psycopg scheme")
         return database_url
+
+    @field_validator("api_keys", mode="before")
+    @classmethod
+    def split_api_keys(cls, value: object) -> object:
+        if isinstance(value, str):
+            return tuple(key.strip() for key in value.split(",") if key.strip())
+        return value
+
+    @field_validator("api_keys")
+    @classmethod
+    def require_strong_api_keys(cls, keys: tuple[SecretStr, ...]) -> tuple[SecretStr, ...]:
+        if any(len(key.get_secret_value()) < 16 for key in keys):
+            raise ValueError("API keys must have at least 16 characters")
+        return keys
+
+    @property
+    def database_dsn(self) -> str:
+        """Plain URL for engine creation only; never log or render it."""
+        return self.database_url.get_secret_value()
 
 
 class PubMedSettings(BaseSettings):
@@ -116,3 +152,5 @@ class JobSettings(BaseSettings):
     # Must exceed the longest expected job; there is no heartbeat (D036).
     lease_seconds: float = Field(default=300.0, gt=0, allow_inf_nan=False)
     poll_seconds: float = Field(default=2.0, gt=0, allow_inf_nan=False)
+    # Cap for the exponential wait after consecutive polling failures (M11.2).
+    poll_backoff_max_seconds: float = Field(default=60.0, gt=0, allow_inf_nan=False)

@@ -27,6 +27,18 @@ class _TestDatabaseSettings(BaseSettings):
     test_database_url: PostgresDsn
 
 
+TEST_API_KEY = "test-api-key-0123456789"
+AUTH_HEADERS = {"X-API-Key": TEST_API_KEY}
+
+
+def allow_protected_endpoints(app) -> None:
+    """For apps used without lifespan: bypass API key and rate limit checks."""
+    from evidenceops.security import enforce_llm_rate_limit, require_api_key
+
+    app.dependency_overrides[require_api_key] = lambda: "test"
+    app.dependency_overrides[enforce_llm_rate_limit] = lambda: None
+
+
 class FakeGenerator:
     def __init__(self) -> None:
         self.calls: list[str] = []
@@ -49,13 +61,13 @@ def test_settings() -> Settings:
         pytest.fail(
             "EVIDENCEOPS_TEST_DATABASE_URL must point to the evidenceops_test database"
         )
-    return Settings(database_url=test_database_url, gemini_api_key=None)
+    return Settings(database_url=str(test_database_url), gemini_api_key=None, api_keys=(TEST_API_KEY,))
 
 
 @pytest.fixture(scope="session")
 def migrated_database(test_settings: Settings) -> None:
     alembic_config = Config("alembic.ini")
-    alembic_config.set_main_option("sqlalchemy.url", str(test_settings.database_url))
+    alembic_config.set_main_option("sqlalchemy.url", test_settings.database_dsn)
     command.upgrade(alembic_config, "head")
 
 
@@ -87,7 +99,8 @@ def client(
         create_app(
             test_settings,
             generator=fake_generator,
-        )
+        ),
+        headers=AUTH_HEADERS,
     ) as test_client:
         yield test_client
 

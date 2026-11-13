@@ -327,7 +327,7 @@ def main(argv=None) -> int:
 
             @contextmanager
             def retrieval_context():
-                with frozen_sessions(corpus, str(settings.database_url), encoder, environment) as sessions:
+                with frozen_sessions(corpus, settings.database_dsn, encoder, environment) as sessions:
                     import torch
                     environment.update(torch_threads=torch.get_num_threads(),
                                        torch_interop_threads=torch.get_num_interop_threads())

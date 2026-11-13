@@ -26,7 +26,7 @@ def test_stdio_services_and_graph_against_postgres(database, test_settings, monk
         index_publication(sessions, identifier, encoder)
         params = StdioServerParameters(command=sys.executable,
             args=[str(Path(__file__).with_name("mcp_db_server.py"))],
-            env={"EVIDENCEOPS_DATABASE_URL": str(test_settings.database_url)})
+            env={"EVIDENCEOPS_DATABASE_URL": test_settings.database_dsn})
         with connect_mcp_tools(params) as remote:
             search_call = call(arguments={"query": "discovery", "published_from": 9999})
             direct = create_tool_executor(sessions, encoder)
@@ -39,7 +39,7 @@ def test_stdio_services_and_graph_against_postgres(database, test_settings, monk
                 proposal("get_publication", {"publication_id": str(identifier)}, "read"),
                 answer("Abstract consultado [S1]."))
             response = AgentService(model, remote).run("discovery")
-        monkeypatch.setenv("EVIDENCEOPS_DATABASE_URL", str(test_settings.database_url))
+        monkeypatch.setenv("EVIDENCEOPS_DATABASE_URL", test_settings.database_dsn)
         # Normal production composition reads DB through stdio without loading MedCPT
         # for bibliographic lookup. Also verifies explicit environment propagation.
         with connect_mcp_tools() as production:

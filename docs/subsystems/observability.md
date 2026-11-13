@@ -87,6 +87,22 @@ Los jobs por estado son un Gauge porque es un valor instantáneo compartido por
 todos los workers: se consulta la tabla en lugar de sumar contadores por proceso.
 `job_id` nunca es label. Sin spans de jobs. [Ciclo de vida](jobs.md).
 
+## Operación y seguridad (M11.2)
+
+| Evento | Nivel | Campos |
+| --- | --- | --- |
+| `database.unavailable` | WARNING | `cause: database_unavailable`, `request_id` |
+| `api.request_rejected` | WARNING | `cause=unauthorized|rate_limited`, `request_id` |
+| `worker.poll_failed` | WARNING | `worker_id`, `cause`, `attempt` (fallos consecutivos), `delay_seconds` |
+| `worker.poll_recovered` | INFO | `worker_id`, `attempt` |
+
+Nunca se registran la clave presentada ni su identificador, la URL de la BD ni
+mensajes del driver. Métricas de la API:
+`evidenceops_api_rejections_total{reason}` y
+`evidenceops_database_unavailable_total`; el límite total LLM suma
+`evidenceops_generation_errors_total{cause="deadline_exceeded"}`. Decisión en
+[D037](../decisions/D037-operational-readiness.md).
+
 ## Reranking local (M9.2)
 
 `retrieval.reranked` registra `reranker_model`, `reranker_revision` y
@@ -171,7 +187,7 @@ EVIDENCEOPS_TRACE_CONSOLE=true uv run --locked uvicorn evidenceops.main:app --no
 En otra terminal, sustituir el UUID por una pregunta ya registrada:
 
 ```bash
-curl -sS -D - -o /dev/null -X POST \
+curl -sS -D - -o /dev/null -X POST -H "X-API-Key: $EVIDENCEOPS_API_KEY" \
   http://127.0.0.1:8000/questions/UUID_DE_LA_PREGUNTA/generate
 rg 'llm.gemini|llm.deepseek|generation|trace_id|duration|evidenceops.outcome' \
   /tmp/evidenceops-traces.jsonl
@@ -197,7 +213,7 @@ uv run uvicorn evidenceops.main:app --no-access-log | tee /tmp/evidenceops-event
 En otra terminal, usar una pregunta ya registrada (sustituir el UUID):
 
 ```bash
-curl -sS -D - -o /dev/null -X POST \
+curl -sS -D - -o /dev/null -X POST -H "X-API-Key: $EVIDENCEOPS_API_KEY" \
   http://127.0.0.1:8000/questions/UUID_DE_LA_PREGUNTA/generate
 ```
 
@@ -380,6 +396,7 @@ cuota real:
 
 ```bash
 curl -sS -D - -o /dev/null -X POST http://127.0.0.1:8000/rag \
+  -H "X-API-Key: $EVIDENCEOPS_API_KEY" \
   -H 'Content-Type: application/json' \
   -d '{"query":"association between childhood obesity and asthma risk","published_from":2020}'
 ```

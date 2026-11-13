@@ -27,6 +27,8 @@ class GenerationErrorCause(StrEnum):
     AUTHENTICATION = "authentication"
     PROVIDER_UNAVAILABLE = "provider_unavailable"
     INVALID_OUTPUT = "invalid_output"
+    # The whole call, SDK retries included, exceeded its wall-clock budget (D037).
+    DEADLINE_EXCEEDED = "deadline_exceeded"
     UNKNOWN = "unknown"
 
 
