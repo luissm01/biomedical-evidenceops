@@ -263,6 +263,25 @@ a registrarlos. No hay retries automáticos ni llamadas reales en tests. Los
 abstracts pueden tener condiciones de copyright; respeta las condiciones de
 uso de NCBI y del contenido. [Reglas de E-utilities](https://www.ncbi.nlm.nih.gov/books/NBK25497/).
 
+## Ingesta asíncrona (M11.1)
+
+`POST /ingestion-jobs` con `{"query": ..., "limit": 1-100}` y cabecera opcional
+`Idempotency-Key` responde **202** con `job_id` y `Location`; la misma clave con
+los mismos parámetros devuelve el mismo job (otros parámetros → 409).
+`GET /ingestion-jobs/{job_id}` devuelve estado, intentos, último error, próximo
+intento y el resumen de la ingesta. Lo procesa un proceso aparte:
+
+```bash
+uv run --locked alembic upgrade head
+uv run --locked evidenceops worker [--metrics-port 9101]
+```
+
+El worker sí consulta PubMed; Ctrl+C termina el job en curso y sale (un segundo
+Ctrl+C lo libera). Cola en PostgreSQL, reintentos, lease y semántica
+at-least-once en [jobs](docs/subsystems/jobs.md) y
+[D036](docs/decisions/D036-postgresql-job-queue.md). `evidenceops ingest` sigue
+siendo síncrono y no usa la cola.
+
 ## Pruebas y CI
 
 La suite completa usa PostgreSQL local; las fixtures exigen `evidenceops_test`,

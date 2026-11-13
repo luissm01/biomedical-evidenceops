@@ -51,6 +51,42 @@ evento final `outcome: error` y causa segura. No se añaden métricas ni spans d
 ingestión. Operación y semántica en el
 [README](../../README.md#ingestión-pubmed-m6).
 
+## Ingesta asíncrona (M11.1)
+
+El worker configura el mismo logger JSON. Mientras procesa un intento fija un
+`ContextVar` `job_id`: todos los eventos de ese intento, incluidos
+`ingestion.started`/`ingestion.finished` del pipeline reutilizado, llevan
+`job_id` (y `run_id` distinto por intento). Fuera de un job el campo no aparece.
+
+| Evento | Nivel | Campos específicos |
+| --- | --- | --- |
+| `worker.started` / `worker.stopped` | INFO | `worker_id` |
+| `worker.poll_failed` | WARNING | `worker_id`, `cause: database_error` |
+| `job.enqueued` (API) | INFO | `outcome=created|existing`, `request_id` |
+| `job.claimed` | INFO | `worker_id`, `attempt`, `max_attempts`, `recovered` |
+| `job.succeeded` | INFO | anteriores + `outcome`, `duration_ms` |
+| `job.retry_scheduled` | WARNING | anteriores + `cause`, `delay_seconds` |
+| `job.failed` | WARNING | anteriores + `cause` (también `lease_expired` sin intentos) |
+| `job.released` | WARNING | parada forzada; `cause: released_on_shutdown` |
+| `job.lease_lost` | WARNING | el fencing descartó el resultado de un intento antiguo |
+
+No se registran query, títulos ni mensajes de excepción; `cause` es el código
+estable guardado en `last_error`. El worker expone sus métricas con
+`--metrics-port` (solo 127.0.0.1); la API añade a su `GET /metrics`
+`evidenceops_ingestion_jobs_enqueued_total{outcome=created|existing|conflict}`.
+
+| Métrica (worker) | Tipo | Labels |
+| --- | --- | --- |
+| `evidenceops_ingestion_jobs` | Gauge leído de PostgreSQL al hacer scrape | `status` |
+| `evidenceops_ingestion_job_attempts_total` | Counter | `outcome=succeeded|retried|failed|released|lease_lost` |
+| `evidenceops_ingestion_job_duration_seconds` | Histogram | `outcome` |
+| `evidenceops_ingestion_job_retries_total` | Counter | `cause` |
+| `evidenceops_ingestion_job_lease_expirations_total` | Counter | `action=reclaimed|failed` |
+
+Los jobs por estado son un Gauge porque es un valor instantáneo compartido por
+todos los workers: se consulta la tabla en lugar de sumar contadores por proceso.
+`job_id` nunca es label. Sin spans de jobs. [Ciclo de vida](jobs.md).
+
 ## Reranking local (M9.2)
 
 `retrieval.reranked` registra `reranker_model`, `reranker_revision` y

@@ -33,8 +33,12 @@ class PubMedErrorCause(StrEnum):
 
 
 class PubMedError(Exception):
-    def __init__(self, cause: PubMedErrorCause, message: str) -> None:
+    def __init__(
+        self, cause: PubMedErrorCause, message: str, *, status_code: int | None = None,
+    ) -> None:
         self.cause = cause
+        # HTTP status when NCBI answered; lets callers tell 5xx from 4xx.
+        self.status_code = status_code
         super().__init__(message)
 
 
@@ -106,7 +110,10 @@ class PubMedClient:
             raise PubMedError(PubMedErrorCause.TIMEOUT, "PubMed request timed out") from exc
         except httpx.HTTPStatusError as exc:
             cause = PubMedErrorCause.RATE_LIMIT if exc.response.status_code == 429 else PubMedErrorCause.HTTP_ERROR
-            raise PubMedError(cause, f"PubMed returned HTTP {exc.response.status_code}") from exc
+            raise PubMedError(
+                cause, f"PubMed returned HTTP {exc.response.status_code}",
+                status_code=exc.response.status_code,
+            ) from exc
         except httpx.RequestError as exc:
             raise PubMedError(PubMedErrorCause.TRANSPORT, "PubMed request failed") from exc
 

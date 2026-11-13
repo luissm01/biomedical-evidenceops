@@ -15,6 +15,9 @@ from starlette.types import ASGIApp, Message, Receive, Scope, Send
 from evidenceops.tracing import finish_error, finish_success, tracer
 
 request_id: ContextVar[str | None] = ContextVar("request_id", default=None)
+# Set by the ingestion worker around one job attempt; every event inside it,
+# including the reused pipeline's ingestion.started/finished, carries it.
+job_id: ContextVar[str | None] = ContextVar("job_id", default=None)
 
 
 class JsonFormatter(logging.Formatter):
@@ -25,6 +28,8 @@ class JsonFormatter(logging.Formatter):
             "event": record.getMessage(),
             "request_id": request_id.get(),
         }
+        if (current_job := job_id.get()) is not None:
+            event["job_id"] = current_job
         context = trace.get_current_span().get_span_context()
         if context.is_valid:
             event["trace_id"] = format(context.trace_id, "032x")
@@ -37,7 +42,8 @@ class JsonFormatter(logging.Formatter):
                       "operation_id", "call_id", "tool",
                       "transition", "steps", "llm_calls", "tool_calls",
                       "source", "run_id", "requested", "unique", "batches",
-                      "updated", "omitted", "failed", "unidentified_invalid"):
+                      "updated", "omitted", "failed", "unidentified_invalid",
+                      "worker_id", "attempt", "max_attempts", "delay_seconds", "recovered"):
             if hasattr(record, field):
                 event[field] = getattr(record, field)
         if hasattr(record, "created_count"):

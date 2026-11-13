@@ -40,6 +40,7 @@ en Git/issues. El estado de entrega vive en GitHub y el trabajo local en los pla
 | [D033](D033-bounded-langgraph-agent.md) | Agente único LangGraph sobre M10.1, fuentes estables y presupuestos explícitos | Arquitectura e implementación aceptadas |
 | [D034](D034-local-mcp-integration.md) | MCP local v2/stdio sobre herramientas y agente existentes | Validada; entrega autorizada |
 | [D035](D035-consolidated-final-learning-review.md) | Cierre de milestone por aceptación técnica y repaso de aprendizaje consolidado al final | Aceptada; sustituye el repaso por cierre de D029 |
+| [D036](D036-postgresql-job-queue.md) | Cola de jobs propia en PostgreSQL, lease y at-least-once para la ingesta (M11.1) | Implementada; pendiente de aceptación |
 
 D029 actualiza la secuencia futura descrita en D017; las decisiones y el contexto
 históricos de M0–M8 se conservan.

@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Literal
 from uuid import UUID
 
@@ -40,3 +41,34 @@ class RagHTTPResponse(BaseModel):
     answer: str
     limitations: list[str]
     sources: list[RagSource]
+
+
+class IngestionJobCreate(BaseModel):
+    model_config = ConfigDict(str_strip_whitespace=True, extra="forbid")
+
+    query: str = Field(min_length=1, max_length=2000)
+    limit: int = Field(ge=1, le=100, strict=True)
+
+
+JobStatusValue = Literal["queued", "running", "succeeded", "failed"]
+
+
+class IngestionJobAccepted(BaseModel):
+    job_id: UUID
+    status: JobStatusValue
+
+
+class IngestionJobResponse(BaseModel):
+    job_id: UUID
+    status: JobStatusValue
+    query: str
+    limit: int
+    attempts: int
+    max_attempts: int
+    last_error: str | None
+    next_attempt_at: datetime | None
+    created_at: datetime
+    updated_at: datetime
+    started_at: datetime | None
+    finished_at: datetime | None
+    result: dict | None

@@ -73,7 +73,12 @@ sin leer antes de escribir. Flujo:
 
 `CLI → ESearch opcional → PMIDs únicos → EFetch por lote → parser → BiomedicalDocument → upsert → commit → resumen`
 
-No se retiene conexión DB durante adquisición. No hay endpoint de ingestión;
+No se retiene conexión DB durante adquisición. M11.1 añade un camino asíncrono
+sobre el mismo servicio: `POST /ingestion-jobs` solo inserta una fila en
+`ingestion_jobs` y un proceso `evidenceops worker` la reclama con
+`FOR UPDATE SKIP LOCKED`, ejecuta `ingest_pubmed` y registra el resultado
+([jobs](subsystems/jobs.md), [D036](decisions/D036-postgresql-job-queue.md)).
+La API nunca llama a PubMed;
 el servicio RAG puede recuperar sus representaciones indexadas para generación. Motivos y alcance en
 [D021](decisions/D021-biomedical-ingestion-source-and-contract.md) y
 [D022](decisions/D022-biomedical-publication-persistence.md) y

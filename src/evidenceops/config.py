@@ -96,3 +96,23 @@ class PubMedSettings(BaseSettings):
         if "@" not in value or any(char.isspace() for char in value):
             raise ValueError("PubMed email must be a contact email address")
         return value
+
+
+class JobSettings(BaseSettings):
+    """Queue and worker policy; independent of LLM and PubMed settings."""
+
+    model_config = SettingsConfigDict(
+        env_file=".env",
+        env_prefix="EVIDENCEOPS_JOBS_",
+        extra="ignore",
+        frozen=True,
+        hide_input_in_errors=True,
+    )
+
+    # Copied into each job at enqueue time: changing it never alters queued jobs.
+    max_attempts: int = Field(default=3, ge=1, le=10)
+    backoff_base_seconds: float = Field(default=10.0, gt=0, allow_inf_nan=False)
+    backoff_max_seconds: float = Field(default=300.0, gt=0, allow_inf_nan=False)
+    # Must exceed the longest expected job; there is no heartbeat (D036).
+    lease_seconds: float = Field(default=300.0, gt=0, allow_inf_nan=False)
+    poll_seconds: float = Field(default=2.0, gt=0, allow_inf_nan=False)
