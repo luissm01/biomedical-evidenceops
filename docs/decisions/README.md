@@ -33,11 +33,15 @@ en Git/issues. El estado de entrega vive en GitHub y el trabajo local en los pla
 | [D026](D026-rag-v1-contract-context-and-citations.md) | Contrato RAG v1, contexto y política de citas (#44) | Aplicada en #45/#46 |
 | [D027](D027-rag-http-errors-and-observability.md) | Integración HTTP, errores y observabilidad RAG (#46) | Aplicada en #46 |
 | [D028](D028-rag-evaluation.md) | Evaluación RAG end-to-end, revisión humana y baseline (#47) | Aplicada; baseline revisado/promocionado |
+| [D029](D029-roadmap-simplification.md) | Simplificación del roadmap pendiente a M9–M14 | Aceptada; M9–M10 sincronizadas en GitHub, M11–M14 pendientes |
 | [D030](D030-hybrid-retrieval.md) | BM25 en memoria y fusión RRF con MedCPT (M9.1) | Implementación y experimento completados; semantic por defecto |
 | [D031](D031-medcpt-reranking.md) | MedCPT Cross-Encoder top20 → top5 y evaluación de calidad/latencia (M9.2) | Aceptada: semantic por defecto; reranking experimental |
 | [D032](D032-controlled-tool-calling.md) | Dos herramientas de lectura, una ronda y DeepSeek sin razonamiento (M10.1) | Arquitectura e implementación aceptadas |
 | [D033](D033-bounded-langgraph-agent.md) | Agente único LangGraph sobre M10.1, fuentes estables y presupuestos explícitos | Arquitectura e implementación aceptadas |
 | [D034](D034-local-mcp-integration.md) | MCP local v2/stdio sobre herramientas y agente existentes | Validada; entrega autorizada |
+
+D029 actualiza la secuencia futura descrita en D017; las decisiones y el contexto
+históricos de M0–M8 se conservan.
 
 Nueva decisión: siguiente ID, problema, alternativas, decisión, consecuencias
 y estado. Cambios de dirección enlazan a la decisión sustituida; no reescribas

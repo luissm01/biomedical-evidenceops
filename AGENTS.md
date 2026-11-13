@@ -11,9 +11,10 @@ comprender las decisiones importantes, sin escribir manualmente todo el código.
 - Consulta [estado actual](docs/CURRENT_STATE.md) cuando la tarea dependa del estado del proyecto,
   del milestone actual, del trabajo pendiente o de cambios locales en curso.
 - Trabaja dentro del milestone actual y el encargo. El [roadmap](docs/ROADMAP.md)
-  es la única secuencia canónica M0–M19: consulta la sección relevante al definir
+  es la única secuencia canónica M0–M14: consulta la sección relevante al definir
   alcance; no autoriza fases futuras. Cambiar la secuencia requiere acuerdo
-  explícito del desarrollador, actualizar roadmap, ADR y milestones de GitHub.
+  explícito del desarrollador, actualizar roadmap y ADR, y sincronizar milestones
+  de GitHub cuando se autorice el trabajo remoto; una tarea documental no lo autoriza.
 - Involucra al desarrollador en decisiones arquitectónicas importantes: problema,
   alternativas, recomendación y trade-offs. Usa la solución más sencilla justificada.
 - Automatiza trabajo mecánico y patrones comprendidos. Para enseñanza o conceptos

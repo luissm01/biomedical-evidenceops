@@ -41,3 +41,17 @@ decisiones/comportamientos importantes y facilitar su revisión. El desarrollado
 debe comprender el sistema sin escribir todas sus líneas. Los registros de
 [aprendizaje](README.md) distinguen interacción confirmada de código generado;
 no acreditar dominio por haber usado automáticamente una tecnología.
+
+## Cierre de milestone
+
+Reservar un breve repaso conceptual y práctico al cierre de cada milestone:
+explicar el problema resuelto, la decisión principal, una alternativa y sus
+trade-offs; recorrer un caso representativo y un fallo o resultado de evaluación.
+Usar el sistema y las evidencias existentes, sin exigir otra implementación ni
+una nueva inferencia real. Concentrarse en lagunas observadas, sin cuestionarios
+rutinarios ni convertir el repaso en una fase adicional.
+
+Registrar solo comprensión demostrada en la interacción y dudas pendientes en
+el registro correspondiente. Una entrega de código o este cambio de planificación
+no acredita aprendizaje. Este cierre se aplica en adelante; no reconstruye
+retrospectivamente repasos ni modifica registros históricos de M0–M8.

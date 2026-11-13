@@ -5,7 +5,8 @@ pública: formular preguntas sobre intervenciones y poblaciones, recuperar liter
 analizar estudios y sintetizar respuestas con fuentes e incertidumbre explícita.
 Utiliza literatura y datos públicos, nunca datos clínicos privados o sensibles.
 
-El proyecto combina un producto real con aprendizaje profesional de AI Engineering.
+El proyecto es educativo y de portfolio, aplicado a un sistema real de AI Engineering;
+no persigue convertirse en un producto comercial.
 El éxito consiste en poder diseñar, explicar, evaluar, desplegar, observar, depurar
 y mantener un sistema de IA fiable, justificando decisiones y sus trade-offs.
 Debe servir como portfolio para AI/Applied AI/ML Engineering, también en salud.

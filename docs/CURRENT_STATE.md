@@ -163,7 +163,7 @@ Actualizado: 2026-11-02. Distingue código versionado de trabajo local pendiente
 - Timeout de transporte sin deadline total; un retry puede duplicar consumo.
   [Política y motivos](decisions/D011-gemini.md).
 - Una caída de PostgreSQL tras startup aún produce errores no controlados en
-  endpoints de datos. Readiness y recuperación quedan para M14.
+  endpoints de datos. Readiness y recuperación quedan para M11.
 - Dos DeprecationWarning conocidos de dependencias: Starlette usa
   `anyio.abc.BlockingPortal`; google-genai usa `typing._UnionGenericAlias`
   (previsto para eliminación en Python 3.17). No se ocultan.
