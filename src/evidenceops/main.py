@@ -8,8 +8,11 @@ from typing import Annotated, cast
 from uuid import UUID, uuid4
 
 from fastapi import APIRouter, Depends, FastAPI, Header, HTTPException, Request, Response
+from fastapi.responses import JSONResponse
 from prometheus_client import CONTENT_TYPE_LATEST
-from sqlalchemy import text
+from sqlalchemy import Engine, text
+from sqlalchemy.exc import InterfaceError, OperationalError
+from sqlalchemy.exc import TimeoutError as PoolTimeoutError
 from sqlalchemy.orm import Session, sessionmaker
 
 from evidenceops import jobs
@@ -22,6 +25,10 @@ from evidenceops.generation import (
     Generator,
 )
 from evidenceops.embeddings import LocalMedCPT, MedCPTEncoder
+from evidenceops.health import check_readiness, expected_migration_heads
+from evidenceops.security import (
+    ApiKeyAuth, TokenBucketLimiter, enforce_llm_rate_limit, require_api_key,
+)
 from evidenceops.rag import RagService
 from evidenceops.rag_errors import InvalidCitationsError, RagRetrievalError
 from evidenceops.retrieval import search
@@ -35,6 +42,7 @@ from evidenceops.schemas import (
     RagRequest,
     RagHTTPResponse,
     HealthCheckResponse,
+    ReadinessResponse,
     IngestionJobAccepted,
     IngestionJobCreate,
     IngestionJobResponse,
@@ -73,6 +81,11 @@ _GENERATION_HTTP_ERRORS = {
         "invalid_generation",
         "Generation service returned an invalid response",
     ),
+    GenerationErrorCause.DEADLINE_EXCEEDED: (
+        504,
+        "generation_deadline_exceeded",
+        "Generation exceeded its total time limit",
+    ),
     GenerationErrorCause.UNKNOWN: (
         502,
         "generation_failed",
@@ -108,7 +121,8 @@ def get_rag_service(request: Request) -> RagService:
     return cast(RagService, request.app.state.rag_service)
 
 
-@router.post("/rag", response_model=RagHTTPResponse)
+@router.post("/rag", response_model=RagHTTPResponse,
+             dependencies=[Depends(enforce_llm_rate_limit)])
 def generate_rag(
     body: RagRequest, service: RagService = Depends(get_rag_service),
 ) -> RagHTTPResponse:
@@ -149,7 +163,19 @@ def get_question_text(question_id: UUID, request: Request) -> str:
 
 @router.get("/health", response_model=HealthCheckResponse)
 def health_check() -> HealthCheckResponse:
+    """Liveness: no dependency checks by design (see evidenceops.health)."""
     return HealthCheckResponse(status="ok")
+
+
+@router.get("/ready", response_model=ReadinessResponse,
+            responses={503: {"model": ReadinessResponse}})
+def readiness_check(request: Request, response: Response) -> ReadinessResponse:
+    checks = check_readiness(cast(Engine, request.app.state.engine),
+                             cast(frozenset[str], request.app.state.migration_heads))
+    ready = all(state == "ok" for state in checks.values())
+    if not ready:
+        response.status_code = 503
+    return ReadinessResponse(status="ready" if ready else "not_ready", checks=checks)
 
 
 @router.get("/metrics")
@@ -157,7 +183,8 @@ def metrics_endpoint(metrics: GenerationMetrics = Depends(get_metrics)) -> Respo
     return Response(content=metrics.render(), media_type=CONTENT_TYPE_LATEST)
 
 
-@router.post("/ingestion-jobs", response_model=IngestionJobAccepted, status_code=202)
+@router.post("/ingestion-jobs", response_model=IngestionJobAccepted, status_code=202,
+             dependencies=[Depends(require_api_key)])
 def enqueue_ingestion_job(
     body: IngestionJobCreate,
     request: Request,
@@ -212,7 +239,8 @@ def get_ingestion_job(job_id: UUID, request: Request) -> IngestionJobResponse:
     )
 
 
-@router.post("/questions", response_model=QuestionResponse, status_code=201)
+@router.post("/questions", response_model=QuestionResponse, status_code=201,
+             dependencies=[Depends(require_api_key)])
 def create_question(
     question: QuestionCreate,
     response: Response,
@@ -240,6 +268,8 @@ def get_question(
 @router.post(
     "/questions/{question_id}/generate",
     response_model=GenerationResponse,
+    # Route dependencies run first: auth and rate limit before any DB/LLM work.
+    dependencies=[Depends(enforce_llm_rate_limit)],
 )
 def generate_answer(
     question_text: str = Depends(get_question_text),
@@ -286,6 +316,20 @@ def generate_answer(
         )
 
 
+def _database_unavailable(request: Request, _exc: Exception) -> JSONResponse:
+    """PostgreSQL unreachable, connection lost or statement/pool timeout after startup.
+
+    Same {code, message} shape as the other typed errors; the driver message
+    (host, port, SQL) is never returned or logged. Integrity or programming
+    errors are bugs and keep producing a 500.
+    """
+    cast(GenerationMetrics, request.app.state.metrics).database_unavailable.inc()
+    logger.warning("database.unavailable", extra={"cause": "database_unavailable"})
+    return JSONResponse(status_code=503, content={"detail": {
+        "code": "database_unavailable", "message": "Database is temporarily unavailable",
+    }})
+
+
 def create_app(
     settings: Settings | None = None, generator: Generator | None = None,
     encoder: MedCPTEncoder | None = None,
@@ -297,7 +341,15 @@ def create_app(
         configure_logging()
         configured_settings = settings or Settings()
         configure_tracing(configured_settings.trace_console)
+        # Fail fast: costly and mutating endpoints must never run unprotected.
+        app.state.api_key_auth = ApiKeyAuth(configured_settings.api_keys)
+        app.state.rate_limiter = TokenBucketLimiter(
+            configured_settings.rate_limit_capacity,
+            configured_settings.rate_limit_refill_per_second,
+        )
+        app.state.migration_heads = expected_migration_heads()
         engine, session_factory = create_database(configured_settings)
+        app.state.engine = engine
 
         owned_generator = None
         try:
@@ -329,6 +381,8 @@ def create_app(
 
     application = CorrelatedFastAPI(lifespan=lifespan)
     application.state.metrics = GenerationMetrics()
+    for error_type in (OperationalError, InterfaceError, PoolTimeoutError):
+        application.add_exception_handler(error_type, _database_unavailable)
     application.include_router(router)
 
     return application

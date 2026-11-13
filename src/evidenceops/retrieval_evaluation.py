@@ -315,7 +315,7 @@ def main() -> None:
     args = parser.parse_args()
     if not args.live:
         parser.error('--live is required; tests never perform model inference')
-    run = run_baseline(args.dataset_dir, args.output, str(Settings().database_url), LocalMedCPT(), mode=args.mode,
+    run = run_baseline(args.dataset_dir, args.output, Settings().database_dsn, LocalMedCPT(), mode=args.mode,
                        reranker=LocalMedCPTReranker() if args.mode == 'reranking' else None, warmup=args.warmup)
     print(json.dumps(run['aggregate'], indent=2))
 

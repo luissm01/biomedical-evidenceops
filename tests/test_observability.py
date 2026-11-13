@@ -11,6 +11,7 @@ from uuid import UUID, uuid4
 import pytest
 from fastapi.testclient import TestClient
 
+from conftest import allow_protected_endpoints
 from evidenceops.database import get_session
 from evidenceops.generation import GeneratedContent, GenerationError, GenerationErrorCause
 from evidenceops.main import create_app, get_generator, get_question_text
@@ -44,6 +45,7 @@ def client_for(generator):
     app.dependency_overrides[get_question_text] = lambda: "private-question"
     app.dependency_overrides[get_generator] = lambda: generator
     app.dependency_overrides[get_session] = lambda: None
+    allow_protected_endpoints(app)
     # No lifespan: these tests replace the database and generator dependencies.
     return TestClient(app, raise_server_exceptions=False)
 

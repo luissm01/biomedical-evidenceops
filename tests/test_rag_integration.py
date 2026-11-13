@@ -8,6 +8,7 @@ from unittest.mock import Mock
 from fastapi.testclient import TestClient
 from sqlalchemy import delete
 
+from conftest import AUTH_HEADERS
 from evidenceops.database import create_database
 from evidenceops.generation import GeneratedContent
 from evidenceops.main import create_app
@@ -35,7 +36,7 @@ def test_api_database_retrieval_context_generation_and_filter(test_settings, mig
             index_publication(sessions, publication_id, encoder)
         with sessions() as session:
             before_questions = list(session.query(Question.id))
-        with TestClient(create_app(test_settings.model_copy(update={"retrieval_mode": mode}), generator=generator, encoder=encoder, reranker=reranker)) as client:
+        with TestClient(create_app(test_settings.model_copy(update={"retrieval_mode": mode}), generator=generator, encoder=encoder, reranker=reranker), headers=AUTH_HEADERS) as client:
             response = client.post("/rag", json={"query": " diabetes ", "published_from": 2024})
             assert response.status_code == 200
             body = response.json()
@@ -100,7 +101,7 @@ def test_frozen_rag_evaluation_database_isolation_and_full_trace(tmp_path, test_
 
     @contextmanager
     def retrieval_context():
-        with frozen_sessions(corpus, str(test_settings.database_url), encoder, environment) as isolated:
+        with frozen_sessions(corpus, test_settings.database_dsn, encoder, environment) as isolated:
             yield partial(search, isolated, encoder)
 
     try:

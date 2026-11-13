@@ -5,6 +5,8 @@
 Accepted; proveedor acordado el 2026-09-15 y política de fiabilidad
 actualizada en #11 el 2026-09-17.
 Sustituye el plan anterior de Gemini seguido de Ollama dentro de M3.
+M11.2 añade un límite total por llamada sobre esta política de transporte y
+retries; ver [D037](D037-operational-readiness.md). El razonamiento de M3 se conserva.
 
 ## Problem and decision
 

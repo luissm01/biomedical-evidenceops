@@ -18,7 +18,12 @@ flowchart LR
 ```
 
 - [main.py](../src/evidenceops/main.py) define rutas, composición, dependencias
-  y traducción de errores a HTTP. [schemas.py](../src/evidenceops/schemas.py)
+  y traducción de errores a HTTP. [security.py](../src/evidenceops/security.py)
+  aplica `X-API-Key` a escrituras/LLM y token bucket a generate/RAG;
+  [health.py](../src/evidenceops/health.py) separa liveness de readiness; una
+  caída de PostgreSQL se traduce a 503 `database_unavailable`. La factoría
+  envuelve cada generador en `DeadlineGenerator` (límite total por llamada).
+  Motivos: [D037](decisions/D037-operational-readiness.md). [schemas.py](../src/evidenceops/schemas.py)
   define contratos HTTP; OpenAPI de la API es la referencia interactiva.
 - [models.py](../src/evidenceops/models.py) y
   [database.py](../src/evidenceops/database.py) separan persistencia de schemas:

@@ -7,6 +7,7 @@ import httpx
 import pytest
 from pydantic import ValidationError
 
+from conftest import allow_protected_endpoints
 from evidenceops.config import GenerationSettings
 from evidenceops.deepseek import DeepSeekGenerator
 from evidenceops.generation import GeneratedContent, GenerationError, GenerationErrorCause
@@ -95,9 +96,9 @@ def test_factory_selects_both_providers(monkeypatch):
     monkeypatch.setattr("evidenceops.gemini.GeminiGenerator", gemini)
     monkeypatch.setattr("evidenceops.deepseek.DeepSeekGenerator", deepseek)
     settings = GenerationSettings(_env_file=None, gemini_api_key="gemini-key")
-    assert create_generator(settings) is gemini.return_value
+    assert create_generator(settings).inner is gemini.return_value
     settings = GenerationSettings(_env_file=None, llm_provider="deepseek", deepseek_api_key="deepseek-key")
-    assert create_generator(settings) is deepseek.return_value
+    assert create_generator(settings).inner is deepseek.return_value
     assert deepseek.call_args.kwargs["model"] == "deepseek-flash"
 
 
@@ -146,6 +147,7 @@ def test_http_contract_with_deepseek_adapter(transport):
         app = create_app()
         app.dependency_overrides[get_generator] = lambda: generator
         app.dependency_overrides[get_question_text] = lambda: "private-question"
+        allow_protected_endpoints(app)
         response = TestClient(app).post(f"/questions/{uuid4()}/generate")
     assert response.status_code == 200
     assert response.json() == {

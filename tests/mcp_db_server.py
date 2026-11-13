@@ -1,6 +1,7 @@
 """Test-only stdio composition: real PostgreSQL, deterministic query encoder."""
 
 import anyio
+from sqlalchemy.engine import make_url
 
 from evidenceops.config import Settings
 from evidenceops.database import create_database
@@ -10,7 +11,7 @@ from test_retrieval import ControlledMedCPT
 
 settings = Settings()
 # Same isolation guard as the main database fixtures; never run against user data.
-if settings.database_url.path != "/evidenceops_test":
+if make_url(settings.database_dsn).database != "evidenceops_test":
     raise RuntimeError("MCP test server requires evidenceops_test")
 engine, sessions = create_database(settings)
 try:

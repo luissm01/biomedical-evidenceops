@@ -3,6 +3,7 @@ from unittest.mock import Mock
 import pytest
 from fastapi.testclient import TestClient
 
+from conftest import TEST_API_KEY
 from evidenceops.config import Settings
 from evidenceops.main import create_app
 
@@ -25,6 +26,7 @@ def settings(key=None):
         _env_file=None,
         database_url="postgresql+psycopg://localhost/evidenceops_test",
         gemini_api_key=key,
+        api_keys=(TEST_API_KEY,),
     )
 
 
@@ -46,7 +48,7 @@ def test_owned_generator_is_closed_and_engine_disposed(resources, close_fails):
 
     def run_app():
         with TestClient(create_app(settings("test-key"))) as client:
-            assert client.app.state.generator is constructor.return_value
+            assert client.app.state.generator.inner is constructor.return_value
             constructor.return_value.close.assert_not_called()
 
     if close_fails:

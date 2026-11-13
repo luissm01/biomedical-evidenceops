@@ -11,6 +11,11 @@ class HealthCheckResponse(BaseModel):
     status: Literal["ok"]
 
 
+class ReadinessResponse(BaseModel):
+    status: Literal["ready", "not_ready"]
+    checks: dict[str, str]
+
+
 class QuestionCreate(BaseModel):
     model_config = ConfigDict(str_strip_whitespace=True, extra="forbid")
 
@@ -34,7 +39,8 @@ class RagRequest(BaseModel):
     model_config = ConfigDict(str_strip_whitespace=True, extra="forbid")
 
     query: str = Field(min_length=1, max_length=2000)
-    published_from: int | None = Field(default=None, gt=0, strict=True)
+    # Upper bound keeps the value inside PostgreSQL's integer range (no 500s).
+    published_from: int | None = Field(default=None, gt=0, le=9999, strict=True)
 
 
 class RagHTTPResponse(BaseModel):

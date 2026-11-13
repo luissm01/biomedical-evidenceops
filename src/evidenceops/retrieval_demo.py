@@ -33,7 +33,7 @@ def main() -> None:
         parser.error("index-limit/top-k must be positive and query must contain text")
     if args.mode == "reranking" and args.top_k > 20:
         parser.error("reranking top-k must be at most 20")
-    settings = Settings(database_url=_DatabaseSettings().database_url)
+    settings = Settings(database_url=str(_DatabaseSettings().database_url))
     engine, sessions = create_database(settings)
     encoder = LocalMedCPT()
     try:

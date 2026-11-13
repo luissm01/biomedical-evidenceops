@@ -3,6 +3,7 @@ from uuid import UUID, uuid4
 import pytest
 from fastapi.testclient import TestClient
 
+from conftest import AUTH_HEADERS
 from evidenceops.config import Settings
 from evidenceops.main import create_app
 
@@ -40,7 +41,7 @@ def test_repeated_text_creates_distinct_questions(client: TestClient) -> None:
 def test_question_survives_application_restart(
     test_settings: Settings, clean_questions: None, fake_generator
 ) -> None:
-    with TestClient(create_app(test_settings, generator=fake_generator)) as first_client:
+    with TestClient(create_app(test_settings, generator=fake_generator), headers=AUTH_HEADERS) as first_client:
         created = first_client.post("/questions", json={"text": "Persistente"})
 
     with TestClient(create_app(test_settings, generator=fake_generator)) as restarted_client:

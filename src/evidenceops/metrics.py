@@ -43,6 +43,15 @@ class GenerationMetrics:
             "Ingestion enqueue requests; existing means an idempotent replay",
             ["outcome"], registry=self.registry,
         )
+        self.api_rejections = Counter(
+            "evidenceops_api_rejections_total", "Requests rejected by authentication or rate limiting",
+            ["reason"], registry=self.registry,
+        )
+        self.database_unavailable = Counter(
+            "evidenceops_database_unavailable_total",
+            "API requests answered 503 because PostgreSQL was unreachable or timed out",
+            registry=self.registry,
+        )
         self.input_tokens = Counter(
             "evidenceops_llm_input_tokens_total", "Provider-reported input tokens",
             ["provider", "model"], registry=self.registry,
