@@ -3,6 +3,8 @@
 Estado: aceptada por el encargo explícito del desarrollador (2026-10-26).
 Aplicación documental. Las milestones M9 y M10 de GitHub ya siguen esta numeración;
 crear M11–M14 en GitHub queda pendiente de un encargo posterior.
+El repaso breve en cada cierre queda sustituido por un repaso final consolidado
+según [D035](D035-consolidated-final-learning-review.md).
 
 ## Contexto y problema
 
