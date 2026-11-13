@@ -4,15 +4,16 @@ from time import perf_counter
 
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
-from typing import cast
+from typing import Annotated, cast
 from uuid import UUID, uuid4
 
-from fastapi import APIRouter, Depends, FastAPI, HTTPException, Request, Response
+from fastapi import APIRouter, Depends, FastAPI, Header, HTTPException, Request, Response
 from prometheus_client import CONTENT_TYPE_LATEST
 from sqlalchemy import text
 from sqlalchemy.orm import Session, sessionmaker
 
-from evidenceops.config import Settings
+from evidenceops import jobs
+from evidenceops.config import JobSettings, Settings
 from evidenceops.database import create_database, get_session
 from evidenceops.generator_factory import create_generator
 from evidenceops.generation import (
@@ -28,11 +29,15 @@ from evidenceops.reranking import LocalMedCPTReranker, MedCPTReranker
 from evidenceops.models import Question
 from evidenceops.metrics import GenerationMetrics
 from evidenceops.observability import CorrelatedFastAPI, configure_logging
+from evidenceops.observability import job_id as job_id_context
 from evidenceops.schemas import (
     GenerationResponse,
     RagRequest,
     RagHTTPResponse,
     HealthCheckResponse,
+    IngestionJobAccepted,
+    IngestionJobCreate,
+    IngestionJobResponse,
     QuestionCreate,
     QuestionResponse,
 )
@@ -152,6 +157,61 @@ def metrics_endpoint(metrics: GenerationMetrics = Depends(get_metrics)) -> Respo
     return Response(content=metrics.render(), media_type=CONTENT_TYPE_LATEST)
 
 
+@router.post("/ingestion-jobs", response_model=IngestionJobAccepted, status_code=202)
+def enqueue_ingestion_job(
+    body: IngestionJobCreate,
+    request: Request,
+    response: Response,
+    idempotency_key: Annotated[
+        str | None, Header(alias="Idempotency-Key", min_length=1, max_length=128),
+    ] = None,
+    metrics: GenerationMetrics = Depends(get_metrics),
+) -> IngestionJobAccepted:
+    """Accept a PubMed ingestion for the worker; never calls PubMed here.
+
+    A repeated Idempotency-Key with the same parameters replays the original
+    acceptance (same job, 202) instead of creating a second job.
+    """
+    session_factory = cast(sessionmaker[Session], request.app.state.session_factory)
+    settings = cast(JobSettings, request.app.state.job_settings)
+    try:
+        enqueued = jobs.enqueue_ingestion(
+            session_factory, query=body.query, limit=body.limit,
+            max_attempts=settings.max_attempts, idempotency_key=idempotency_key,
+        )
+    except jobs.IdempotencyConflictError as exc:
+        metrics.ingestion_jobs_enqueued.labels(outcome="conflict").inc()
+        raise HTTPException(status_code=409, detail={
+            "code": "idempotency_key_conflict",
+            "message": "Idempotency-Key was already used with different parameters",
+        }) from exc
+    outcome = "created" if enqueued.created else "existing"
+    metrics.ingestion_jobs_enqueued.labels(outcome=outcome).inc()
+    token = job_id_context.set(str(enqueued.job_id))
+    try:
+        logger.info("job.enqueued", extra={"outcome": outcome})
+    finally:
+        job_id_context.reset(token)
+    job = jobs.get_job(session_factory, enqueued.job_id)
+    response.headers["Location"] = f"/ingestion-jobs/{enqueued.job_id}"
+    return IngestionJobAccepted(job_id=enqueued.job_id, status=job.status)
+
+
+@router.get("/ingestion-jobs/{job_id}", response_model=IngestionJobResponse)
+def get_ingestion_job(job_id: UUID, request: Request) -> IngestionJobResponse:
+    session_factory = cast(sessionmaker[Session], request.app.state.session_factory)
+    job = jobs.get_job(session_factory, job_id)
+    if job is None:
+        raise HTTPException(status_code=404, detail="Ingestion job not found")
+    return IngestionJobResponse(
+        job_id=job.id, status=job.status, query=job.query, limit=job.search_limit,
+        attempts=job.attempts, max_attempts=job.max_attempts, last_error=job.last_error,
+        next_attempt_at=job.run_after if job.status == jobs.JobStatus.QUEUED else None,
+        created_at=job.created_at, updated_at=job.updated_at, started_at=job.started_at,
+        finished_at=job.finished_at, result=job.result,
+    )
+
+
 @router.post("/questions", response_model=QuestionResponse, status_code=201)
 def create_question(
     question: QuestionCreate,
@@ -230,6 +290,7 @@ def create_app(
     settings: Settings | None = None, generator: Generator | None = None,
     encoder: MedCPTEncoder | None = None,
     reranker: MedCPTReranker | None = None,
+    job_settings: JobSettings | None = None,
 ) -> FastAPI:
     @asynccontextmanager
     async def lifespan(app: FastAPI) -> AsyncIterator[None]:
@@ -243,6 +304,7 @@ def create_app(
             with engine.connect() as connection:
                 connection.execute(text("SELECT 1"))
             app.state.session_factory = session_factory
+            app.state.job_settings = job_settings or JobSettings()
 
             if generator is not None:
                 configured_generator = generator

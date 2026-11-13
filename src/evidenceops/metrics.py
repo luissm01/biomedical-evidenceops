@@ -1,6 +1,10 @@
 """Prometheus metrics for generation and provider-reported usage."""
 
+from collections.abc import Callable, Iterator
+
 from prometheus_client import CollectorRegistry, Counter, Histogram, generate_latest
+from prometheus_client.core import GaugeMetricFamily
+from prometheus_client.registry import Collector
 
 from evidenceops.generation import GenerationErrorCause
 
@@ -33,6 +37,11 @@ class GenerationMetrics:
         self.rag_errors = Counter(
             "evidenceops_rag_errors_total", "RAG operation and stage errors",
             ["stage", "cause"], registry=self.registry,
+        )
+        self.ingestion_jobs_enqueued = Counter(
+            "evidenceops_ingestion_jobs_enqueued_total",
+            "Ingestion enqueue requests; existing means an idempotent replay",
+            ["outcome"], registry=self.registry,
         )
         self.input_tokens = Counter(
             "evidenceops_llm_input_tokens_total", "Provider-reported input tokens",
@@ -78,6 +87,59 @@ class GenerationMetrics:
         self.input_tokens.labels(provider=provider, model=model).inc(input_tokens)
         self.output_tokens.labels(provider=provider, model=model).inc(output_tokens)
         self.total_tokens.labels(provider=provider, model=model).inc(total_tokens)
+
+    def render(self) -> bytes:
+        return generate_latest(self.registry)
+
+
+class _JobStatusCollector(Collector):
+    """Queue depth read from PostgreSQL at scrape time: the table is the truth."""
+
+    def __init__(self, count_by_status: Callable[[], dict[str, int]]) -> None:
+        self._count_by_status = count_by_status
+
+    def collect(self) -> Iterator[GaugeMetricFamily]:
+        try:
+            counts = self._count_by_status()
+        except Exception:  # A failed scrape must not break the worker.
+            return
+        family = GaugeMetricFamily(
+            "evidenceops_ingestion_jobs", "Ingestion jobs currently in each status", labels=["status"],
+        )
+        for status, count in sorted(counts.items()):
+            family.add_metric([status], count)
+        yield family
+
+
+class JobMetrics:
+    """Worker-process metrics; exposed by the worker, not by the API."""
+
+    def __init__(self, count_by_status: Callable[[], dict[str, int]] | None = None) -> None:
+        self.registry = CollectorRegistry()
+        self.attempts = Counter(
+            "evidenceops_ingestion_job_attempts_total", "Finished job attempts by outcome",
+            ["outcome"], registry=self.registry,
+        )
+        self.duration = Histogram(
+            "evidenceops_ingestion_job_duration_seconds", "Duration of one job attempt",
+            ["outcome"], buckets=(0.5, 1, 2, 5, 10, 20, 30, 60, 120, 300, float("inf")),
+            registry=self.registry,
+        )
+        self.retries = Counter(
+            "evidenceops_ingestion_job_retries_total", "Attempts scheduled for retry by cause",
+            ["cause"], registry=self.registry,
+        )
+        self.lease_expirations = Counter(
+            "evidenceops_ingestion_job_lease_expirations_total",
+            "Expired leases found: reclaimed by a worker or failed with no attempts left",
+            ["action"], registry=self.registry,
+        )
+        if count_by_status is not None:
+            self.registry.register(_JobStatusCollector(count_by_status))
+
+    def record_attempt(self, outcome: str, duration_seconds: float) -> None:
+        self.attempts.labels(outcome=outcome).inc()
+        self.duration.labels(outcome=outcome).observe(duration_seconds)
 
     def render(self) -> bytes:
         return generate_latest(self.registry)

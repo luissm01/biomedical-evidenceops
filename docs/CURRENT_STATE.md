@@ -1,8 +1,21 @@
 # Estado actual
 
-Actualizado: 2026-11-02. Distingue código versionado de trabajo local pendiente.
+Actualizado: 2026-11-13. Distingue código versionado de trabajo local pendiente.
 
 ## Presente
+
+- **M11.1 — Async ingestion queue**, [#65](https://github.com/luissm01/biomedical-evidenceops/issues/65):
+  implementada en rama/PR, pendiente de aceptación del desarrollador. Cola propia
+  en PostgreSQL (`ingestion_jobs`, `FOR UPDATE SKIP LOCKED`), estados
+  queued/running/succeeded/failed, reintentos acotados con backoff solo para
+  errores transitorios de PubMed, lease con caducidad y fencing por intento,
+  clave de idempotencia y semántica at-least-once sobre el upsert existente.
+  `POST /ingestion-jobs` (202) y `GET /ingestion-jobs/{job_id}`; worker síncrono
+  `evidenceops worker` con parada ordenada y métricas opcionales. El CLI `ingest`
+  sigue síncrono. Tests deterministas sin red. Demo local con PubMed real
+  (20 + 10 publicaciones) y `kill -9` a mitad de job: recuperado tras caducar el
+  lease, sin duplicados. [D036](decisions/D036-postgresql-job-queue.md) y
+  [operación/conceptos](subsystems/jobs.md).
 
 - **M10.3 — MCP Integration**: implementación y demo local validadas y aceptadas por el
   desarrollador. SDK oficial Python v2, servidor stdio de las dos herramientas
@@ -163,7 +176,9 @@ Actualizado: 2026-11-02. Distingue código versionado de trabajo local pendiente
 - Timeout de transporte sin deadline total; un retry puede duplicar consumo.
   [Política y motivos](decisions/D011-gemini.md).
 - Una caída de PostgreSQL tras startup aún produce errores no controlados en
-  endpoints de datos. Readiness y recuperación quedan para M11.
+  endpoints de datos (el worker sigue haciendo polling). Readiness y recuperación quedan para M11.2.
+- El lease de la cola no tiene heartbeat: un job más lento que el lease puede
+  ejecutarse dos veces (fencing + upsert evitan corrupción y duplicados).
 - Dos DeprecationWarning conocidos de dependencias: Starlette usa
   `anyio.abc.BlockingPortal`; google-genai usa `typing._UnionGenericAlias`
   (previsto para eliminación en Python 3.17). No se ocultan.
@@ -172,6 +187,11 @@ Actualizado: 2026-11-02. Distingue código versionado de trabajo local pendiente
   Windows. Es una limitación de ese entorno, no un requisito del proyecto.
 
 ## Siguiente trabajo
+
+M11.1 en revisión (#65): merge y cierre requieren autorización del desarrollador.
+Después, M11.2 (health/readiness, caídas de dependencias, seguridad proporcionada)
+requiere su propio encargo; LISTEN/NOTIFY, prioridades, cancelación y aplicar la
+cola a otros flujos quedan fuera de M11.1.
 
 M10.3 aceptada y validada; commit, push, PR, merge y cierre de #58 autorizados.
 M10.1 y M10.2 ya integradas; Git/GitHub conserva el estado de entrega. Las
