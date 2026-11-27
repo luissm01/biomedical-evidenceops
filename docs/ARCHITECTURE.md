@@ -40,6 +40,15 @@ flowchart LR
   [deepseek.py](../src/evidenceops/deepseek.py) aplican instrucciones compartidas,
   validan la salida y clasifican fallos propios. [D012](decisions/D012-generator-boundary.md).
 
+## Despliegue
+
+Local: procesos con `uv` y PostgreSQL en Docker Compose. Práctica Kubernetes
+(M12.1): una imagen ([Dockerfile](../Dockerfile)) para API, worker y Job de
+migraciones en kind, detrás de Traefik. La configuración no sensible va en un
+ConfigMap y la sensible en Secrets creados por script. Las probes siguen la
+separación liveness/readiness de D037. [Operación y límites](subsystems/kubernetes.md),
+[D038](decisions/D038-local-kubernetes.md).
+
 ## Configuración y recursos
 
 [config.py](../src/evidenceops/config.py) valida configuración del entorno y

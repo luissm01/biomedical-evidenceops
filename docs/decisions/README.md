@@ -42,6 +42,7 @@ en Git/issues. El estado de entrega vive en GitHub y el trabajo local en los pla
 | [D035](D035-consolidated-final-learning-review.md) | Cierre de milestone por aceptación técnica y repaso de aprendizaje consolidado al final | Aceptada; sustituye el repaso por cierre de D029 |
 | [D036](D036-postgresql-job-queue.md) | Cola de jobs propia en PostgreSQL, lease y at-least-once para la ingesta (M11.1) | Implementada y aceptada |
 | [D037](D037-operational-readiness.md) | Health/readiness, caídas de PostgreSQL, límite total LLM, API key y rate limit en memoria (M11.2) | Implementada y aceptada |
+| [D038](D038-local-kubernetes.md) | Kubernetes local con kind, Traefik sin Helm, imagen única, probes y secretos por script (M12.1) | Implementada y verificada localmente |
 
 D029 actualiza la secuencia futura descrita en D017; las decisiones y el contexto
 históricos de M0–M8 se conservan.

@@ -1,0 +1,31 @@
+# Alembic migrations as a one-off Job. Jobs are immutable: bin/up.sh deletes and
+# re-creates it. API pods stay not-ready (migrations: missing/outdated) until it ends.
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: migrate
+  namespace: evidenceops
+spec:
+  backoffLimit: 6
+  template:
+    metadata:
+      labels: {app: migrate}
+    spec:
+      restartPolicy: OnFailure
+      securityContext:
+        runAsNonRoot: true
+      containers:
+        - name: migrate
+          image: evidenceops:local
+          imagePullPolicy: IfNotPresent
+          command: [alembic, upgrade, head]
+          envFrom:
+            - configMapRef: {name: evidenceops-config}
+            - secretRef: {name: evidenceops-secrets}
+          resources:
+            requests: {cpu: 100m, memory: 128Mi}
+            limits: {cpu: 500m, memory: 384Mi}
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities: {drop: [ALL]}

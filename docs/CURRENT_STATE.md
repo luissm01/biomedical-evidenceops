@@ -4,6 +4,14 @@ Actualizado: 2026-11-27. Distingue código versionado de trabajo local pendiente
 
 ## Presente
 
+- **M12.1 — Local Kubernetes**, [#70](https://github.com/luissm01/biomedical-evidenceops/issues/70):
+  kind sin Helm. Imagen única sin `medcpt`; PostgreSQL+pgvector en StatefulSet;
+  Job de Alembic; API ×2 y worker; ConfigMap; Secrets y TLS autofirmado generados
+  por script; Traefik con límite de 64 KiB y redirección a HTTPS; probes y
+  requests/limits medidos. Verificados el despliegue desde cero, el smoke con API
+  key, el borrado de un pod y la caída/recuperación de PostgreSQL sin reinicios.
+  [D038](decisions/D038-local-kubernetes.md) y [operación](subsystems/kubernetes.md).
+
 - **M11.2 — Operational readiness**, [#67](https://github.com/luissm01/biomedical-evidenceops/issues/67):
   integrada (PR #68) y aceptada; milestone M11 cerrada. Liveness
   `/health` sin dependencias y readiness `/ready` (PostgreSQL + head de Alembic);

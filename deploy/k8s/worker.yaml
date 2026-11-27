@@ -1,0 +1,35 @@
+# Ingestion worker (D036). No HTTP endpoint, so no probes: the Deployment restarts
+# it if the process exits. Several replicas are safe (SKIP LOCKED + fencing), but
+# the lease has no heartbeat: a job slower than the lease may run twice.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: worker
+  namespace: evidenceops
+spec:
+  replicas: 1
+  selector:
+    matchLabels: {app: worker}
+  template:
+    metadata:
+      labels: {app: worker}
+    spec:
+      # SIGTERM lets the worker finish or release its current job (D036).
+      terminationGracePeriodSeconds: 60
+      securityContext:
+        runAsNonRoot: true
+      containers:
+        - name: worker
+          image: evidenceops:local
+          imagePullPolicy: IfNotPresent
+          command: [evidenceops, worker]
+          envFrom:
+            - configMapRef: {name: evidenceops-config}
+            - secretRef: {name: evidenceops-secrets}
+          resources:
+            requests: {cpu: 50m, memory: 128Mi}
+            limits: {cpu: 500m, memory: 384Mi}
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities: {drop: [ALL]}

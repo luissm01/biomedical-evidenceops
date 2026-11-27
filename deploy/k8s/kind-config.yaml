@@ -1,0 +1,17 @@
+# Single-node local cluster (M12.1, D038). Host ports reach the ingress controller.
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+name: evidenceops
+networking:
+  apiServerAddress: "127.0.0.1"
+nodes:
+  - role: control-plane
+    labels:
+      ingress-ready: "true"
+    extraPortMappings:
+      - containerPort: 8080
+        hostPort: 8080
+        listenAddress: "127.0.0.1"
+      - containerPort: 8443
+        hostPort: 8443
+        listenAddress: "127.0.0.1"

@@ -1,0 +1,13 @@
+.git
+.venv
+.env
+.env.*
+**/__pycache__
+.pytest_cache
+.aws
+.vscode
+evaluation
+tests
+docs
+deploy
+experiments

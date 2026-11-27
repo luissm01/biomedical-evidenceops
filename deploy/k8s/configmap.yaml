@@ -1,0 +1,15 @@
+# Non-sensitive settings only. Secrets come from bin/secrets.sh (never versioned).
+# Defaults of retrieval and generation are left as the code defines them.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: evidenceops-config
+  namespace: evidenceops
+data:
+  EVIDENCEOPS_DATABASE_CONNECT_TIMEOUT_SECONDS: "3"
+  EVIDENCEOPS_DATABASE_STATEMENT_TIMEOUT_MS: "30000"
+  EVIDENCEOPS_RATE_LIMIT_CAPACITY: "5"
+  EVIDENCEOPS_RATE_LIMIT_REFILL_PER_SECOND: "0.1"
+  EVIDENCEOPS_JOBS_POLL_SECONDS: "2"
+  EVIDENCEOPS_JOBS_LEASE_SECONDS: "300"
+  EVIDENCEOPS_PUBMED_TOOL: "EvidenceOps"
