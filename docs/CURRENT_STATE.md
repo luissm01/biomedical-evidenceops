@@ -1,11 +1,11 @@
 # Estado actual
 
-Actualizado: 2026-11-13. Distingue código versionado de trabajo local pendiente.
+Actualizado: 2026-11-27. Distingue código versionado de trabajo local pendiente.
 
 ## Presente
 
 - **M11.2 — Operational readiness**, [#67](https://github.com/luissm01/biomedical-evidenceops/issues/67):
-  implementada en rama/PR apilada sobre M11.1, pendiente de aceptación. Liveness
+  integrada (PR #68) y aceptada; milestone M11 cerrada. Liveness
   `/health` sin dependencias y readiness `/ready` (PostgreSQL + head de Alembic);
   caída de PostgreSQL → 503 `database_unavailable` y recuperación sin reinicio
   (`pool_pre_ping`, timeouts de conexión/sentencia); backoff con tope en el polling
@@ -17,7 +17,7 @@ Actualizado: 2026-11-13. Distingue código versionado de trabajo local pendiente
   [D037](decisions/D037-operational-readiness.md).
 
 - **M11.1 — Async ingestion queue**, [#65](https://github.com/luissm01/biomedical-evidenceops/issues/65):
-  implementada en rama/PR, pendiente de aceptación del desarrollador. Cola propia
+  integrada (PR #66) y aceptada. Cola propia
   en PostgreSQL (`ingestion_jobs`, `FOR UPDATE SKIP LOCKED`), estados
   queued/running/succeeded/failed, reintentos acotados con backoff solo para
   errores transitorios de PubMed, lease con caducidad y fencing por intento,
@@ -200,33 +200,16 @@ Actualizado: 2026-11-13. Distingue código versionado de trabajo local pendiente
 
 ## Siguiente trabajo
 
-M11.1 (#65, PR #66) y M11.2 (#67, PR apilada) en revisión: merge y cierre
-requieren autorización del desarrollador; integrar primero #66. M12 requiere su
-propio encargo (TLS, probes de Kubernetes y límites de cuerpo en el ingress).
+M11 está cerrada (M11.1 y M11.2 integradas). El encargo vigente autoriza M12,
+M13 y M14 en ese orden, una issue cada vez; el detalle de alcance vive en el
+[roadmap](ROADMAP.md) y en las milestones de GitHub.
 
-M10.3 aceptada y validada; commit, push, PR, merge y cierre de #58 autorizados.
-M10.1 y M10.2 ya integradas; Git/GitHub conserva el estado de entrega. Las
-milestones se cierran con el trabajo técnico aceptado; los repasos de M9 y M10
-quedan diferidos al repaso final consolidado ([D035](decisions/D035-consolidated-final-learning-review.md)),
-sin atribuir aprendizaje por el código generado.
-La demo acredita el recorrido técnico y conserva las decisiones prefijadas;
-no prueba relevancia ni calidad biomédica. El siguiente milestone requiere su
-propio encargo. No ejecutar inferencias reales sin autorización específica.
-
-La evaluación y promoción RAG v1 de #47 están terminadas; no queda otra corrida
-pendiente. M8 reúne contrato, servicio, integración HTTP y baseline revisado.
-Git/GitHub conserva el estado de integración y cierre; no se considera entregado
-antes de integrar la PR y cerrar las issues correspondientes. La autorización excepcional
-ya se consumió: no repetir casos ni ejecutar nuevos candidatos sin encargo.
-La [milestone M9](https://github.com/luissm01/biomedical-evidenceops/milestone/9)
-queda lista para cierre tras integrar M9.2 (#53). M9.1 (#52) ya está integrada
-mediante PR #54. M9.2 completa implementación, evaluación real y decisión:
-`semantic` por defecto, `hybrid` y `reranking` como alternativas experimentales.
-[Informe M9.2](../evaluation/retrieval/REPORT-m9.2.md) y
-[plan M9](plans/m9-advanced-rag-retrieval.md). Git/GitHub conserva el estado de
-integración y cierre. No quedan funcionalidades o experimentos pendientes para
-M9; no repetir inferencias ni ajustar parámetros/juicios para mejorar resultados.
-La siguiente fase se rige por el roadmap y requiere su propio encargo.
+Los repasos de aprendizaje de M9–M11 quedan diferidos al repaso final
+consolidado ([D035](decisions/D035-consolidated-final-learning-review.md)),
+sin atribuir aprendizaje por el código generado. La autorización excepcional
+de inferencia de M8 ya se consumió; no repetir casos ni ejecutar candidatos sin
+encargo. M9 conserva `semantic` por defecto y `hybrid`/`reranking` experimentales
+([informe M9.2](../evaluation/retrieval/REPORT-m9.2.md)).
 El baseline RAG no resuelve el baseline independiente de generación M4 pendiente.
 Cuando exista cuota gratuita y se solicite, obtener/promover/revisar ese baseline M4.
 Los comandos y requisitos de pruebas viven en el [README](../README.md);

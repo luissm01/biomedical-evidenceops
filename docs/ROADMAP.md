@@ -10,8 +10,7 @@ la ejecución. Las antiguas “Phase 1–10” no se usan.
 
 El roadmap expresa dirección, no autorización para implementar fases futuras.
 Cambiar orden o alcance requiere acuerdo explícito, ADR y posterior sincronización
-de milestones de GitHub. Las milestones M9 y M10 de GitHub ya siguen esta
-secuencia; crear M11–M14 requiere un encargo posterior.
+de milestones de GitHub. Las milestones M9–M14 de GitHub siguen esta secuencia.
 
 ## Principios de progresión
 
