@@ -43,6 +43,7 @@ en Git/issues. El estado de entrega vive en GitHub y el trabajo local en los pla
 | [D036](D036-postgresql-job-queue.md) | Cola de jobs propia en PostgreSQL, lease y at-least-once para la ingesta (M11.1) | Implementada y aceptada |
 | [D037](D037-operational-readiness.md) | Health/readiness, caídas de PostgreSQL, límite total LLM, API key y rate limit en memoria (M11.2) | Implementada y aceptada |
 | [D038](D038-local-kubernetes.md) | Kubernetes local con kind, Traefik sin Helm, imagen única, probes y secretos por script (M12.1) | Implementada y verificada localmente |
+| [D039](D039-aws-design-without-provisioning.md) | AWS solo como diseño: ECS Fargate + RDS, IAM mínimo, health check en /health, sin provisionar por coste (M12.2) | Aceptada; sin recursos creados |
 
 D029 actualiza la secuencia futura descrita en D017; las decisiones y el contexto
 históricos de M0–M8 se conservan.

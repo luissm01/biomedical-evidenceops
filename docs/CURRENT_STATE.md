@@ -4,6 +4,14 @@ Actualizado: 2026-11-27. Distingue código versionado de trabajo local pendiente
 
 ## Presente
 
+- **M12.2 — AWS design**, [#71](https://github.com/luissm01/biomedical-evidenceops/issues/71):
+  solo diseño, sin recursos, sin credenciales y sin llamadas a AWS. ECS Fargate,
+  ALB+ACM, RDS PostgreSQL single-AZ, VPC privada, SSM, IAM mínimo con OIDC y
+  CloudWatch. El health check apunta a `/health` para no reiniciar las tareas ante
+  una caída de RDS. Coste estimado de ≈110–125 USD/mes (≈75–85 sin NAT): no se
+  provisiona. [D039](decisions/D039-aws-design-without-provisioning.md) y
+  [diseño](design/aws-target-architecture.md). M12 cerrada sin infraestructura cloud.
+
 - **M12.1 — Local Kubernetes**, [#70](https://github.com/luissm01/biomedical-evidenceops/issues/70):
   kind sin Helm. Imagen única sin `medcpt`; PostgreSQL+pgvector en StatefulSet;
   Job de Alembic; API ×2 y worker; ConfigMap; Secrets y TLS autofirmado generados
@@ -208,8 +216,8 @@ Actualizado: 2026-11-27. Distingue código versionado de trabajo local pendiente
 
 ## Siguiente trabajo
 
-M11 está cerrada (M11.1 y M11.2 integradas). El encargo vigente autoriza M12,
-M13 y M14 en ese orden, una issue cada vez; el detalle de alcance vive en el
+M11 y M12 están cerradas. El encargo vigente continúa con M13 (inferencia y
+cuantización; después QLoRA) y M14, una issue cada vez; el detalle de alcance vive en el
 [roadmap](ROADMAP.md) y en las milestones de GitHub.
 
 Los repasos de aprendizaje de M9–M11 quedan diferidos al repaso final
