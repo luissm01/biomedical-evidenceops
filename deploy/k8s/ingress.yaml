@@ -1,0 +1,20 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: evidenceops
+  namespace: evidenceops
+spec:
+  ingressClassName: traefik
+  tls:
+    - hosts: [evidenceops.local]
+      secretName: evidenceops-tls
+  rules:
+    - host: evidenceops.local
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: api
+                port: {name: http}

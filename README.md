@@ -319,6 +319,20 @@ siendo síncrono y no usa la cola.
 Motivos, alternativas descartadas y límites en
 [D037](docs/decisions/D037-operational-readiness.md).
 
+## Kubernetes local (M12.1)
+
+Despliegue de práctica en kind (API ×2, worker, PostgreSQL + pgvector, Job de
+migraciones, Traefik con TLS autofirmado y límite de cuerpo). Desde la raíz:
+
+```bash
+deploy/k8s/bin/up.sh && deploy/k8s/bin/smoke.sh && deploy/k8s/bin/chaos.sh
+deploy/k8s/bin/down.sh
+```
+
+Requisitos, conceptos, límites de escalado y verificación en
+[Kubernetes local](docs/subsystems/kubernetes.md); decisiones en
+[D038](docs/decisions/D038-local-kubernetes.md).
+
 ## Pruebas y CI
 
 La suite completa usa PostgreSQL local; las fixtures exigen `evidenceops_test`,

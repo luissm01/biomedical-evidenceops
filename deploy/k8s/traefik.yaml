@@ -1,0 +1,128 @@
+# Minimal Traefik v3 ingress controller without Helm or CRDs (M12.1, D038).
+# The Kubernetes Ingress provider routes; the file provider defines the body-size
+# middleware, attached to both entry points so every route inherits it.
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: ingress
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: traefik
+  namespace: ingress
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: traefik-ingress
+rules:
+  - apiGroups: [""]
+    resources: [services, secrets, nodes]
+    verbs: [get, list, watch]
+  - apiGroups: [discovery.k8s.io]
+    resources: [endpointslices]
+    verbs: [list, watch]
+  - apiGroups: [networking.k8s.io]
+    resources: [ingresses, ingressclasses]
+    verbs: [get, list, watch]
+  - apiGroups: [networking.k8s.io]
+    resources: [ingresses/status]
+    verbs: [update]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: traefik-ingress
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: traefik-ingress
+subjects:
+  - kind: ServiceAccount
+    name: traefik
+    namespace: ingress
+---
+apiVersion: networking.k8s.io/v1
+kind: IngressClass
+metadata:
+  name: traefik
+spec:
+  controller: traefik.io/ingress-controller
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: traefik-dynamic
+  namespace: ingress
+data:
+  limits.yaml: |
+    http:
+      middlewares:
+        body-limit:
+          buffering:
+            # API payloads are a few KB; larger bodies get 413 before the app.
+            maxRequestBodyBytes: 65536
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: traefik
+  namespace: ingress
+spec:
+  replicas: 1
+  # hostPorts can be bound by one pod per node: replace, do not surge.
+  strategy: {type: Recreate}
+  selector:
+    matchLabels: {app: traefik}
+  template:
+    metadata:
+      labels: {app: traefik}
+    spec:
+      serviceAccountName: traefik
+      nodeSelector:
+        ingress-ready: "true"
+      tolerations:
+        - key: node-role.kubernetes.io/control-plane
+          operator: Exists
+          effect: NoSchedule
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 65532
+      containers:
+        - name: traefik
+          image: traefik:v3.8.0
+          args:
+            - --providers.kubernetesingress.ingressclass=traefik
+            - --providers.file.filename=/etc/traefik/dynamic/limits.yaml
+            - --entryPoints.web.address=:8080
+            # Plain HTTP only redirects: the API key must not travel unencrypted.
+            - --entryPoints.web.http.redirections.entryPoint.to=websecure
+            - --entryPoints.web.http.redirections.entryPoint.scheme=https
+            - --entryPoints.websecure.address=:8443
+            - --entryPoints.websecure.http.tls=true
+            - --entryPoints.websecure.http.middlewares=body-limit@file
+            - --entryPoints.traefik.address=:9000
+            - --ping=true
+            - --accesslog=true
+          ports:
+            - {name: web, containerPort: 8080, hostPort: 8080}
+            - {name: websecure, containerPort: 8443, hostPort: 8443}
+          readinessProbe:
+            httpGet: {path: /ping, port: 9000}
+            periodSeconds: 5
+          livenessProbe:
+            httpGet: {path: /ping, port: 9000}
+            periodSeconds: 10
+          resources:
+            requests: {cpu: 50m, memory: 64Mi}
+            limits: {cpu: 500m, memory: 256Mi}
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities: {drop: [ALL]}
+          volumeMounts:
+            - {name: dynamic, mountPath: /etc/traefik/dynamic, readOnly: true}
+      volumes:
+        - name: dynamic
+          configMap: {name: traefik-dynamic}
