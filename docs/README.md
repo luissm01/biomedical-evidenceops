@@ -24,6 +24,7 @@ destinos en cascada.
 | Agente acotado con LangGraph | [Agente](subsystems/agent.md) | Ciclo, fuentes, presupuestos, demo y pruebas de M10.2 |
 | Cola de ingesta y worker | [Jobs](subsystems/jobs.md) | Ciclo de vida, lease, at-least-once, operación y pruebas de M11.1 |
 | Kubernetes local | [Kubernetes](subsystems/kubernetes.md) | Desplegar en kind, probes, secretos, simulacros de fallo y límites de escalado (M12.1) |
+| Arquitectura objetivo AWS | [Diseño AWS](design/aws-target-architecture.md) | Diseño no provisionado: compute, red, IAM, secretos, observabilidad, costes y retirada (M12.2) |
 | MCP local y cliente del agente | [MCP](subsystems/mcp.md) | Catálogo, stdio, errores, composición y demos de M10.3 |
 | Workflow de evaluación asistida | [Skill evaluation](../.codex/skills/evidenceops-evaluation/SKILL.md) | Ejecutar, revisar o comparar evaluaciones |
 

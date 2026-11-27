@@ -118,6 +118,8 @@ Estudiar servicios gestionados sin obligación de contratarlos. Practicar Kubern
 local: Pods, Deployments, Services, ConfigMaps, Secrets, probes y recursos;
 comprender escalado y sus límites sin exigir un clúster cloud ni alta disponibilidad.
 Aproximadamente **2 issues**: práctica AWS temporal con retirada y Kubernetes local.
+Resultado: Kubernetes local practicado ([D038](decisions/D038-local-kubernetes.md)); AWS
+solo diseñado, al no poder garantizarse coste cero ([D039](decisions/D039-aws-design-without-provisioning.md)).
 
 ## M13 — Advanced LLM Engineering & Model Adaptation
 
