@@ -2,7 +2,7 @@
 
 ## Estado
 
-Decisiones de alcance cerradas por el desarrollador en el encargo de M11.1 (#65).
+Implementada, integrada y aceptada (M11 cerrada). Decisiones de alcance cerradas por el desarrollador en el encargo de M11.1 (#65).
 Implementación con tests deterministas; sin inferencias LLM.
 
 ## Problema

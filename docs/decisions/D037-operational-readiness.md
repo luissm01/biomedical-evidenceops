@@ -2,7 +2,7 @@
 
 ## Estado
 
-Decisiones de alcance cerradas por el desarrollador en el encargo de M11.2 (#67).
+Implementada, integrada y aceptada (M11 cerrada). Decisiones de alcance cerradas por el desarrollador en el encargo de M11.2 (#67).
 Implementación con tests deterministas; sin inferencias LLM. Completa, sin
 reescribirla, la política de transporte de [D011](D011-gemini.md).
 
